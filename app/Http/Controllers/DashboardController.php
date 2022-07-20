@@ -8,6 +8,11 @@ class DashboardController extends Controller
 {
     public function show()
     {
-        return view('eaudit_page');
+        return view('dashboard');
+    }
+
+    public function apiGetChart(Request $request)
+    {
+        return ['result' => 'hello'];
     }
 }
