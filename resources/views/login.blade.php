@@ -25,7 +25,7 @@
                             </div>
                             @enderror()
                         </div>
-                        <button class="btn btn-primary" type="submit">Login</button>
+                        <button class="btn btn-primary" type="submit">Login <i class="fa-solid fa-right-to-bracket"></i></button>
                     </form>
                 </div>
             </div>

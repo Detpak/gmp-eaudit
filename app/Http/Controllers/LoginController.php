@@ -42,12 +42,21 @@ class LoginController extends Controller
                 ->withInput();
         }
 
-        // if (env('APP_ENV') == 'local') {
+        // this only applies on production
+        if (env('APP_ENV') == 'production') {
+            $ldap = ldap_connect("ldap://internal.detmold.com.au");
+            $bind = @ldap_connect($ldap, "detmold\\" . $request->loginID, $request->loginPassword);
+            ldap_close($ldap);
 
-        // }
+            if (!$bind) {
+                return redirect('/');
+            }
+        }
 
         $user = User::where('login', $request->loginID)->first();
 
+        // Put the user session
+        Session::regenerate();
         Session::put('eaudit_id', $user->login);
         Session::put('eaudit_name', $user->name);
         Session::put('eaudit_usergroup', $user->usergroup_id);
@@ -57,6 +66,8 @@ class LoginController extends Controller
 
     public function deauth()
     {
+        Session::regenerate();
+        Session::regenerateToken();
         Session::remove('eaudit_id');
         Session::remove('eaudit_name');
         Session::remove('eaudit_usergroup');

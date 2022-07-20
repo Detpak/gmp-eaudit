@@ -8,7 +8,8 @@
     {{-- @auth('admin')
     <meta name="api-token" content="{{ session()->get('access_token') }}">
     @endauth --}}
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
+    <script src="{{ asset('js/app.js') }}"></script>
+    <link rel="stylesheet" href="{{ asset('css/app.css') }}">
     @isset($title)<title>{{ $title }}</title>@endisset
 </head>
 <body>
