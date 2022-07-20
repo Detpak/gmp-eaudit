@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\LoginController;
 use Illuminate\Support\Facades\Route;
 
@@ -15,3 +16,7 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('/', [LoginController::class, 'show']);
+Route::post('/auth', [LoginController::class, 'auth']);
+Route::prefix('/admin')->group(function() {
+    Route::get('/', [DashboardController::class, 'show']);
+});
