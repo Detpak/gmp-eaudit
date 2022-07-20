@@ -2,8 +2,11 @@
 
 namespace App\Http\Middleware;
 
+use App\Models\User;
 use Closure;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Redirect;
+use Illuminate\Support\Facades\Session;
 
 class AdminAuthentication
 {
@@ -16,6 +19,10 @@ class AdminAuthentication
      */
     public function handle(Request $request, Closure $next)
     {
+        if (!Session::has('eaudit_id') || !User::where('login', Session::get('eaudit_id'))->first()) {
+            abort(404);
+        }
+
         return $next($request);
     }
 }

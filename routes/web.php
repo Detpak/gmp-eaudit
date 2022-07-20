@@ -17,6 +17,13 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/', [LoginController::class, 'show']);
 Route::post('/auth', [LoginController::class, 'auth']);
-Route::prefix('/admin')->group(function() {
-    Route::get('/', [DashboardController::class, 'show']);
+
+Route::middleware('admin')->group(function() {
+    Route::get('/deauth', [LoginController::class, 'deauth']);
+
+    Route::prefix('/admin')->group(function() {
+        Route::get('/', [DashboardController::class, 'show']);
+    });
 });
+
+
