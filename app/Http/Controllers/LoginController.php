@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\UserHelpers;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Redirect;
@@ -12,7 +13,7 @@ class LoginController extends Controller
 {
     public function show()
     {
-        if (Session::has('eaudit_id') && User::where('login', Session::get('eaudit_id'))->first()) {
+        if (UserHelpers::isLoggedIn()) {
             return Redirect::intended('admin');
         }
 
@@ -21,6 +22,10 @@ class LoginController extends Controller
 
     public function auth(Request $request)
     {
+        if (UserHelpers::isLoggedIn()) {
+            return Redirect::intended('admin');
+        }
+
         $validator = Validator::make(
             $request->all(),
             [
@@ -42,14 +47,17 @@ class LoginController extends Controller
                 ->withInput();
         }
 
-        // this only applies on production
+        // This only applies on production
         if (env('APP_ENV') == 'production') {
             $ldap = ldap_connect("ldap://internal.detmold.com.au");
             $bind = @ldap_connect($ldap, "detmold\\" . $request->loginID, $request->loginPassword);
             ldap_close($ldap);
 
+            // Reject login
             if (!$bind) {
-                return redirect('/');
+                return Redirect::intended('/')
+                    ->withErrors(['loginPassword' => 'Password is incorrect.'])
+                    ->withInput();
             }
         }
 
@@ -61,7 +69,7 @@ class LoginController extends Controller
         Session::put('eaudit_name', $user->name);
         Session::put('eaudit_usergroup', $user->usergroup_id);
 
-        return Redirect::intended('admin/');
+        return Redirect::intended('admin/dashboard');
     }
 
     public function deauth()

@@ -1,16 +1,19 @@
 @php
     $pages = [
-        ['title' => 'Dashboard', 'url' => 'dashboard', 'icon' => 'fa-chart-line', 'selected' => true],
+        ['title' => 'Dashboard', 'url' => 'dashboard', 'icon' => 'fa-chart-line', 'selected' => false],
         ['title' => 'Audit', 'url' => 'audit', 'icon' => 'fa-list-check', 'selected' => false],
         ['title' => 'Standard', 'url' => 'standard', 'icon' => 'fa-ruler', 'selected' => false],
         ['title' => 'Work Center', 'url' => 'work-center', 'icon' => 'fa-building', 'selected' => false],
         ['title' => 'Settings', 'url' => 'settings', 'icon' => 'fa-gear', 'selected' => false],
     ];
 
+    $currentPage = $pages[$pageId];
+    $currentPage['selected'] = true;
+
     $fullname = Session::get('eaudit_name');
 @endphp
 
-<x-layouts.main title="e-Audit | {{ $title }}">
+<x-layouts.main title="e-Audit | {{ $title }}" viewtype="{{ $currentPage['url'] }}">
     <div class="d-flex flex-row main">
         <div class="d-flex flex-column min-vh-100 p-2 bg-primary bg-gradient text-white" style="width: 110px">
             <ul class="nav nav-pills flex-column mb-auto">

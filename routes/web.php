@@ -22,7 +22,8 @@ Route::middleware('admin')->group(function() {
     Route::get('/deauth', [LoginController::class, 'deauth']);
 
     Route::prefix('/admin')->group(function() {
-        Route::get('/', [DashboardController::class, 'show']);
+        Route::get('/', function() { return redirect()->intended('admin/dashboard'); });
+        Route::get('/dashboard', [DashboardController::class, 'show']);
     });
 });
 

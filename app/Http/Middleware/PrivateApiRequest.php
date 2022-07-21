@@ -18,7 +18,7 @@ class PrivateApiRequest
      */
     public function handle(Request $request, Closure $next)
     {
-        if (!$request->has('user_id') || !User::where('login', $request->get('user_id'))->first()) {
+        if (!$request->has('userId') || !User::where('login', $request->get('userId'))->first()) {
             return Response::json(['result' => 'error'], 404);
         }
 

@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Helpers\UserHelpers;
 use App\Models\User;
 use Closure;
 use Illuminate\Http\Request;
@@ -19,7 +20,7 @@ class AdminAuthentication
      */
     public function handle(Request $request, Closure $next)
     {
-        if (!Session::has('eaudit_id') || !User::where('login', Session::get('eaudit_id'))->first()) {
+        if (!UserHelpers::isLoggedIn()) {
             abort(404);
         }
 
