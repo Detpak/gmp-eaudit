@@ -14,10 +14,4 @@ $(function() {
     if (viewtype && userId) {
         createViewLogic(viewtype.content, userId.content);
     }
-
-    // const el = document.querySelector('.counter');
-
-    // counterUp(el, { duration: 1000, delay: 16 });
 });
-
-//counterUp(el, { duration: 1000, delay: 16 });

@@ -1,4 +1,9 @@
 <x-layouts.admin title="Dashboard" page-id="0">
+    <x-slot:controls>
+        <x-indicator_button id="refreshCharts">
+            <i class="fa-solid fa-arrow-rotate-right"></i> Refresh
+        </x-indicator_button>
+    </x-slot:controls>
     <div class="container-fluid pb-4">
         <div class="row">
             <a class="col-lg btn btn-outline-primary m-2 text-start" role="button">

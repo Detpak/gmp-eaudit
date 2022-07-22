@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AuditController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\LoginController;
 use Illuminate\Support\Facades\Route;
@@ -24,6 +25,7 @@ Route::middleware('admin')->group(function() {
     Route::prefix('/admin')->group(function() {
         Route::get('/', function() { return redirect()->intended('admin/dashboard'); });
         Route::get('/dashboard', [DashboardController::class, 'show']);
+        Route::get('/audit', [AuditController::class, 'show']);
     });
 });
 

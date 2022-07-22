@@ -1,6 +1,6 @@
 import axios from 'axios';
 import { counterUp } from 'counterup2';
-import { Spinner } from './components';
+import { IndicatorButton, Spinner } from './components';
 import Chart from 'chart.js/auto';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
 import chroma from "chroma-js";
@@ -27,25 +27,38 @@ export class DashboardViewLogic
         ];
 
         this.cpal = chroma.bezier([
-                chroma.hsv(0,   0.65,    1.0),
-                chroma.hsv(30,  0.65,    1.0),
-                chroma.hsv(60,  0.65,    1.0),
-                chroma.hsv(90,  0.65,    1.0),
-                chroma.hsv(120, 0.65,    1.0),
-                chroma.hsv(150, 0.65,    1.0),
-                chroma.hsv(180, 0.65,    1.0),
-                chroma.hsv(210, 0.65,    1.0),
-                chroma.hsv(240, 0.65,    1.0),
-                chroma.hsv(270, 0.65,    1.0),
-                chroma.hsv(300, 0.65,    1.0),
-                chroma.hsv(330, 0.65,    1.0),
+                chroma.hsv(0,   0.60,    1.0),
+                chroma.hsv(30,  0.60,    1.0),
+                chroma.hsv(60,  0.60,    1.0),
+                chroma.hsv(90,  0.60,    1.0),
+                chroma.hsv(120, 0.60,    1.0),
+                chroma.hsv(150, 0.60,    1.0),
+                chroma.hsv(180, 0.60,    1.0),
+                chroma.hsv(210, 0.60,    1.0),
+                chroma.hsv(240, 0.60,    1.0),
+                chroma.hsv(270, 0.60,    1.0),
+                chroma.hsv(300, 0.60,    1.0),
+                chroma.hsv(330, 0.60,    1.0),
             ])
             .scale();
+
+        // Refreshing is done asynchronously for convenience
+        this.refreshBtn = new IndicatorButton("refreshCharts");
+        this.refreshBtn.setOnClick(() => {
+            Promise.all([...this.updateNumbers(), ...this.updateCharts()])
+                .then(() => {
+                    this.refreshBtn.setDone();
+                });
+        });
 
         this.updateNumbers();
         this.setupCharts();
         this.updateCharts();
         this.startTimer();
+    }
+
+    refresh()
+    {
     }
 
     // Prepare charts upfront so we can update it later
@@ -156,14 +169,16 @@ export class DashboardViewLogic
 
     startTimer()
     {
-        setInterval(this.updateCharts.bind(this), 5000);
+        //setInterval(this.updateCharts.bind(this), 10000);
     }
 
     // Update chart numbers
     updateNumbers()
     {
+        let promises = [];
+
         for (const element of this.numberRequests) {
-            axios.post('/api/v1/get-chart', element, { headers: { 'Content-Type': 'application/json' } })
+            let currentRequest = axios.post('/api/v1/get-chart', element, { headers: { 'Content-Type': 'application/json' } })
                 .then(function (response) {
                     let spinner = Spinner.getOrCreateInstance(response.data.type);
                     let childElement = spinner.getChildElement();
@@ -174,13 +189,19 @@ export class DashboardViewLogic
                 .catch(function (reason) {
                     console.log(reason);
                 });
+
+            promises.push(currentRequest);
         }
+
+        return promises;
     }
 
     updateCharts()
     {
+        let promises = [];
+
         for (const element of this.chartRequests) {
-            axios.post('/api/v1/get-chart', element, { headers: { 'Content-Type': 'application/json' } })
+            let currentRequest = axios.post('/api/v1/get-chart', element, { headers: { 'Content-Type': 'application/json' } })
                 .then((function (response) {
                     let chart = this.charts[response.data.type];
                     let numItems = response.data.result.length;
@@ -199,8 +220,10 @@ export class DashboardViewLogic
                 .catch(function (reason) {
                     console.log(reason);
                 })
+
+            promises.push(currentRequest);
         }
 
-
+        return promises;
     }
 }

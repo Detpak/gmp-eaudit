@@ -7,13 +7,12 @@
         ['title' => 'Settings', 'url' => 'settings', 'icon' => 'fa-gear', 'selected' => false],
     ];
 
-    $currentPage = $pages[$pageId];
-    $currentPage['selected'] = true;
+    $pages[$pageId]['selected'] = 'true';
 
     $fullname = Session::get('eaudit_name');
 @endphp
 
-<x-layouts.main title="e-Audit | {{ $title }}" viewtype="{{ $currentPage['url'] }}">
+<x-layouts.main title="e-Audit | {{ $title }}" viewtype="{{ $pages[$pageId]['url'] }}">
     <div class="d-flex flex-row main">
         <div class="d-flex flex-column min-vh-100 p-2 bg-primary bg-gradient text-white" style="width: 110px">
             <ul class="nav nav-pills flex-column mb-auto">
@@ -30,8 +29,12 @@
         <div class="vh-100 flex-fill bg-white">
             <div class="d-flex flex-column h-100">
                 <div class="sticky-top">
-                    <div class="navbar navbar-light bg-light p-4">
-                        <div class="navbar-nav">e-Audit</div>
+                    <div class="navbar navbar-light bg-light p-3">
+                        @isset($controls)
+                        {{ $controls }}
+                        @else
+                        <div class="p-2">e-Audit</div>
+                        @endisset
                         <div class="dropdown d-flex flex-row">
                             <a class="text-truncate text-decoration-none pt-1 me-2" href="#" id="user_dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                                 <small>{{ $fullname }}</small>
