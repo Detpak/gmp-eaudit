@@ -1,8 +1,9 @@
 import './bootstrap';
 import 'bootstrap';
+import 'bootstrap-table';
 import $ from 'jquery';
-import counterUp from 'counterup2';
 import { createViewLogic } from './view_logic_factory';
+import "gridjs/dist/theme/mermaid.css";
 
 $(function() {
     axios.defaults.headers.common["X-Requested-With"] ="XMLHttpRequest";

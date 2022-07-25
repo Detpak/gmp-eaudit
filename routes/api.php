@@ -1,6 +1,8 @@
 <?php
 
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\TestbedController;
+use App\Http\Controllers\UsersController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -19,6 +21,14 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 
-Route::middleware('private_api')->prefix('/v1')->group(function() {
-    Route::post('/get-chart', [DashboardController::class, 'apiGetChart']);
+Route::prefix('/v1')->group(function() {
+    Route::middleware('private_api')->group(function() {
+        Route::post('/get-chart', [DashboardController::class, 'apiGetChart']);
+        Route::post('/add-role', [UsersController::class, 'apiAddRole']);
+        Route::get('/fetch-roles', [UsersController::class, 'apiFetchRoles']);
+    });
+
+    if (env('APP_ENV') != 'production') {
+        Route::post('/modal-form-test', [TestbedController::class, 'modalFormTest']);
+    }
 });

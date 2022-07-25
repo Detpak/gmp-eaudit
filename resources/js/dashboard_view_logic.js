@@ -4,7 +4,6 @@ import { IndicatorButton, Spinner } from './components';
 import Chart from 'chart.js/auto';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
 import chroma from "chroma-js";
-import { truncateString } from './utils';
 
 Chart.register(ChartDataLabels);
 

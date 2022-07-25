@@ -9,12 +9,12 @@ class UserHelpers
 {
     public static function getUserData()
     {
-        return User::where('login', Session::get('eaudit_id'))->first();
+        return User::where('login_id', Session::get('eaudit_id'))->first();
     }
 
     public static function isLoggedIn()
     {
-        return Session::has('eaudit_id') && User::where('login', Session::get('eaudit_id'))->first();
+        return Session::has('eaudit_id') && User::where('login_id', Session::get('eaudit_id'))->first();
     }
 
     public static function getUserId()

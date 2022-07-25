@@ -29,7 +29,7 @@ class LoginController extends Controller
         $validator = Validator::make(
             $request->all(),
             [
-                'loginID' => 'required|string|exists:user,login|max:255',
+                'loginID' => 'required|string|exists:users,login_id|max:255',
                 'loginPassword' => 'required|string|min:8'
             ],
             [
@@ -61,13 +61,13 @@ class LoginController extends Controller
             }
         }
 
-        $user = User::where('login', $request->loginID)->first();
+        $user = User::where('login_id', $request->loginID)->first();
 
         // Put the user session
         Session::regenerate();
-        Session::put('eaudit_id', $user->login);
+        Session::put('eaudit_id', $user->login_id);
         Session::put('eaudit_name', $user->name);
-        Session::put('eaudit_usergroup', $user->usergroup_id);
+        Session::put('eaudit_role', $user->role_id);
 
         return Redirect::intended('admin/dashboard');
     }
@@ -78,7 +78,7 @@ class LoginController extends Controller
         Session::regenerateToken();
         Session::remove('eaudit_id');
         Session::remove('eaudit_name');
-        Session::remove('eaudit_usergroup');
+        Session::remove('eaudit_role');
 
         return Redirect::intended('/');
     }

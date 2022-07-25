@@ -19,6 +19,8 @@ class DashboardController extends Controller
 
     public function apiGetChart(Request $request)
     {
+        return ['error' => 'Work in progress'];
+
         if (!$request->has('type')) {
             return ['error' => 'Type not specified'];
         }

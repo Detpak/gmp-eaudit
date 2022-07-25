@@ -16,12 +16,16 @@
         "webpack": "^5.73.0"
     },
     "dependencies": {
+        "@faker-js/faker": "^7.3.0",
         "@fortawesome/fontawesome-free": "^6.1.1",
         "bootstrap": "^5.2.0",
+        "bootstrap-table": "^1.20.2",
         "chart.js": "^3.8.0",
         "chartjs-plugin-datalabels": "^2.0.0",
         "chroma-js": "^2.4.2",
         "counterup2": "^2.0.2",
+        "gridjs": "^5.0.2",
+        "gridjs-selection": "^4.0.0",
         "jquery": "^3.6.0"
     }
 }
