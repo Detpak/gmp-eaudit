@@ -3,8 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Helpers\UserHelpers;
+use App\Models\ApiAccessToken;
 use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Validator;
@@ -62,23 +66,36 @@ class LoginController extends Controller
         }
 
         $user = User::where('login_id', $request->loginID)->first();
+        $token = Str::random(32);
+        $tokenHash = Hash::make($token);
+
+        // Create token with expired date
+        ApiAccessToken::create([
+            'token' => $tokenHash,
+            'user_id' => $user->id,
+            'expire_date' => Carbon::now()->addDay()
+        ]);
 
         // Put the user session
         Session::regenerate();
         Session::put('eaudit_id', $user->login_id);
         Session::put('eaudit_name', $user->name);
         Session::put('eaudit_role', $user->role_id);
+        Session::put('eaudit_token', "{$user->id}|{$token}");
 
         return Redirect::intended('admin/dashboard');
     }
 
     public function deauth()
     {
+        ApiAccessToken::where('token', Session::get('eaudit_token'))->delete();
+
         Session::regenerate();
         Session::regenerateToken();
         Session::remove('eaudit_id');
         Session::remove('eaudit_name');
         Session::remove('eaudit_role');
+        Session::remove('eaudit_token');
 
         return Redirect::intended('/');
     }

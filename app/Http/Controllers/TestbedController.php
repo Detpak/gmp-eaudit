@@ -31,4 +31,14 @@ class TestbedController extends Controller
 
         return Response::json(['result' => 'ok']);
     }
+
+    public function fetchModalFormTest($id)
+    {
+        sleep(2);
+        return [
+            'field1' => "field1 -> id: {$id}",
+            'field2' => "field2 -> id: {$id}",
+            'field3' => "field3 -> id: {$id}",
+        ];
+    }
 }

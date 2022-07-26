@@ -9,20 +9,20 @@ Chart.register(ChartDataLabels);
 
 export class DashboardViewLogic
 {
-    constructor(userId)
+    constructor()
     {
         this.numberRequests = [
-            { userId: userId, type: 'totalCycles' },
-            { userId: userId, type: 'totalAuditSubmitted' },
-            { userId: userId, type: 'areaAudited' },
-            { userId: userId, type: 'auditAreaGroup' },
+            { type: 'totalCycles' },
+            { type: 'totalAuditSubmitted' },
+            { type: 'areaAudited' },
+            { type: 'auditAreaGroup' },
         ];
 
         this.chartRequests = [
-            { userId: userId, type: 'currentAuditCycleStatus' },
-            { userId: userId, type: 'notStartedAndInProgressAudit' },
-            { userId: userId, type: 'submittedAudit' },
-            { userId: userId, type: 'top10FailedParams' },
+            { type: 'currentAuditCycleStatus' },
+            { type: 'notStartedAndInProgressAudit' },
+            { type: 'submittedAudit' },
+            { type: 'top10FailedParams' },
         ];
 
         this.cpal = chroma.bezier([

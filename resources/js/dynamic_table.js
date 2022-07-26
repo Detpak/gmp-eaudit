@@ -49,7 +49,9 @@ export class DynamicTable
             }
         });
 
-        document.getElementById(config.refreshBtnId).addEventListener('click', () => { this.refresh() });
+        if (config.refreshBtnId) {
+            document.getElementById(config.refreshBtnId).addEventListener('click', () => { this.refresh() });
+        }
     }
 
     refresh()
@@ -90,7 +92,7 @@ export class DynamicTable
             id: 'actions',
             name: 'Actions',
             formatter: (_, row) => html(
-                `<button type="button" class="btn btn-primary btn-sm me-1" data-app-id="${row.cells[0].data}" data-bs-toggle="modal" data-bs-target="#${changeBtnModalTarget}"><i class="fa-regular fa-pen-to-square"></i> Change</button>` +
+                `<button type="button" class="btn btn-primary btn-sm me-1" data-app-id="${row.cells[0].data}" ${changeBtnModalTarget ? `data-bs-toggle="modal" data-bs-target="#${changeBtnModalTarget}"` : ""}><i class="fa-regular fa-pen-to-square"></i> Change</button>` +
                 `<button type="button" class="btn btn-danger btn-sm" data-app-id="${row.cells[0].data}" name="__deleteItemBtn"><i class="fa-solid fa-trash"></i> Delete</button>`
             )
         };

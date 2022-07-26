@@ -7,7 +7,7 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     @isset($viewtype)
     <meta name="viewtype" content="{{ $viewtype }}">
-    <meta name="userid" content="{{ UserHelpers::getUserId() }}">
+    <meta name="token" content="{{ Session::get('eaudit_token') }}">
     @endisset
 
     {{-- @auth('admin')

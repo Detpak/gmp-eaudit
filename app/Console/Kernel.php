@@ -2,8 +2,12 @@
 
 namespace App\Console;
 
+use App\Models\ApiAccessToken;
+use Carbon\Carbon;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 
 class Kernel extends ConsoleKernel
 {
@@ -16,6 +20,12 @@ class Kernel extends ConsoleKernel
     protected function schedule(Schedule $schedule)
     {
         // $schedule->command('inspire')->hourly();
+
+        // Delete expired API tokens regularly
+        $schedule->call(function() {
+            $deleted = ApiAccessToken::where('expire_date', '<', Carbon::now())->delete();
+            Log::info("Deleted {$deleted} expired API tokens");
+        })->everyMinute();
     }
 
     /**

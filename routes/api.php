@@ -25,10 +25,14 @@ Route::prefix('/v1')->group(function() {
     Route::middleware('private_api')->group(function() {
         Route::post('/get-chart', [DashboardController::class, 'apiGetChart']);
         Route::post('/add-role', [UsersController::class, 'apiAddRole']);
+        Route::get('/get-role/{id}', [UsersController::class, 'apiGetRole']);
         Route::get('/fetch-roles', [UsersController::class, 'apiFetchRoles']);
+        Route::get('/delete-role/{id}', [UsersController::class, 'apiDeleteRole']);
+        Route::post('/delete-roles', [UsersController::class, 'apiDeleteRoles']);
     });
 
     if (env('APP_ENV') != 'production') {
         Route::post('/modal-form-test', [TestbedController::class, 'modalFormTest']);
+        Route::get('/fetch-modal-form-test/{id}', [TestbedController::class, 'fetchModalFormTest']);
     }
 });

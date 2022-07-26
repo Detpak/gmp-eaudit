@@ -141,6 +141,7 @@ export class ModalForm
                 jsonData = this._callback(jsonData);
             }
 
+            // Submit form
             axios.post(ev.target.action, jsonData, { headers: { 'Content-Type': 'application/json' } })
                 .then((response) => {
                     this._submitBtn.setDone();
@@ -177,21 +178,26 @@ export class ModalForm
         });
 
         if (this._form.hasAttribute('data-fetch-action')) {
-            this._element.addEventListener('show.bs.modal', () => {
+            this._element.addEventListener('show.bs.modal', (ev) => {
+                let id = ev.relatedTarget.getAttribute('data-app-id');
                 this._inputElements.attr('disabled', '');
                 this._submitBtn.setLoad();
+                this._form.reset();
 
-                //axios.get(this._form.hasAttribute('data-fetch-action') + `?userId=`, )
+                axios.get(this._form.getAttribute('data-fetch-action') + `/${id}`, null, { headers: { 'Content-Type': 'application/json' } })
+                    .then((response) => {
+                        this._submitBtn.setDone();
+                        this._inputElements.removeAttr('disabled');
 
-                new Promise((resolve) => {
-                    setTimeout(() => {
-                        resolve()
-                    }, 2000);
-                })
-                .then(() => {
-                    this._inputElements.removeAttr('disabled');
-                    this._submitBtn.setDone();
-                })
+                        for (const elem of this._inputElements) {
+                            const name = elem.getAttribute("name");
+                            if (!(name in response.data) || response.data[name] == null) continue;
+                            elem.value = response.data[name];
+                        }
+                    })
+                    .catch((reason) => {
+                        console.log(reason);
+                    });
             });
         }
     }
@@ -204,6 +210,11 @@ export class ModalForm
     setOnFormSent(callback)
     {
         this._sentCallback = callback;
+    }
+
+    setOnFormFetchData(callback)
+    {
+        this._fetchDataCallback = callback;
     }
 
     resetForm()
@@ -244,7 +255,7 @@ export class ModalForm
     _disableCloseButtons()
     {
         for (const btn of this._closeBtn) {
-            btn.setAttributes('disabled', '');
+            btn.setAttribute('disabled', '');
         }
     }
 

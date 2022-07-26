@@ -1,3 +1,4 @@
+
 <x-layouts.admin title="Testbed" page-id="6">
     <div class="p-4">
         <button class="btn btn-primary" type="button" data-bs-toggle="modal" data-bs-target="#modalFormTest">Open Modal Form</button>
@@ -35,7 +36,7 @@
         </x-slot:submitButton>
     </x-modal_form>
 
-    <x-modal_form id="modalFormEditTest" action="/api/v1/modal-form-test" fetch-action="/api/v1/fetch-modal-form-test" fetch-method="get">
+    <x-modal_form id="modalFormEditTest" action="/api/v1/modal-form-test" fetch-action="/api/v1/fetch-modal-form-test">
         <x-slot:title>
             <h5>Add Role</h5>
         </x-slot:title>

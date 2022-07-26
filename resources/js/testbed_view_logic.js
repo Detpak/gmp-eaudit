@@ -7,7 +7,7 @@ import { toChildArray } from "preact";
 
 export class TestbedViewLogic
 {
-    constructor(userId)
+    constructor()
     {
         this.modalForm = ModalForm.getOrCreateInstance('modalFormTest');
         this.modalForm.setOnFormSent((data) => {

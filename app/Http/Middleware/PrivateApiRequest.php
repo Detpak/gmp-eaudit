@@ -2,10 +2,13 @@
 
 namespace App\Http\Middleware;
 
+use App\Models\ApiAccessToken;
 use App\Models\User;
 use Closure;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Response;
+use Illuminate\Support\Str;
 
 class PrivateApiRequest
 {
@@ -18,7 +21,22 @@ class PrivateApiRequest
      */
     public function handle(Request $request, Closure $next)
     {
-        if (!$request->has('userId') || !User::where('login_id', $request->get('userId'))->first()) {
+        if (!$request->bearerToken()) {
+            return Response::json(['result' => 'error'], 404);
+        }
+
+        $tokenSplit = explode('|', $request->bearerToken()); // [0] = user id, [1] = token
+        $accessTokens = ApiAccessToken::where('user_id', $tokenSplit[0])->get();
+        $result = false;
+
+        foreach ($accessTokens as $accessToken) {
+            if (Hash::check($tokenSplit[1], $accessToken->token)) {
+                $result = true;
+                break;
+            }
+        }
+
+        if (!$result) {
             return Response::json(['result' => 'error'], 404);
         }
 
