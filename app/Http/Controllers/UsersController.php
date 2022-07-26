@@ -69,7 +69,7 @@ class UsersController extends Controller
                 ->orWhere('remarks', 'LIKE', "%{$request->search}%");
         }
 
-        return $query->paginate(50);
+        return $query->paginate(10);
     }
 
     public function apiDeleteRole($id)

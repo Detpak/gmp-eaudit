@@ -11,8 +11,17 @@ export class DynamicTable
             columns: config.columns,
             fixedHeader: config.fixedHeader,
             height: config.height,
-            search: config.search,
-            pagination: { limit: 50 },
+            search: {
+                server: {
+                    url: (prev, keyword) => `${prev}?search=${keyword}`
+                }
+            },
+            pagination: {
+                limit: 10,
+                server: {
+                    url: (prev, page, limit) => `${prev}${prev.includes('?') ? '&' : '?'}page=${page + 1}`
+                }
+            },
             className: {
                 container: 'h-100 d-flex flex-column',
             }

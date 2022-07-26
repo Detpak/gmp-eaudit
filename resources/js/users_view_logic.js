@@ -64,13 +64,11 @@ export class UsersViewLogic
                             then: data => {
                                 this.rolesPage.selectedItems = document.querySelectorAll('input[name="selectedItems"]');
                                 return data.data.map(item => [item.id, item.name, (item.remarks || item.length > 0) ? item.remarks : '-', null])
+                            },
+                            total: data => {
+                                console.log(data.total);
+                                return data.total;
                             }
-                        }
-                    },
-                    search: {
-                        debounceTimeout: 500,
-                        server: {
-                            url: (prev, keyword) => `${prev}?search=${keyword}`
                         }
                     },
                     onDeleteBtnClicked: (id) => {
