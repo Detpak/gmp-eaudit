@@ -11,6 +11,11 @@ export class DynamicTable
             columns: config.columns,
             fixedHeader: config.fixedHeader,
             height: config.height,
+            search: config.search,
+            pagination: { limit: 50 },
+            className: {
+                container: 'h-100 d-flex flex-column',
+            }
         };
 
         // Choose data source

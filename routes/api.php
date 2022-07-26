@@ -29,6 +29,7 @@ Route::prefix('/v1')->group(function() {
         Route::get('/fetch-roles', [UsersController::class, 'apiFetchRoles']);
         Route::get('/delete-role/{id}', [UsersController::class, 'apiDeleteRole']);
         Route::post('/delete-roles', [UsersController::class, 'apiDeleteRoles']);
+        Route::post('/change-role', [UsersController::class, 'apiChangeRole']);
     });
 
     if (env('APP_ENV') != 'production') {

@@ -184,6 +184,8 @@ export class ModalForm
                 this._submitBtn.setLoad();
                 this._form.reset();
 
+                this._form.setAttribute('data-app-id', id);
+
                 axios.get(this._form.getAttribute('data-fetch-action') + `/${id}`, null, { headers: { 'Content-Type': 'application/json' } })
                     .then((response) => {
                         this._submitBtn.setDone();
@@ -215,6 +217,11 @@ export class ModalForm
     setOnFormFetchData(callback)
     {
         this._fetchDataCallback = callback;
+    }
+
+    getFormElement()
+    {
+        return this._form;
     }
 
     resetForm()

@@ -13,7 +13,7 @@
             <button class="btn btn-outline-primary me-2" type="button" id="refreshRolesTableBtn"><i class="fa-solid fa-arrow-rotate-right"></i></button>
         </x-slot:navbar>
 
-        <div id="rolesTableWrapper"></div>
+        <div class="h-100 pb-4" id="rolesTableWrapper"></div>
 
         <x-modal_form id="addRoleModal" action="/api/v1/add-role">
             <x-slot:title>
@@ -122,12 +122,12 @@
             <x-slot:body>
                 <div class="mb-3">
                     <label for="roleName" class="form-label">Role name:</label>
-                    <input type="text" class="form-control" id="chRoleName" name="chRoleName" aria-describedby="chRoleNameMsg">
+                    <input type="text" class="form-control" id="chRoleName" name="roleName" aria-describedby="chRoleNameMsg">
                     <div id="chRoleNameMsg" class="invalid-feedback d-none"></div>
                 </div>
                 <div class="mb-3">
                     <label for="remarks" class="form-label">Remarks:</label>
-                    <textarea class="form-control" id="chRemarks" name="chRemarks" rows="3" maxlength="255" aria-describedby="chRemarksMsg"></textarea>
+                    <textarea class="form-control" id="chRemarks" name="remarks" rows="3" maxlength="255" aria-describedby="chRemarksMsg"></textarea>
                     <div id="chRemarksMsg" class="invalid-feedback d-none"></div>
                 </div>
                 <div class="mb-3">
@@ -142,7 +142,7 @@
                             <div id="dashboardCollapse" class="accordion-collapse collapse" aria-labelledby="dashboardHeader">
                                 <div class="accordion-body">
                                     <label for="chDashboardAccess" class="form-label">Access level:</label>
-                                    <select class="form-select mb-2" aria-label="Level" id="chDashboardAccess" name="chDashboardAccess">
+                                    <select class="form-select mb-2" aria-label="Level" id="chDashboardAccess" name="dashboardAccess">
                                         <option value="0">No access</option>
                                         <option value="1">Minimal access</option>
                                         <option value="2">Full access</option>
@@ -159,20 +159,20 @@
                             <div id="auditCollapse" class="accordion-collapse collapse" aria-labelledby="auditHeader">
                                 <div class="accordion-body">
                                     <label for="chAuditAccess" class="form-label">Access level:</label>
-                                    <select class="form-select mb-2" aria-label="Level" id="chAuditAccess" name="chAuditAccess">
+                                    <select class="form-select mb-2" aria-label="Level" id="chAuditAccess" name="auditAccess">
                                         <option value="0">No access</option>
                                         <option value="1">Full access</option>
                                     </select>
                                     <label for="chAuditCycleAccess" class="form-label">Submenus:</label>
-                                    <select class="form-select mb-2" aria-label="Level" id="chAuditCycleAccess" name="chAuditCycleAccess">
+                                    <select class="form-select mb-2" aria-label="Level" id="chAuditCycleAccess" name="auditCycleAccess">
                                         <option value="0">Cycles Page: No access</option>
                                         <option value="1">Cycles Page: Full access</option>
                                     </select>
-                                    <select class="form-select mb-2" aria-label="Level" id="chAuditRecordAccess" name="chAuditRecordAccess">
+                                    <select class="form-select mb-2" aria-label="Level" id="chAuditRecordAccess" name="auditRecordAccess">
                                         <option value="0">Records Page: No access</option>
                                         <option value="1">Records Page: Full access</option>
                                     </select>
-                                    <select class="form-select mb-2" aria-label="Level" id="chAuditDetailAccess" name="chAuditDetailAccess">
+                                    <select class="form-select mb-2" aria-label="Level" id="chAuditDetailAccess" name="auditDetailAccess">
                                         <option value="0">Details Page: No access</option>
                                         <option value="1">Details Page: Full access</option>
                                     </select>
@@ -188,16 +188,16 @@
                             <div id="usersCollapse" class="accordion-collapse collapse" aria-labelledby="usersHeader">
                                 <div class="accordion-body">
                                     <label for="chUsersAccess" class="form-label">Access level:</label>
-                                    <select class="form-select mb-2" aria-label="Level" id="chUsersAccess" name="chUsersAccess">
+                                    <select class="form-select mb-2" aria-label="Level" id="chUsersAccess" name="usersAccess">
                                         <option value="0">No access</option>
                                         <option value="1">Full access</option>
                                     </select>
                                     <label for="chUsersRoleAccess" class="form-label">Submenus:</label>
-                                    <select class="form-select mb-2" aria-label="Level" id="chUsersRoleAccess" name="chUsersRoleAccess">
+                                    <select class="form-select mb-2" aria-label="Level" id="chUsersRoleAccess" name="usersRoleAccess">
                                         <option value="0">Roles Page: No access</option>
                                         <option value="1">Roles Page: Full access</option>
                                     </select>
-                                    <select class="form-select mb-2" aria-label="Level" id="chUsersUserListAccess" name="chUsersUserListAccess">
+                                    <select class="form-select mb-2" aria-label="Level" id="chUsersUserListAccess" name="usersUserListAccess">
                                         <option value="0">User Management Page: No access</option>
                                         <option value="1">User Management Page: Full access</option>
                                     </select>
@@ -208,8 +208,8 @@
                 </div>
             </x-slot:body>
 
-            <x-slot:submitButton icon="fa-solid fa-plus">
-                Add
+            <x-slot:submitButton icon="fa-solid fa-pen-to-square">
+                Change
             </x-slot:submitButton>
         </x-modal_form>
     </x-submenu_tab_pane>

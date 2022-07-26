@@ -18,6 +18,12 @@ export class UsersViewLogic
 
         this.changeRoleModalForm = ModalForm.getOrCreateInstance('changeRoleModal');
 
+        this.changeRoleModalForm.setOnFormSubmit((jsonData) => {
+            const form = this.changeRoleModalForm.getFormElement();
+            jsonData['id'] = form.getAttribute('data-app-id');
+            return jsonData;
+        });
+
         this.changeRoleModalForm.setOnFormSent(() => {
             this.refreshRolesTable();
             showToastMsg("Role successfully changed!");
@@ -41,6 +47,7 @@ export class UsersViewLogic
                 rolesTableWrapper: document.getElementById('rolesTableWrapper'),
                 rolesTable: new DynamicTable({
                     wrapperId: 'rolesTableWrapper',
+                    fixedHeader: true,
                     columns: [
                         DynamicTable.idColumn(),
                         DynamicTable.selectionColumn(),
@@ -58,6 +65,12 @@ export class UsersViewLogic
                                 this.rolesPage.selectedItems = document.querySelectorAll('input[name="selectedItems"]');
                                 return data.data.map(item => [item.id, item.name, (item.remarks || item.length > 0) ? item.remarks : '-', null])
                             }
+                        }
+                    },
+                    search: {
+                        debounceTimeout: 500,
+                        server: {
+                            url: (prev, keyword) => `${prev}?search=${keyword}`
                         }
                     },
                     onDeleteBtnClicked: (id) => {

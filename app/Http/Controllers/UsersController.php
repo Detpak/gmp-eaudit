@@ -47,22 +47,29 @@ class UsersController extends Controller
         $accessInfo = json_decode($role->access_info);
 
         return [
-            'chRoleName' => $role->name,
-            'chRemarks' => $role->remarks,
-            'chDashboardAccess' => isset($accessInfo->dashboardAccess) ? $accessInfo->dashboardAccess : null,
-            'chAuditAccess' => isset($accessInfo->auditAccess) ? $accessInfo->auditAccess : null,
-            'chAuditCycleAccess' => isset($accessInfo->auditCycleAccess) ? $accessInfo->auditCycleAccess : null,
-            'chAuditRecordAccess' => isset($accessInfo->auditRecordAccess) ? $accessInfo->auditRecordAccess : null,
-            'chAuditDetailAccess' => isset($accessInfo->auditDetailAccess) ? $accessInfo->auditDetailAccess : null,
-            'chUsersAccess' => isset($accessInfo->usersAccess) ? $accessInfo->usersAccess : null,
-            'chUsersRoleAccess' => isset($accessInfo->usersRoleAccess) ? $accessInfo->auditAccess : null,
-            'chUsersUserListAccess' => isset($accessInfo->usersUserListAccess) ? $accessInfo->usersUserListAccess : null,
+            'roleName' => $role->name,
+            'remarks' => $role->remarks,
+            'dashboardAccess' => isset($accessInfo->dashboardAccess) ? $accessInfo->dashboardAccess : null,
+            'auditAccess' => isset($accessInfo->auditAccess) ? $accessInfo->auditAccess : null,
+            'auditCycleAccess' => isset($accessInfo->auditCycleAccess) ? $accessInfo->auditCycleAccess : null,
+            'auditRecordAccess' => isset($accessInfo->auditRecordAccess) ? $accessInfo->auditRecordAccess : null,
+            'auditDetailAccess' => isset($accessInfo->auditDetailAccess) ? $accessInfo->auditDetailAccess : null,
+            'usersAccess' => isset($accessInfo->usersAccess) ? $accessInfo->usersAccess : null,
+            'usersRoleAccess' => isset($accessInfo->usersRoleAccess) ? $accessInfo->auditAccess : null,
+            'usersUserListAccess' => isset($accessInfo->usersUserListAccess) ? $accessInfo->usersUserListAccess : null,
         ];
     }
 
     public function apiFetchRoles(Request $request)
     {
-        return Role::paginate(50);
+        $query = Role::query();
+
+        if ($request->search) {
+            $query->where('name', 'LIKE', "%{$request->search}%")
+                ->orWhere('remarks', 'LIKE', "%{$request->search}%");
+        }
+
+        return $query->paginate(50);
     }
 
     public function apiDeleteRole($id)
@@ -82,8 +89,36 @@ class UsersController extends Controller
         return Response::json(['result' => 'ok']);
     }
 
-    public function apiChangeRole(Request $request, $id)
+    public function apiChangeRole(Request $request)
     {
+        if (!$request->id) {
+            return Response::json(['result' => 'error'], 404);
+        }
+
+        $data = Role::find($request->id);
+
+        if (!$data) {
+            return Response::json(['result' => 'Data not found']);
+        }
+
+        $updateColumn = [];
+
+        if ($request->roleName) {
+            $updateColumn['name'] = $request->roleName;
+        }
+
+        if ($request->remarks) {
+            $updateColumn['remarks'] = $request->remarks;
+        }
+
+        $accessInfo = $request->except(['roleName', 'remarks']);
+
+        if (sizeof($accessInfo) != 0) {
+            $updateColumn['access_info'] = $accessInfo;
+        }
+
+        $data->update($updateColumn);
+
         return Response::json(['result' => 'ok']);
     }
 }
