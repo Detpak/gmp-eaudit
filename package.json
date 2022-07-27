@@ -26,6 +26,7 @@
         "counterup2": "^2.0.2",
         "gridjs": "^5.0.2",
         "gridjs-selection": "^4.0.0",
+        "inter-ui": "^3.19.3",
         "jquery": "^3.6.0"
     }
 }

@@ -177,31 +177,58 @@ export class ModalForm
                 });
         });
 
-        if (this._form.hasAttribute('data-fetch-action')) {
-            this._element.addEventListener('show.bs.modal', (ev) => {
-                let id = ev.relatedTarget.getAttribute('data-app-id');
-                this._inputElements.attr('disabled', '');
-                this._submitBtn.setLoad();
-                this._form.reset();
+        this._element.addEventListener('show.bs.modal', (ev) => {
+            let selects = this._form.querySelectorAll('select');
+            let fetchOptionsTasks = [];
+            let fetchFormDataTask = null;
+            this._inputElements.attr('disabled', '');
+            this._submitBtn.setLoad();
 
+            for (const selectControl of selects) {
+                if (selectControl.hasAttribute('data-fetch-options')) {
+                    selectControl.setAttribute('disabled', '');
+
+                    fetchOptionsTasks.push(axios.get(selectControl.getAttribute('data-fetch-options'), null, { headers: { 'Content-Type': 'application/json' } })
+                        .then((response) => {
+                            selectControl.innerHTML = ''; // remove all options before adding the new ones
+                            for (const optionsData of response.data) {
+                                $(selectControl).append(`<option value="${optionsData.id}">${optionsData.name}</option>`);
+                            }
+                        })
+                    );
+                }
+            }
+
+            if (this._form.hasAttribute('data-fetch-action')) {
+                let id = ev.relatedTarget.getAttribute('data-app-id');
+
+                this._form.reset();
                 this._form.setAttribute('data-app-id', id);
 
-                axios.get(this._form.getAttribute('data-fetch-action') + `/${id}`, null, { headers: { 'Content-Type': 'application/json' } })
-                    .then((response) => {
-                        this._submitBtn.setDone();
-                        this._inputElements.removeAttr('disabled');
+                let fetchFormData = axios.get(this._form.getAttribute('data-fetch-action') + `/${id}`, null, { headers: { 'Content-Type': 'application/json' } });
+
+                // Wait for the fetch option task
+                fetchFormDataTask = Promise.all([fetchFormData, ...fetchOptionsTasks])
+                    .then((values) => {
+                        const response = values[0];
 
                         for (const elem of this._inputElements) {
                             const name = elem.getAttribute("name");
                             if (!(name in response.data) || response.data[name] == null) continue;
                             elem.value = response.data[name];
                         }
-                    })
-                    .catch((reason) => {
-                        console.log(reason);
                     });
-            });
-        }
+            }
+
+            Promise.all([...fetchOptionsTasks, fetchFormDataTask])
+                .then(() => {
+                    this._inputElements.removeAttr('disabled');
+                    this._submitBtn.setDone();
+                })
+                .catch((reason) => {
+                    console.log(reason);
+                });
+        });
     }
 
     setOnFormSubmit(callback)

@@ -6,7 +6,7 @@
                 <div class="card">
                     <form class="card-body p-4" action="{{ url('auth') }}" method="POST">
                         @csrf
-                        <h4 class="card-title mb-3">Login e-Audit</h4>
+                        <h3 class="card-title mb-3 fw-bold">Login e-Audit</h3>
                         <div class="mb-3">
                             <label for="loginID" class="form-label">ID</label>
                             <input type="text" class="form-control @error('loginID') is-invalid @enderror" value="{{ old('loginID') }}" id="loginID" name="loginID">

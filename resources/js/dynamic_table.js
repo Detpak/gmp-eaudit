@@ -11,19 +11,21 @@ export class DynamicTable
             columns: config.columns,
             fixedHeader: config.fixedHeader,
             height: config.height,
-            search: {
+            search: config.source.type == 'data' ? null : {
                 server: {
                     url: (prev, keyword) => `${prev}?search=${keyword}`
                 }
             },
-            pagination: {
-                limit: 10,
+            pagination: config.source.type == 'data' ? null : {
+                limit: 25,
                 server: {
-                    url: (prev, page, limit) => `${prev}${prev.includes('?') ? '&' : '?'}page=${page + 1}`
+                    url: (prev, page, _) => `${prev}${prev.includes('?') ? '&' : '?'}page=${page + 1}`
                 }
             },
             className: {
                 container: 'h-100 d-flex flex-column',
+                // table: 'table table-striped align-middle',
+                // th: 'bg-white'
             }
         };
 
@@ -48,7 +50,7 @@ export class DynamicTable
 
             // Subscribe to the selection checkbox event listener
             checkboxPlugin.props.store.on('updated', (state, _) => {
-                this.selectedItems = state;
+                this.selectedItems = state; // update selected items
             });
 
             if (this.actionsColumn) {
@@ -99,14 +101,14 @@ export class DynamicTable
         };
     }
 
-    static actionColumn(changeBtnModalTarget)
+    static actionColumn(editBtnModalTarget)
     {
         return {
             sort: false,
             id: 'actions',
             name: 'Actions',
             formatter: (_, row) => html(
-                `<button type="button" class="btn btn-primary btn-sm me-1" data-app-id="${row.cells[0].data}" ${changeBtnModalTarget ? `data-bs-toggle="modal" data-bs-target="#${changeBtnModalTarget}"` : ""}><i class="fa-regular fa-pen-to-square"></i> Change</button>` +
+                `<button type="button" class="btn btn-primary btn-sm me-1" data-app-id="${row.cells[0].data}" ${editBtnModalTarget ? `data-bs-toggle="modal" data-bs-target="#${editBtnModalTarget}"` : ""}><i class="fa-regular fa-pen-to-square"></i> Edit</button>` +
                 `<button type="button" class="btn btn-danger btn-sm" data-app-id="${row.cells[0].data}" name="__deleteItemBtn"><i class="fa-solid fa-trash"></i> Delete</button>`
             )
         };
