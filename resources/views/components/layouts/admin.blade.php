@@ -18,7 +18,7 @@
 @endphp
 
 <x-layouts.main title="e-Audit | {{ $title }}" viewtype="{{ $pages[$pageId]['url'] }}">
-    <div class="d-flex flex-row main">
+    <div class="d-flex flex-row main w-100">
         <div class="d-flex flex-column min-vh-100 p-2 bg-primary bg-gradient text-white" style="width: 110px">
             <ul class="nav nav-pills flex-column mb-auto">
                 @foreach ($pages as $page)
@@ -31,7 +31,7 @@
                 @endforeach
             </ul>
         </div>
-        <div class="vh-100 flex-fill bg-white">
+        <div class="vh-100 flex-fill bg-white overflow-auto">
             <div class="d-flex flex-column h-100">
                 <div class="navbar navbar-light bg-light p-3">
                     @isset($controls)
@@ -49,7 +49,7 @@
                         </ul>
                     </div>
                 </div>
-                <div class="flex-fill overflow-auto">
+                <div class="flex-fill overflow-auto w-100">
                     {{ $slot }}
                 </div>
             </div>

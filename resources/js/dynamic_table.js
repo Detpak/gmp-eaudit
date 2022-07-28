@@ -23,9 +23,9 @@ export class DynamicTable
                 }
             },
             className: {
-                container: 'h-100 d-flex flex-column',
-                // table: 'table table-striped align-middle',
-                // th: 'bg-white'
+                container: 'h-100 overflow-auto d-flex flex-column',
+                table: 'table table-striped align-middle',
+                th: 'bg-white'
             }
         };
 
