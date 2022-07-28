@@ -1,6 +1,6 @@
-<div class="modal fade" id="{{ $id }}" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="__{{ $id }}_Label" aria-hidden="true">
+<div class="modal fade backdrop-blur" id="{{ $id }}" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="__{{ $id }}_Label" aria-hidden="true">
     <div class="modal-dialog">
-        <div class="modal-content">
+        <div class="modal-content border-0">
             <div class="modal-header">
                 <div class="modal-title" id="__{{ $id }}_Label">{{ $title }}</div>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>

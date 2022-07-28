@@ -7,7 +7,6 @@ export class DynamicTable
     constructor(config)
     {
         let gridConfig = {
-            sort: true,
             columns: config.columns,
             fixedHeader: config.fixedHeader,
             height: config.height,
@@ -22,10 +21,23 @@ export class DynamicTable
                     url: (prev, page, _) => `${prev}${prev.includes('?') ? '&' : '?'}page=${page + 1}`
                 }
             },
+            sort: {
+                server: {
+                    url: (prev, columns) => {
+                        if (columns.length == 0) return `${prev}`;
+
+                        const sortBy = config.columns[columns[0].index].id;
+                        const dir = columns[0].direction > 0 ? 'asc' : 'desc';
+
+                        return `${prev}${prev.includes('?') ? '&' : '?'}sort=${sortBy}&dir=${dir}`;
+                    }
+                }
+            },
             className: {
                 container: 'h-100 overflow-auto d-flex flex-column',
-                table: 'table table-striped align-middle',
-                th: 'bg-white'
+                table: 'table table-hover align-middle',
+                th: 'bg-light px-3',
+                td: 'px-3'
             }
         };
 
@@ -48,10 +60,11 @@ export class DynamicTable
         this.grid.on('ready', () => {
             const checkboxPlugin = this.grid.config.plugin.get('selected');
 
-            // Subscribe to the selection checkbox event listener
-            checkboxPlugin.props.store.on('updated', (state, _) => {
-                this.selectedItems = state; // update selected items
-            });
+            if (checkboxPlugin) {
+                checkboxPlugin.props.store.on('updated', (state, _) => {
+                    this.selectedItems = state; // update selected items
+                });
+            }
 
             if (this.actionsColumn) {
                 this.onDeleteBtnClicked = config.onDeleteBtnClicked;
@@ -80,6 +93,15 @@ export class DynamicTable
         return this.selectedItems;
     }
 
+    static idColumn()
+    {
+        return {
+            id: 'id',
+            sort: false,
+            hidden: true,
+        };
+    }
+
     static selectionColumn()
     {
         return {
@@ -90,15 +112,6 @@ export class DynamicTable
                 props: { id: (row) => row.cell(0).data }
             }
         }
-    }
-
-    static idColumn()
-    {
-        return {
-            id: 'id',
-            sort: false,
-            hidden: true,
-        };
     }
 
     static actionColumn(editBtnModalTarget)

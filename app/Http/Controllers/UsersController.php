@@ -70,6 +70,10 @@ class UsersController extends Controller
                 ->orWhere('remarks', 'LIKE', "%{$request->search}%");
         }
 
+        if ($request->sort && $request->dir) {
+            $query->orderBy($request->sort, $request->dir);
+        }
+
         return $query->paginate(25);
     }
 
@@ -182,6 +186,10 @@ class UsersController extends Controller
                 ->orWhere('users.employee_id', 'like', "%{$request->search}%")
                 ->orWhere('users.login_id', 'like', "%{$request->search}%")
                 ->orWhere('users.email', 'like', "%{$request->search}%");
+        }
+
+        if ($request->sort && $request->dir) {
+            $query->orderBy($request->sort, $request->dir);
         }
 
         return $query->leftJoin('roles', 'roles.id', '=', 'users.role_id')

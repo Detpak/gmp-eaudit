@@ -207,7 +207,6 @@ export class ModalForm
 
                 let fetchFormData = axios.get(this._form.getAttribute('data-fetch-action') + `/${id}`, null, { headers: { 'Content-Type': 'application/json' } });
 
-                // Wait for the fetch option task
                 fetchFormDataTask = Promise.all([fetchFormData, ...fetchOptionsTasks])
                     .then((values) => {
                         const response = values[0];

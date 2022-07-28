@@ -69,7 +69,12 @@ class LoginController extends Controller
         $token = Str::random(32);
         $tokenHash = Hash::make($token);
 
-        // Create token with expired date
+        // Remove expired tokens
+        ApiAccessToken::where('user_id', $user->id)
+            ->where('expire_date', '<', Carbon::now())
+            ->delete();
+
+        // Create new token
         ApiAccessToken::create([
             'token' => $tokenHash,
             'user_id' => $user->id,

@@ -115,8 +115,14 @@ export class UsersViewLogic
             tableColumns: [
                 DynamicTable.idColumn(),
                 DynamicTable.selectionColumn(),
-                'Name',
-                'Description',
+                {
+                    id: 'name',
+                    name: 'Name'
+                },
+                {
+                    id: 'remarks',
+                    name: 'Description'
+                },
                 DynamicTable.actionColumn('editRoleModal')
             ],
             tableUrlSource: '/api/v1/fetch-roles',
@@ -150,11 +156,26 @@ export class UsersViewLogic
                     tableColumns: [
                         DynamicTable.idColumn(),
                         DynamicTable.selectionColumn(),
-                        'Name',
-                        'Employee ID',
-                        'Login ID',
-                        'E-mail',
-                        'Role',
+                        {
+                            id: 'name',
+                            name: 'Name'
+                        },
+                        {
+                            id: 'employee_id',
+                            name: 'Employee ID'
+                        },
+                        {
+                            id: 'login_id',
+                            name: 'Login ID'
+                        },
+                        {
+                            id: 'email',
+                            name: 'E-mail'
+                        },
+                        {
+                            id: 'role_name',
+                            name: 'Role'
+                        },
                         DynamicTable.actionColumn('editUserModal')
                     ],
                     tableUrlSource: '/api/v1/fetch-users',

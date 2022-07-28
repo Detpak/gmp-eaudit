@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AuditController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\TestbedController;
 use App\Http\Controllers\UsersController;
@@ -24,6 +25,11 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 Route::prefix('/v1')->group(function() {
     Route::middleware('private_api')->group(function() {
         Route::post('/get-chart', [DashboardController::class, 'apiGetChart']);
+
+        // Audit APIs
+        Route::post('/new-cycle', [AuditController::class, 'apiNewCycle']);
+        Route::get('/get-active-cycle', [AuditController::class, 'apiGetActiveCycle']);
+        Route::get('/fetch-cycles', [AuditController::class, 'apiFetchCycles']);
 
         // Role APIs
         Route::post('/add-role', [UsersController::class, 'apiAddRole']);
