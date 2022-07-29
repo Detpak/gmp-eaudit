@@ -1,7 +1,7 @@
 <x-layouts.submenus title="Users" page-id="4">
     <x-slot:tabs>
-        <x-tab active id="rolesTab" target="rolesTabPane">Roles</x-tab>
-        <x-tab id="manageUserTab" target="manageUserTabPane">Manage User</x-tab>
+        <x-tab active id="rolesTab" target="rolesTabPane"><i class="fa-solid fa-user-group me-1"></i> Roles</x-tab>
+        <x-tab id="manageUserTab" target="manageUserTabPane"><i class="fa-solid fa-address-book me-1"></i> Manage User</x-tab>
     </x-slot:tabs>
 
     <x-submenu_tab_pane shown id="rolesTabPane" labelled-by="rolesTab">

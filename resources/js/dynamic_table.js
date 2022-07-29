@@ -6,6 +6,17 @@ export class DynamicTable
 {
     constructor(config)
     {
+        this.paginationConfig = {
+            limit: 25,
+            page: 0,
+            server: {
+                url: (prev, page, _) => {
+                    this.currentPage = page;
+                    return `${prev}${prev.includes('?') ? '&' : '?'}page=${this.currentPage + 1}`
+                }
+            }
+        };
+
         let gridConfig = {
             columns: config.columns,
             fixedHeader: config.fixedHeader,
@@ -15,12 +26,7 @@ export class DynamicTable
                     url: (prev, keyword) => `${prev}?search=${keyword}`
                 }
             },
-            pagination: config.source.type == 'data' ? null : {
-                limit: 25,
-                server: {
-                    url: (prev, page, _) => `${prev}${prev.includes('?') ? '&' : '?'}page=${page + 1}`
-                }
-            },
+            pagination: config.source.type == 'data' ? null : this.paginationConfig,
             sort: {
                 server: {
                     url: (prev, columns) => {
@@ -36,8 +42,11 @@ export class DynamicTable
             className: {
                 container: 'h-100 overflow-auto d-flex flex-column',
                 table: 'table table-hover align-middle',
-                th: 'bg-light px-3',
-                td: 'px-3'
+                th: 'bg-light px-3 py-2',
+                td: 'px-3 py-2'
+            },
+            language: {
+                'search': 'Type a keyword to search...'
             }
         };
 
@@ -85,12 +94,23 @@ export class DynamicTable
 
     refresh()
     {
+        this.paginationConfig.page = this.getCurrentPage();
+
+        this.grid.updateConfig({
+            pagination: this.paginationConfig
+        });
+
         this.grid.forceRender();
     }
 
     getSelectedItems()
     {
         return this.selectedItems;
+    }
+
+    getCurrentPage()
+    {
+        return this.currentPage;
     }
 
     static idColumn()
