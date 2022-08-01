@@ -40,7 +40,6 @@ export class CommonView
                     headers: axios.defaults.headers.common,
                     then: config.tableParseData,
                     total: data => {
-                        console.log(data.total);
                         return data.total;
                     }
                 }

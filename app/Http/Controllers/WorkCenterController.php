@@ -32,6 +32,28 @@ class WorkCenterController extends Controller
         return ['result' => 'ok'];
     }
 
+    public function apiEditDepartment(Request $request)
+    {
+        if (!$request->id) {
+            return Response::json(['result' => 'error'], 404);
+        }
+
+        $user = Department::find($request->id);
+
+        if (!$user) {
+            return Response::json(['result' => 'Data not found']);
+        }
+
+        $user->update($request->except('id'));
+
+        return ['result' => 'ok'];
+    }
+
+    public function apiGetDepartment($id)
+    {
+        return Department::find($id)->makeHidden(['id', 'created_at', 'updated_at']);
+    }
+
     public function apiFetchDepartments(Request $request)
     {
         $query = Department::query();

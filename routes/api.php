@@ -34,6 +34,8 @@ Route::prefix('/v1')->group(function() {
 
         // Work Center APIs
         Route::post('/add-dept', [WorkCenterController::class, 'apiAddDepartment']);
+        Route::post('/edit-dept', [WorkCenterController::class, 'apiEditDepartment']);
+        Route::get('/get-dept/{id}', [WorkCenterController::class, 'apiGetDepartment']);
         Route::get('/fetch-depts', [WorkCenterController::class, 'apiFetchDepartments']);
         Route::get('/delete-dept/{id}', [WorkCenterController::class, 'apiDeleteDepartment']);
         Route::post('/delete-depts', [WorkCenterController::class, 'apiDeleteDepartments']);
