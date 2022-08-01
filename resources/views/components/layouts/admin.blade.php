@@ -3,7 +3,7 @@
         ['title' => 'Dashboard',    'url' => 'dashboard',   'icon' => 'fa-chart-line',  'selected' => false],
         ['title' => 'Audit',        'url' => 'audit',       'icon' => 'fa-list-check',  'selected' => false],
         ['title' => 'Standard',     'url' => 'standard',    'icon' => 'fa-ruler',       'selected' => false],
-        ['title' => 'Work Center',  'url' => 'work-center', 'icon' => 'fa-building',    'selected' => false],
+        ['title' => 'Work Center',  'url' => 'work-center', 'icon' => 'fa-industry',    'selected' => false],
         ['title' => 'Users',        'url' => 'users',       'icon' => 'fa-users',       'selected' => false],
         ['title' => 'Settings',     'url' => 'settings',    'icon' => 'fa-gear',        'selected' => false],
     ];

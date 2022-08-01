@@ -5,6 +5,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\LoginController;
 use App\Http\Controllers\TestbedController;
 use App\Http\Controllers\UsersController;
+use App\Http\Controllers\WorkCenterController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -28,6 +29,7 @@ Route::middleware('admin')->group(function() {
         Route::get('/', function() { return redirect()->intended('admin/dashboard'); });
         Route::get('/dashboard', [DashboardController::class, 'show']);
         Route::get('/audit', [AuditController::class, 'show']);
+        Route::get('/work-center', [WorkCenterController::class, 'show']);
         Route::get('/users', [UsersController::class, 'show']);
         Route::get('/testbed', [TestbedController::class, 'show']);
     });

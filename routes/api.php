@@ -4,6 +4,7 @@ use App\Http\Controllers\AuditController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\TestbedController;
 use App\Http\Controllers\UsersController;
+use App\Http\Controllers\WorkCenterController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -30,6 +31,12 @@ Route::prefix('/v1')->group(function() {
         Route::post('/new-cycle', [AuditController::class, 'apiNewCycle']);
         Route::get('/get-active-cycle', [AuditController::class, 'apiGetActiveCycle']);
         Route::get('/fetch-cycles', [AuditController::class, 'apiFetchCycles']);
+
+        // Work Center APIs
+        Route::post('/add-dept', [WorkCenterController::class, 'apiAddDepartment']);
+        Route::get('/fetch-depts', [WorkCenterController::class, 'apiFetchDepartments']);
+        Route::get('/delete-dept/{id}', [WorkCenterController::class, 'apiDeleteDepartment']);
+        Route::post('/delete-depts', [WorkCenterController::class, 'apiDeleteDepartments']);
 
         // Role APIs
         Route::post('/add-role', [UsersController::class, 'apiAddRole']);
