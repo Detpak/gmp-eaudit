@@ -41,7 +41,7 @@ export class DashboardViewLogic
             ])
             .scale();
 
-        // Refreshing is done asynchronously for convenience
+        // Refreshing is done asynchronously for convenience.
         this.refreshBtn = new IndicatorButton("refreshCharts");
         this.refreshBtn.setOnClick(() => {
             Promise.all([...this.updateNumbers(), ...this.updateCharts()])
