@@ -31,6 +31,9 @@
                     <input type="text" class="form-control" id="deptCode" name="code" aria-describedby="deptCodeMsg">
                     <div id="deptCodeMsg" class="invalid-feedback d-none"></div>
                 </div>
+                <div class="mb-3">
+                    <label for="deptCode" class="form-label">PIC (Person in Charge):</label>
+                </div>
             </x-slot:body>
 
             <x-slot:submitButton icon="fa-solid fa-plus">
