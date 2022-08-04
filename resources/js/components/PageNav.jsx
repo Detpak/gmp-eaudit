@@ -20,3 +20,31 @@ export function PageLink({ to, children }) {
         </Nav.Item>
     );
 }
+
+export function PageContent({ children }) {
+    return (
+        <div className="flex-fill overflow-auto">
+            <div className="d-flex flex-column h-100">
+                {children}
+            </div>
+        </div>
+    );
+}
+
+export function PageContentTopbar({ children }) {
+    return (
+        <nav className="navbar bg-white px-1 py-3">
+            <div className="container-fluid justify-content-start">
+                {children}
+            </div>
+        </nav>
+    );
+}
+
+export function PageContentView({ children }) {
+    return (
+        <div className="flex-fill overflow-auto px-4">
+            {children}
+        </div>
+    )
+}
