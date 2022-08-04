@@ -24,12 +24,13 @@ export default class AuditCyclesLayout extends React.Component {
             }
         };
 
+        this.table = React.createRef();
         this.refreshTable = this.refreshTable.bind(this);
         this.startNewCycle = this.startNewCycle.bind(this);
     }
 
     async startNewCycle() {
-        // Check current active cycle before starting the new one
+        // Check if there is a current active cycle before starting the new one
         const activeCycle = await axios.get(rootUrl('api/v1/get-active-cycle'));
 
         if (activeCycle.data.result && !confirm('The current audit cycle has not yet been finished. Are you sure you want to start a new cycle?')) {
@@ -40,13 +41,14 @@ export default class AuditCyclesLayout extends React.Component {
 
         if (newCycle.data.result == 'ok') {
             showToastMsg("New cycle has been started.");
+            this.refreshTable();
         }
 
         return;
     }
 
     refreshTable() {
-        this.setState({ serverSource: this.state.serverSource }); // Trigger the update
+        this.table.current.refreshTable();
     }
 
     render() {
@@ -75,6 +77,7 @@ export default class AuditCyclesLayout extends React.Component {
                             }
                         ]}
                         server={this.state.serverSource}
+                        ref={this.table}
                     />
                 </PageContentView>
             </PageContent>

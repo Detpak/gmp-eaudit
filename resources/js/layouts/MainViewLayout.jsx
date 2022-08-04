@@ -1,17 +1,15 @@
 import React from 'react';
-import { faChartLine, faListCheck, faPowerOff, faUsers } from '@fortawesome/free-solid-svg-icons';
+import { faChartLine, faIndustry, faListCheck, faPowerOff, faUsers } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { NavLink } from 'react-router-dom';
-import { Routes, Route, Navigate } from "react-router-dom";
+import { Routes, Route, Navigate, Outlet, NavLink } from "react-router-dom";
 import DashboardLayout from './DashboardLayout';
-import AuditLayout from './AuditLayout';
 import AuditCyclesLayout from "./AuditCyclesLayout";
 import AuditRecordsLayout from "./AuditRecordsLayout";
-import UsersLayout from "./UsersLayout";
 import RolesLayout from "./RolesLayout";
 import ManageUserLayout from "./ManageUserLayout";
 import { Toast } from 'react-bootstrap';
 import { rootUrl } from '../utils';
+import { PageLink, PageNavbar } from "../components/PageNav";
 
 const menus = [
     {
@@ -23,6 +21,11 @@ const menus = [
         name: 'Audit',
         link: 'audit',
         icon: faListCheck,
+    },
+    {
+        name: 'Workplace',
+        link: 'workplace',
+        icon: faIndustry
     },
     {
         name: 'Users',
@@ -48,6 +51,39 @@ function Sidebar() {
     )
 }
 
+function AuditOutlet() {
+    return (
+        <>
+            <PageNavbar>
+                <PageLink to="cycles">Cycles</PageLink>
+                <PageLink to="records">Records</PageLink>
+            </PageNavbar>
+
+            <Outlet />
+        </>
+    );
+}
+
+
+function WorkspaceOutlet() {
+    return (
+        <></>
+    );
+}
+
+function UsersOutlet() {
+    return (
+        <>
+            <PageNavbar>
+                <PageLink to="roles">Roles</PageLink>
+                <PageLink to="manage-user">Manage User</PageLink>
+            </PageNavbar>
+
+            <Outlet />
+        </>
+    );
+}
+
 export function MainViewLayout() {
     const [toastMsgState, setToastMsgState, updateToastMsgState] = window.globalStateStore.useState("toastMsg");
     const closeToast = () => updateToastMsgState((value) => ({ shown: false, msg: value.msg }));
@@ -55,7 +91,7 @@ export function MainViewLayout() {
     return (
         <>
             <div className="d-flex flex-row main">
-                <div className="d-flex flex-column min-vh-100 p-2 bg-primary bg-gradient text-white" style={{width: '110px'}}>
+                <div className="d-flex flex-column min-vh-100 p-2 bg-primary bg-gradient text-white" style={{ minWidth: '100px' }}>
                     <Sidebar />
                     <a role="button" href={rootUrl('deauth')} className="text-white">
                         <FontAwesomeIcon icon={faPowerOff} className="menu-icon d-block mx-auto"/>
@@ -67,14 +103,14 @@ export function MainViewLayout() {
                         <Routes>
                             <Route path="/app/dashboard" element={<DashboardLayout />} />
 
-                            <Route path="/app/audit" element={<AuditLayout />}>
+                            <Route path="/app/audit" element={<AuditOutlet />}>
                                 <Route index element={<Navigate to="/app/audit/cycles" replace />} />
                                 <Route path="cycles" element={<AuditCyclesLayout />} />
                                 <Route path="records" element={<AuditRecordsLayout />} />
                                 <Route path="*" element={<Navigate to="/app/dashboard" replace />} />
                             </Route>
 
-                            <Route path="/app/users" element={<UsersLayout />}>
+                            <Route path="/app/users" element={<UsersOutlet />}>
                                 <Route index element={<Navigate to="/app/users/roles" replace />} />
                                 <Route path="roles" element={<RolesLayout /> } />
                                 <Route path="manage-user" element={<ManageUserLayout />} />
