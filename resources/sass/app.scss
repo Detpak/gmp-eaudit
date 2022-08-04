@@ -1,0 +1,20 @@
+@import './_variables.scss';
+
+// Bootstrap
+@import '~bootstrap/scss/bootstrap';
+
+.menu-icon {
+    font-size: 1.5rem;
+}
+
+.menu-text {
+    font-size: 0.80rem;
+}
+
+.chart-icon {
+    font-size: 2.5rem;
+}
+
+.backdrop-blur {
+    backdrop-filter: blur(10px);
+}

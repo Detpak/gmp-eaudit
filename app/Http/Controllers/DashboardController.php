@@ -14,7 +14,7 @@ class DashboardController extends Controller
 {
     public function show()
     {
-        return view('dashboard');
+        return view('main_view', ['viewtype' => 'dashboard']);
     }
 
     public function apiGetChart(Request $request)

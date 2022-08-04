@@ -1,4 +1,4 @@
-<x-layouts.main title="e-Audit">
+<x-layouts.main>
     <div class="container-fluid">
         <div class="row">
             <div class="col-lg"></div>
@@ -25,7 +25,7 @@
                             </div>
                             @enderror()
                         </div>
-                        <button class="btn btn-primary" type="submit">Login <i class="fa-solid fa-right-to-bracket"></i></button>
+                        <button class="btn btn-primary" type="submit">Login</button>
                     </form>
                 </div>
             </div>

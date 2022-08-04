@@ -1,0 +1,527 @@
+i Compiling Mix
+ΓêÜ Mix: Compiled with some errors in 12.40s
+[1m[33mWARNING[39m[22m in [1m./node_modules/jest-worker/build/WorkerPool.js[39m[22m [1m[32m22:4-29[39m[22m
+[1mModule [1m[31mnot found[39m[22m[1m: [1m[31mError[39m[22m[1m: Can't resolve 'worker_threads' in 'D:\git_repos\project\gmp-eaudit\node_modules\jest-worker\build'[39m[22m
+
+[1m[33mWARNING[39m[22m in [1m./node_modules/jest-worker/build/base/BaseWorkerPool.js[39m[22m [1m[32m111:19-46[39m[22m
+[1mCritical dependency: the request of a dependency is an expression[39m[22m
+
+[1m[33mWARNING[39m[22m in [1m./node_modules/jest-worker/build/index.js[39m[22m [1m[32m68:19-38[39m[22m
+[1mCritical dependency: the request of a dependency is an expression[39m[22m
+
+[1m[33mWARNING[39m[22m in [1m./node_modules/jest-worker/build/workers/processChild.js[39m[22m [1m[32m89:15-28[39m[22m
+[1mCritical dependency: the request of a dependency is an expression[39m[22m
+
+[1m[33mWARNING[39m[22m in [1m./node_modules/jest-worker/build/workers/processChild.js[39m[22m [1m[32m105:15-28[39m[22m
+[1mCritical dependency: the request of a dependency is an expression[39m[22m
+
+[1m[33mWARNING[39m[22m in [1m./node_modules/loader-runner/lib/loadLoader.js[39m[22m [1m[32m19:16-36[39m[22m
+[1mCritical dependency: the request of a dependency is an expression[39m[22m
+
+[1m[33mWARNING[39m[22m in [1m./node_modules/terser-webpack-plugin/dist/minify.js[39m[22m [1m[32m43:118-125[39m[22m
+[1mCritical dependency: require function is used in a way in which dependencies cannot be statically extracted[39m[22m
+
+[1m[33mWARNING[39m[22m in [1m./node_modules/terser-webpack-plugin/dist/utils.js[39m[22m [1m[32m517:18-51[39m[22m
+[1mModule [1m[31mnot found[39m[22m[1m: [1m[31mError[39m[22m[1m: Can't resolve 'uglify-js/package.json' in 'D:\git_repos\project\gmp-eaudit\node_modules\terser-webpack-plugin\dist'[39m[22m
+
+[1m[33mWARNING[39m[22m in [1m./node_modules/terser-webpack-plugin/dist/utils.js[39m[22m [1m[32m593:18-51[39m[22m
+[1mModule [1m[31mnot found[39m[22m[1m: [1m[31mError[39m[22m[1m: Can't resolve '@swc/core/package.json' in 'D:\git_repos\project\gmp-eaudit\node_modules\terser-webpack-plugin\dist'[39m[22m
+
+[1m[33mWARNING[39m[22m in [1m./node_modules/terser-webpack-plugin/dist/utils.js[39m[22m [1m[32m674:18-49[39m[22m
+[1mModule [1m[31mnot found[39m[22m[1m: [1m[31mError[39m[22m[1m: Can't resolve 'esbuild/package.json' in 'D:\git_repos\project\gmp-eaudit\node_modules\terser-webpack-plugin\dist'[39m[22m
+
+[1m[33mWARNING[39m[22m in [1m./node_modules/webpack/lib/debug/ProfilingPlugin.js[39m[22m [1m[32m26:13-33[39m[22m
+[1mModule [1m[31mnot found[39m[22m[1m: [1m[31mError[39m[22m[1m: Can't resolve 'inspector' in 'D:\git_repos\project\gmp-eaudit\node_modules\webpack\lib\debug'[39m[22m
+
+[1m[33mWARNING[39m[22m in [1m./node_modules/webpack/lib/serialization/ObjectMiddleware.js[39m[22m [1m[32m647:9-25[39m[22m
+[1mCritical dependency: the request of a dependency is an expression[39m[22m
+
+[1m[31mERROR[39m[22m in [1m./node_modules/enhanced-resolve/lib/ExportsFieldPlugin.js[39m[22m [1m[32m8:13-28[39m[22m
+[1mModule [1m[31mnot found[39m[22m[1m: [1m[31mError[39m[22m[1m: Can't resolve 'path' in 'D:\git_repos\project\gmp-eaudit\node_modules\enhanced-resolve\lib'
+
+[1m[31mBREAKING CHANGE[39m[22m[1m: webpack < 5 used to include polyfills for node.js core modules by default.
+This is no longer the case. Verify if you need this module and configure a polyfill for it.
+
+If you want to include a polyfill, you need to:
+	- add a fallback 'resolve.fallback: { "path": require.resolve("path-browserify") }'
+	- install 'path-browserify'
+If you don't want to include a polyfill, you can use an empty module like this:
+	resolve.fallback: { "path": false }[39m[22m
+
+[1m[31mERROR[39m[22m in [1m./node_modules/enhanced-resolve/lib/ImportsFieldPlugin.js[39m[22m [1m[32m8:13-28[39m[22m
+[1mModule [1m[31mnot found[39m[22m[1m: [1m[31mError[39m[22m[1m: Can't resolve 'path' in 'D:\git_repos\project\gmp-eaudit\node_modules\enhanced-resolve\lib'
+
+[1m[31mBREAKING CHANGE[39m[22m[1m: webpack < 5 used to include polyfills for node.js core modules by default.
+This is no longer the case. Verify if you need this module and configure a polyfill for it.
+
+If you want to include a polyfill, you need to:
+	- add a fallback 'resolve.fallback: { "path": require.resolve("path-browserify") }'
+	- install 'path-browserify'
+If you don't want to include a polyfill, you can use an empty module like this:
+	resolve.fallback: { "path": false }[39m[22m
+
+[1m[31mERROR[39m[22m in [1m./node_modules/enhanced-resolve/lib/MainFieldPlugin.js[39m[22m [1m[32m8:13-28[39m[22m
+[1mModule [1m[31mnot found[39m[22m[1m: [1m[31mError[39m[22m[1m: Can't resolve 'path' in 'D:\git_repos\project\gmp-eaudit\node_modules\enhanced-resolve\lib'
+
+[1m[31mBREAKING CHANGE[39m[22m[1m: webpack < 5 used to include polyfills for node.js core modules by default.
+This is no longer the case. Verify if you need this module and configure a polyfill for it.
+
+If you want to include a polyfill, you need to:
+	- add a fallback 'resolve.fallback: { "path": require.resolve("path-browserify") }'
+	- install 'path-browserify'
+If you don't want to include a polyfill, you can use an empty module like this:
+	resolve.fallback: { "path": false }[39m[22m
+
+[1m[31mERROR[39m[22m in [1m./node_modules/enhanced-resolve/lib/util/path.js[39m[22m [1m[32m8:13-28[39m[22m
+[1mModule [1m[31mnot found[39m[22m[1m: [1m[31mError[39m[22m[1m: Can't resolve 'path' in 'D:\git_repos\project\gmp-eaudit\node_modules\enhanced-resolve\lib\util'
+[1m[32mDid you mean './path'?[39m[22m[1m
+Requests that should resolve in the current directory need to start with './'.
+Requests that start with a name are treated as module requests and resolve within module directories (node_modules).
+If changing the source code is not an option there is also a resolve options called 'preferRelative' which tries to resolve these kind of requests in the current directory too.
+
+[1m[31mBREAKING CHANGE[39m[22m[1m: webpack < 5 used to include polyfills for node.js core modules by default.
+This is no longer the case. Verify if you need this module and configure a polyfill for it.
+
+If you want to include a polyfill, you need to:
+	- add a fallback 'resolve.fallback: { "path": require.resolve("path-browserify") }'
+	- install 'path-browserify'
+If you don't want to include a polyfill, you can use an empty module like this:
+	resolve.fallback: { "path": false }[39m[22m
+
+[1m[31mERROR[39m[22m in [1m./node_modules/graceful-fs/graceful-fs.js[39m[22m [1m[32m1:9-22[39m[22m
+[1mModule [1m[31mnot found[39m[22m[1m: [1m[31mError[39m[22m[1m: Can't resolve 'fs' in 'D:\git_repos\project\gmp-eaudit\node_modules\graceful-fs'[39m[22m
+
+[1m[31mERROR[39m[22m in [1m./node_modules/graceful-fs/polyfills.js[39m[22m [1m[32m1:16-36[39m[22m
+[1mModule [1m[31mnot found[39m[22m[1m: [1m[31mError[39m[22m[1m: Can't resolve 'constants' in 'D:\git_repos\project\gmp-eaudit\node_modules\graceful-fs'
+
+[1m[31mBREAKING CHANGE[39m[22m[1m: webpack < 5 used to include polyfills for node.js core modules by default.
+This is no longer the case. Verify if you need this module and configure a polyfill for it.
+
+If you want to include a polyfill, you need to:
+	- add a fallback 'resolve.fallback: { "constants": require.resolve("constants-browserify") }'
+	- install 'constants-browserify'
+If you don't want to include a polyfill, you can use an empty module like this:
+	resolve.fallback: { "constants": false }[39m[22m
+
+[1m[31mERROR[39m[22m in [1m./node_modules/jest-worker/build/base/BaseWorkerPool.js[39m[22m [1m[32m9:39-54[39m[22m
+[1mModule [1m[31mnot found[39m[22m[1m: [1m[31mError[39m[22m[1m: Can't resolve 'path' in 'D:\git_repos\project\gmp-eaudit\node_modules\jest-worker\build\base'
+
+[1m[31mBREAKING CHANGE[39m[22m[1m: webpack < 5 used to include polyfills for node.js core modules by default.
+This is no longer the case. Verify if you need this module and configure a polyfill for it.
+
+If you want to include a polyfill, you need to:
+	- add a fallback 'resolve.fallback: { "path": require.resolve("path-browserify") }'
+	- install 'path-browserify'
+If you don't want to include a polyfill, you can use an empty module like this:
+	resolve.fallback: { "path": false }[39m[22m
+
+[1m[31mERROR[39m[22m in [1m./node_modules/jest-worker/build/index.js[39m[22m [1m[32m27:15-28[39m[22m
+[1mModule [1m[31mnot found[39m[22m[1m: [1m[31mError[39m[22m[1m: Can't resolve 'os' in 'D:\git_repos\project\gmp-eaudit\node_modules\jest-worker\build'
+
+[1m[31mBREAKING CHANGE[39m[22m[1m: webpack < 5 used to include polyfills for node.js core modules by default.
+This is no longer the case. Verify if you need this module and configure a polyfill for it.
+
+If you want to include a polyfill, you need to:
+	- add a fallback 'resolve.fallback: { "os": require.resolve("os-browserify/browser") }'
+	- install 'os-browserify'
+If you don't want to include a polyfill, you can use an empty module like this:
+	resolve.fallback: { "os": false }[39m[22m
+
+[1m[31mERROR[39m[22m in [1m./node_modules/jest-worker/build/workers/ChildProcessWorker.js[39m[22m [1m[32m9:15-39[39m[22m
+[1mModule [1m[31mnot found[39m[22m[1m: [1m[31mError[39m[22m[1m: Can't resolve 'child_process' in 'D:\git_repos\project\gmp-eaudit\node_modules\jest-worker\build\workers'[39m[22m
+
+[1m[31mERROR[39m[22m in [1m./node_modules/jest-worker/build/workers/NodeThreadsWorker.js[39m[22m [1m[32m9:39-54[39m[22m
+[1mModule [1m[31mnot found[39m[22m[1m: [1m[31mError[39m[22m[1m: Can't resolve 'path' in 'D:\git_repos\project\gmp-eaudit\node_modules\jest-worker\build\workers'
+
+[1m[31mBREAKING CHANGE[39m[22m[1m: webpack < 5 used to include polyfills for node.js core modules by default.
+This is no longer the case. Verify if you need this module and configure a polyfill for it.
+
+If you want to include a polyfill, you need to:
+	- add a fallback 'resolve.fallback: { "path": require.resolve("path-browserify") }'
+	- install 'path-browserify'
+If you don't want to include a polyfill, you can use an empty module like this:
+	resolve.fallback: { "path": false }[39m[22m
+
+[1m[31mERROR[39m[22m in [1m./node_modules/jest-worker/build/workers/NodeThreadsWorker.js[39m[22m [1m[32m29:15-40[39m[22m
+[1mModule [1m[31mnot found[39m[22m[1m: [1m[31mError[39m[22m[1m: Can't resolve 'worker_threads' in 'D:\git_repos\project\gmp-eaudit\node_modules\jest-worker\build\workers'[39m[22m
+
+[1m[31mERROR[39m[22m in [1m./node_modules/jest-worker/build/workers/messageParent.js[39m[22m [1m[32m19:39-64[39m[22m
+[1mModule [1m[31mnot found[39m[22m[1m: [1m[31mError[39m[22m[1m: Can't resolve 'worker_threads' in 'D:\git_repos\project\gmp-eaudit\node_modules\jest-worker\build\workers'[39m[22m
+
+[1m[31mERROR[39m[22m in [1m./node_modules/loader-runner/lib/LoaderRunner.js[39m[22m [1m[32m5:9-22[39m[22m
+[1mModule [1m[31mnot found[39m[22m[1m: [1m[31mError[39m[22m[1m: Can't resolve 'fs' in 'D:\git_repos\project\gmp-eaudit\node_modules\loader-runner\lib'[39m[22m
+
+[1m[31mERROR[39m[22m in [1m./node_modules/mime-types/index.js[39m[22m [1m[32m16:14-37[39m[22m
+[1mModule [1m[31mnot found[39m[22m[1m: [1m[31mError[39m[22m[1m: Can't resolve 'path' in 'D:\git_repos\project\gmp-eaudit\node_modules\mime-types'
+
+[1m[31mBREAKING CHANGE[39m[22m[1m: webpack < 5 used to include polyfills for node.js core modules by default.
+This is no longer the case. Verify if you need this module and configure a polyfill for it.
+
+If you want to include a polyfill, you need to:
+	- add a fallback 'resolve.fallback: { "path": require.resolve("path-browserify") }'
+	- install 'path-browserify'
+If you don't want to include a polyfill, you can use an empty module like this:
+	resolve.fallback: { "path": false }[39m[22m
+
+[1m[31mERROR[39m[22m in [1m./node_modules/terser-webpack-plugin/dist/index.js[39m[22m [1m[32m3:13-28[39m[22m
+[1mModule [1m[31mnot found[39m[22m[1m: [1m[31mError[39m[22m[1m: Can't resolve 'path' in 'D:\git_repos\project\gmp-eaudit\node_modules\terser-webpack-plugin\dist'
+
+[1m[31mBREAKING CHANGE[39m[22m[1m: webpack < 5 used to include polyfills for node.js core modules by default.
+This is no longer the case. Verify if you need this module and configure a polyfill for it.
+
+If you want to include a polyfill, you need to:
+	- add a fallback 'resolve.fallback: { "path": require.resolve("path-browserify") }'
+	- install 'path-browserify'
+If you don't want to include a polyfill, you can use an empty module like this:
+	resolve.fallback: { "path": false }[39m[22m
+
+[1m[31mERROR[39m[22m in [1m./node_modules/terser-webpack-plugin/dist/index.js[39m[22m [1m[32m5:11-24[39m[22m
+[1mModule [1m[31mnot found[39m[22m[1m: [1m[31mError[39m[22m[1m: Can't resolve 'os' in 'D:\git_repos\project\gmp-eaudit\node_modules\terser-webpack-plugin\dist'
+
+[1m[31mBREAKING CHANGE[39m[22m[1m: webpack < 5 used to include polyfills for node.js core modules by default.
+This is no longer the case. Verify if you need this module and configure a polyfill for it.
+
+If you want to include a polyfill, you need to:
+	- add a fallback 'resolve.fallback: { "os": require.resolve("os-browserify/browser") }'
+	- install 'os-browserify'
+If you don't want to include a polyfill, you can use an empty module like this:
+	resolve.fallback: { "os": false }[39m[22m
+
+[1m[31mERROR[39m[22m in [1m./node_modules/terser-webpack-plugin/dist/utils.js[39m[22m [1m[32m479:6-26[39m[22m
+[1mModule [1m[31mnot found[39m[22m[1m: [1m[31mError[39m[22m[1m: Can't resolve 'uglify-js' in 'D:\git_repos\project\gmp-eaudit\node_modules\terser-webpack-plugin\dist'[39m[22m
+
+[1m[31mERROR[39m[22m in [1m./node_modules/terser-webpack-plugin/dist/utils.js[39m[22m [1m[32m557:14-34[39m[22m
+[1mModule [1m[31mnot found[39m[22m[1m: [1m[31mError[39m[22m[1m: Can't resolve '@swc/core' in 'D:\git_repos\project\gmp-eaudit\node_modules\terser-webpack-plugin\dist'[39m[22m
+
+[1m[31mERROR[39m[22m in [1m./node_modules/terser-webpack-plugin/dist/utils.js[39m[22m [1m[32m635:18-36[39m[22m
+[1mModule [1m[31mnot found[39m[22m[1m: [1m[31mError[39m[22m[1m: Can't resolve 'esbuild' in 'D:\git_repos\project\gmp-eaudit\node_modules\terser-webpack-plugin\dist'[39m[22m
+
+[1m[31mERROR[39m[22m in [1m./node_modules/watchpack/lib/DirectoryWatcher.js[39m[22m [1m[32m9:13-28[39m[22m
+[1mModule [1m[31mnot found[39m[22m[1m: [1m[31mError[39m[22m[1m: Can't resolve 'path' in 'D:\git_repos\project\gmp-eaudit\node_modules\watchpack\lib'
+
+[1m[31mBREAKING CHANGE[39m[22m[1m: webpack < 5 used to include polyfills for node.js core modules by default.
+This is no longer the case. Verify if you need this module and configure a polyfill for it.
+
+If you want to include a polyfill, you need to:
+	- add a fallback 'resolve.fallback: { "path": require.resolve("path-browserify") }'
+	- install 'path-browserify'
+If you don't want to include a polyfill, you can use an empty module like this:
+	resolve.fallback: { "path": false }[39m[22m
+
+[1m[31mERROR[39m[22m in [1m./node_modules/watchpack/lib/DirectoryWatcher.js[39m[22m [1m[32m17:15-37[39m[22m
+[1mModule [1m[31mnot found[39m[22m[1m: [1m[31mError[39m[22m[1m: Can't resolve 'os' in 'D:\git_repos\project\gmp-eaudit\node_modules\watchpack\lib'
+
+[1m[31mBREAKING CHANGE[39m[22m[1m: webpack < 5 used to include polyfills for node.js core modules by default.
+This is no longer the case. Verify if you need this module and configure a polyfill for it.
+
+If you want to include a polyfill, you need to:
+	- add a fallback 'resolve.fallback: { "os": require.resolve("os-browserify/browser") }'
+	- install 'os-browserify'
+If you don't want to include a polyfill, you can use an empty module like this:
+	resolve.fallback: { "os": false }[39m[22m
+
+[1m[31mERROR[39m[22m in [1m./node_modules/watchpack/lib/LinkResolver.js[39m[22m [1m[32m7:11-24[39m[22m
+[1mModule [1m[31mnot found[39m[22m[1m: [1m[31mError[39m[22m[1m: Can't resolve 'fs' in 'D:\git_repos\project\gmp-eaudit\node_modules\watchpack\lib'[39m[22m
+
+[1m[31mERROR[39m[22m in [1m./node_modules/watchpack/lib/LinkResolver.js[39m[22m [1m[32m8:13-28[39m[22m
+[1mModule [1m[31mnot found[39m[22m[1m: [1m[31mError[39m[22m[1m: Can't resolve 'path' in 'D:\git_repos\project\gmp-eaudit\node_modules\watchpack\lib'
+
+[1m[31mBREAKING CHANGE[39m[22m[1m: webpack < 5 used to include polyfills for node.js core modules by default.
+This is no longer the case. Verify if you need this module and configure a polyfill for it.
+
+If you want to include a polyfill, you need to:
+	- add a fallback 'resolve.fallback: { "path": require.resolve("path-browserify") }'
+	- install 'path-browserify'
+If you don't want to include a polyfill, you can use an empty module like this:
+	resolve.fallback: { "path": false }[39m[22m
+
+[1m[31mERROR[39m[22m in [1m./node_modules/watchpack/lib/getWatcherManager.js[39m[22m [1m[32m7:13-28[39m[22m
+[1mModule [1m[31mnot found[39m[22m[1m: [1m[31mError[39m[22m[1m: Can't resolve 'path' in 'D:\git_repos\project\gmp-eaudit\node_modules\watchpack\lib'
+
+[1m[31mBREAKING CHANGE[39m[22m[1m: webpack < 5 used to include polyfills for node.js core modules by default.
+This is no longer the case. Verify if you need this module and configure a polyfill for it.
+
+If you want to include a polyfill, you need to:
+	- add a fallback 'resolve.fallback: { "path": require.resolve("path-browserify") }'
+	- install 'path-browserify'
+If you don't want to include a polyfill, you can use an empty module like this:
+	resolve.fallback: { "path": false }[39m[22m
+
+[1m[31mERROR[39m[22m in [1m./node_modules/watchpack/lib/reducePlan.js[39m[22m [1m[32m7:13-28[39m[22m
+[1mModule [1m[31mnot found[39m[22m[1m: [1m[31mError[39m[22m[1m: Can't resolve 'path' in 'D:\git_repos\project\gmp-eaudit\node_modules\watchpack\lib'
+
+[1m[31mBREAKING CHANGE[39m[22m[1m: webpack < 5 used to include polyfills for node.js core modules by default.
+This is no longer the case. Verify if you need this module and configure a polyfill for it.
+
+If you want to include a polyfill, you need to:
+	- add a fallback 'resolve.fallback: { "path": require.resolve("path-browserify") }'
+	- install 'path-browserify'
+If you don't want to include a polyfill, you can use an empty module like this:
+	resolve.fallback: { "path": false }[39m[22m
+
+[1m[31mERROR[39m[22m in [1m./node_modules/watchpack/lib/watchEventSource.js[39m[22m [1m[32m7:11-24[39m[22m
+[1mModule [1m[31mnot found[39m[22m[1m: [1m[31mError[39m[22m[1m: Can't resolve 'fs' in 'D:\git_repos\project\gmp-eaudit\node_modules\watchpack\lib'[39m[22m
+
+[1m[31mERROR[39m[22m in [1m./node_modules/watchpack/lib/watchEventSource.js[39m[22m [1m[32m8:13-28[39m[22m
+[1mModule [1m[31mnot found[39m[22m[1m: [1m[31mError[39m[22m[1m: Can't resolve 'path' in 'D:\git_repos\project\gmp-eaudit\node_modules\watchpack\lib'
+
+[1m[31mBREAKING CHANGE[39m[22m[1m: webpack < 5 used to include polyfills for node.js core modules by default.
+This is no longer the case. Verify if you need this module and configure a polyfill for it.
+
+If you want to include a polyfill, you need to:
+	- add a fallback 'resolve.fallback: { "path": require.resolve("path-browserify") }'
+	- install 'path-browserify'
+If you don't want to include a polyfill, you can use an empty module like this:
+	resolve.fallback: { "path": false }[39m[22m
+
+[1m[31mERROR[39m[22m in [1m./node_modules/watchpack/lib/watchEventSource.js[39m[22m [1m[32m12:15-37[39m[22m
+[1mModule [1m[31mnot found[39m[22m[1m: [1m[31mError[39m[22m[1m: Can't resolve 'os' in 'D:\git_repos\project\gmp-eaudit\node_modules\watchpack\lib'
+
+[1m[31mBREAKING CHANGE[39m[22m[1m: webpack < 5 used to include polyfills for node.js core modules by default.
+This is no longer the case. Verify if you need this module and configure a polyfill for it.
+
+If you want to include a polyfill, you need to:
+	- add a fallback 'resolve.fallback: { "os": require.resolve("os-browserify/browser") }'
+	- install 'os-browserify'
+If you don't want to include a polyfill, you can use an empty module like this:
+	resolve.fallback: { "os": false }[39m[22m
+
+[1m[31mERROR[39m[22m in [1m./node_modules/webpack/hot/lazy-compilation-node.js[39m[22m [1m[32m13:32-48[39m[22m
+[1mModule [1m[31mnot found[39m[22m[1m: [1m[31mError[39m[22m[1m: Can't resolve 'https' in 'D:\git_repos\project\gmp-eaudit\node_modules\webpack\hot'
+
+[1m[31mBREAKING CHANGE[39m[22m[1m: webpack < 5 used to include polyfills for node.js core modules by default.
+This is no longer the case. Verify if you need this module and configure a polyfill for it.
+
+If you want to include a polyfill, you need to:
+	- add a fallback 'resolve.fallback: { "https": require.resolve("https-browserify") }'
+	- install 'https-browserify'
+If you don't want to include a polyfill, you can use an empty module like this:
+	resolve.fallback: { "https": false }[39m[22m
+
+[1m[31mERROR[39m[22m in [1m./node_modules/webpack/hot/lazy-compilation-node.js[39m[22m [1m[32m13:51-66[39m[22m
+[1mModule [1m[31mnot found[39m[22m[1m: [1m[31mError[39m[22m[1m: Can't resolve 'http' in 'D:\git_repos\project\gmp-eaudit\node_modules\webpack\hot'
+
+[1m[31mBREAKING CHANGE[39m[22m[1m: webpack < 5 used to include polyfills for node.js core modules by default.
+This is no longer the case. Verify if you need this module and configure a polyfill for it.
+
+If you want to include a polyfill, you need to:
+	- add a fallback 'resolve.fallback: { "http": require.resolve("stream-http") }'
+	- install 'stream-http'
+If you don't want to include a polyfill, you can use an empty module like this:
+	resolve.fallback: { "http": false }[39m[22m
+
+[1m[31mERROR[39m[22m in [1m./node_modules/webpack/lib/FileSystemInfo.js[39m[22m [1m[32m9:19-36[39m[22m
+[1mModule [1m[31mnot found[39m[22m[1m: [1m[31mError[39m[22m[1m: Can't resolve 'module' in 'D:\git_repos\project\gmp-eaudit\node_modules\webpack\lib'
+[1m[32mDid you mean './module'?[39m[22m[1m
+Requests that should resolve in the current directory need to start with './'.
+Requests that start with a name are treated as module requests and resolve within module directories (node_modules).
+If changing the source code is not an option there is also a resolve options called 'preferRelative' which tries to resolve these kind of requests in the current directory too.[39m[22m
+
+[1m[31mERROR[39m[22m in [1m./node_modules/webpack/lib/TemplatedPathPlugin.js[39m[22m [1m[32m9:30-45[39m[22m
+[1mModule [1m[31mnot found[39m[22m[1m: [1m[31mError[39m[22m[1m: Can't resolve 'path' in 'D:\git_repos\project\gmp-eaudit\node_modules\webpack\lib'
+
+[1m[31mBREAKING CHANGE[39m[22m[1m: webpack < 5 used to include polyfills for node.js core modules by default.
+This is no longer the case. Verify if you need this module and configure a polyfill for it.
+
+If you want to include a polyfill, you need to:
+	- add a fallback 'resolve.fallback: { "path": require.resolve("path-browserify") }'
+	- install 'path-browserify'
+If you don't want to include a polyfill, you can use an empty module like this:
+	resolve.fallback: { "path": false }[39m[22m
+
+[1m[31mERROR[39m[22m in [1m./node_modules/webpack/lib/asset/AssetGenerator.js[39m[22m [1m[32m9:13-28[39m[22m
+[1mModule [1m[31mnot found[39m[22m[1m: [1m[31mError[39m[22m[1m: Can't resolve 'path' in 'D:\git_repos\project\gmp-eaudit\node_modules\webpack\lib\asset'
+
+[1m[31mBREAKING CHANGE[39m[22m[1m: webpack < 5 used to include polyfills for node.js core modules by default.
+This is no longer the case. Verify if you need this module and configure a polyfill for it.
+
+If you want to include a polyfill, you need to:
+	- add a fallback 'resolve.fallback: { "path": require.resolve("path-browserify") }'
+	- install 'path-browserify'
+If you don't want to include a polyfill, you can use an empty module like this:
+	resolve.fallback: { "path": false }[39m[22m
+
+[1m[31mERROR[39m[22m in [1m./node_modules/webpack/lib/cli.js[39m[22m [1m[32m8:13-28[39m[22m
+[1mModule [1m[31mnot found[39m[22m[1m: [1m[31mError[39m[22m[1m: Can't resolve 'path' in 'D:\git_repos\project\gmp-eaudit\node_modules\webpack\lib'
+
+[1m[31mBREAKING CHANGE[39m[22m[1m: webpack < 5 used to include polyfills for node.js core modules by default.
+This is no longer the case. Verify if you need this module and configure a polyfill for it.
+
+If you want to include a polyfill, you need to:
+	- add a fallback 'resolve.fallback: { "path": require.resolve("path-browserify") }'
+	- install 'path-browserify'
+If you don't want to include a polyfill, you can use an empty module like this:
+	resolve.fallback: { "path": false }[39m[22m
+
+[1m[31mERROR[39m[22m in [1m./node_modules/webpack/lib/config/browserslistTargetHandler.js[39m[22m [1m[32m9:13-28[39m[22m
+[1mModule [1m[31mnot found[39m[22m[1m: [1m[31mError[39m[22m[1m: Can't resolve 'path' in 'D:\git_repos\project\gmp-eaudit\node_modules\webpack\lib\config'
+
+[1m[31mBREAKING CHANGE[39m[22m[1m: webpack < 5 used to include polyfills for node.js core modules by default.
+This is no longer the case. Verify if you need this module and configure a polyfill for it.
+
+If you want to include a polyfill, you need to:
+	- add a fallback 'resolve.fallback: { "path": require.resolve("path-browserify") }'
+	- install 'path-browserify'
+If you don't want to include a polyfill, you can use an empty module like this:
+	resolve.fallback: { "path": false }[39m[22m
+
+[1m[31mERROR[39m[22m in [1m./node_modules/webpack/lib/config/defaults.js[39m[22m [1m[32m8:11-24[39m[22m
+[1mModule [1m[31mnot found[39m[22m[1m: [1m[31mError[39m[22m[1m: Can't resolve 'fs' in 'D:\git_repos\project\gmp-eaudit\node_modules\webpack\lib\config'[39m[22m
+
+[1m[31mERROR[39m[22m in [1m./node_modules/webpack/lib/config/defaults.js[39m[22m [1m[32m9:13-28[39m[22m
+[1mModule [1m[31mnot found[39m[22m[1m: [1m[31mError[39m[22m[1m: Can't resolve 'path' in 'D:\git_repos\project\gmp-eaudit\node_modules\webpack\lib\config'
+
+[1m[31mBREAKING CHANGE[39m[22m[1m: webpack < 5 used to include polyfills for node.js core modules by default.
+This is no longer the case. Verify if you need this module and configure a polyfill for it.
+
+If you want to include a polyfill, you need to:
+	- add a fallback 'resolve.fallback: { "path": require.resolve("path-browserify") }'
+	- install 'path-browserify'
+If you don't want to include a polyfill, you can use an empty module like this:
+	resolve.fallback: { "path": false }[39m[22m
+
+[1m[31mERROR[39m[22m in [1m./node_modules/webpack/lib/hmr/lazyCompilationBackend.js[39m[22m [1m[32m38:28-44[39m[22m
+[1mModule [1m[31mnot found[39m[22m[1m: [1m[31mError[39m[22m[1m: Can't resolve 'https' in 'D:\git_repos\project\gmp-eaudit\node_modules\webpack\lib\hmr'
+
+[1m[31mBREAKING CHANGE[39m[22m[1m: webpack < 5 used to include polyfills for node.js core modules by default.
+This is no longer the case. Verify if you need this module and configure a polyfill for it.
+
+If you want to include a polyfill, you need to:
+	- add a fallback 'resolve.fallback: { "https": require.resolve("https-browserify") }'
+	- install 'https-browserify'
+If you don't want to include a polyfill, you can use an empty module like this:
+	resolve.fallback: { "https": false }[39m[22m
+
+[1m[31mERROR[39m[22m in [1m./node_modules/webpack/lib/hmr/lazyCompilationBackend.js[39m[22m [1m[32m38:47-62[39m[22m
+[1mModule [1m[31mnot found[39m[22m[1m: [1m[31mError[39m[22m[1m: Can't resolve 'http' in 'D:\git_repos\project\gmp-eaudit\node_modules\webpack\lib\hmr'
+
+[1m[31mBREAKING CHANGE[39m[22m[1m: webpack < 5 used to include polyfills for node.js core modules by default.
+This is no longer the case. Verify if you need this module and configure a polyfill for it.
+
+If you want to include a polyfill, you need to:
+	- add a fallback 'resolve.fallback: { "http": require.resolve("stream-http") }'
+	- install 'stream-http'
+If you don't want to include a polyfill, you can use an empty module like this:
+	resolve.fallback: { "http": false }[39m[22m
+
+[1m[31mERROR[39m[22m in [1m./node_modules/webpack/lib/javascript/JavascriptModulesPlugin.js[39m[22m [1m[32m9:11-24[39m[22m
+[1mModule [1m[31mnot found[39m[22m[1m: [1m[31mError[39m[22m[1m: Can't resolve 'vm' in 'D:\git_repos\project\gmp-eaudit\node_modules\webpack\lib\javascript'
+
+[1m[31mBREAKING CHANGE[39m[22m[1m: webpack < 5 used to include polyfills for node.js core modules by default.
+This is no longer the case. Verify if you need this module and configure a polyfill for it.
+
+If you want to include a polyfill, you need to:
+	- add a fallback 'resolve.fallback: { "vm": require.resolve("vm-browserify") }'
+	- install 'vm-browserify'
+If you don't want to include a polyfill, you can use an empty module like this:
+	resolve.fallback: { "vm": false }[39m[22m
+
+[1m[31mERROR[39m[22m in [1m./node_modules/webpack/lib/javascript/JavascriptParser.js[39m[22m [1m[32m11:11-24[39m[22m
+[1mModule [1m[31mnot found[39m[22m[1m: [1m[31mError[39m[22m[1m: Can't resolve 'vm' in 'D:\git_repos\project\gmp-eaudit\node_modules\webpack\lib\javascript'
+
+[1m[31mBREAKING CHANGE[39m[22m[1m: webpack < 5 used to include polyfills for node.js core modules by default.
+This is no longer the case. Verify if you need this module and configure a polyfill for it.
+
+If you want to include a polyfill, you need to:
+	- add a fallback 'resolve.fallback: { "vm": require.resolve("vm-browserify") }'
+	- install 'vm-browserify'
+If you don't want to include a polyfill, you can use an empty module like this:
+	resolve.fallback: { "vm": false }[39m[22m
+
+[1m[31mERROR[39m[22m in [1m./node_modules/webpack/lib/schemes/HttpUriPlugin.js[39m[22m [1m[32m9:30-45[39m[22m
+[1mModule [1m[31mnot found[39m[22m[1m: [1m[31mError[39m[22m[1m: Can't resolve 'path' in 'D:\git_repos\project\gmp-eaudit\node_modules\webpack\lib\schemes'
+
+[1m[31mBREAKING CHANGE[39m[22m[1m: webpack < 5 used to include polyfills for node.js core modules by default.
+This is no longer the case. Verify if you need this module and configure a polyfill for it.
+
+If you want to include a polyfill, you need to:
+	- add a fallback 'resolve.fallback: { "path": require.resolve("path-browserify") }'
+	- install 'path-browserify'
+If you don't want to include a polyfill, you can use an empty module like this:
+	resolve.fallback: { "path": false }[39m[22m
+
+[1m[31mERROR[39m[22m in [1m./node_modules/webpack/lib/schemes/HttpUriPlugin.js[39m[22m [1m[32m11:64-79[39m[22m
+[1mModule [1m[31mnot found[39m[22m[1m: [1m[31mError[39m[22m[1m: Can't resolve 'zlib' in 'D:\git_repos\project\gmp-eaudit\node_modules\webpack\lib\schemes'
+
+[1m[31mBREAKING CHANGE[39m[22m[1m: webpack < 5 used to include polyfills for node.js core modules by default.
+This is no longer the case. Verify if you need this module and configure a polyfill for it.
+
+If you want to include a polyfill, you need to:
+	- add a fallback 'resolve.fallback: { "zlib": require.resolve("browserify-zlib") }'
+	- install 'browserify-zlib'
+If you don't want to include a polyfill, you can use an empty module like this:
+	resolve.fallback: { "zlib": false }[39m[22m
+
+[1m[31mERROR[39m[22m in [1m./node_modules/webpack/lib/schemes/HttpUriPlugin.js[39m[22m [1m[32m21:30-45[39m[22m
+[1mModule [1m[31mnot found[39m[22m[1m: [1m[31mError[39m[22m[1m: Can't resolve 'http' in 'D:\git_repos\project\gmp-eaudit\node_modules\webpack\lib\schemes'
+
+[1m[31mBREAKING CHANGE[39m[22m[1m: webpack < 5 used to include polyfills for node.js core modules by default.
+This is no longer the case. Verify if you need this module and configure a polyfill for it.
+
+If you want to include a polyfill, you need to:
+	- add a fallback 'resolve.fallback: { "http": require.resolve("stream-http") }'
+	- install 'stream-http'
+If you don't want to include a polyfill, you can use an empty module like this:
+	resolve.fallback: { "http": false }[39m[22m
+
+[1m[31mERROR[39m[22m in [1m./node_modules/webpack/lib/schemes/HttpUriPlugin.js[39m[22m [1m[32m22:31-47[39m[22m
+[1mModule [1m[31mnot found[39m[22m[1m: [1m[31mError[39m[22m[1m: Can't resolve 'https' in 'D:\git_repos\project\gmp-eaudit\node_modules\webpack\lib\schemes'
+
+[1m[31mBREAKING CHANGE[39m[22m[1m: webpack < 5 used to include polyfills for node.js core modules by default.
+This is no longer the case. Verify if you need this module and configure a polyfill for it.
+
+If you want to include a polyfill, you need to:
+	- add a fallback 'resolve.fallback: { "https": require.resolve("https-browserify") }'
+	- install 'https-browserify'
+If you don't want to include a polyfill, you can use an empty module like this:
+	resolve.fallback: { "https": false }[39m[22m
+
+[1m[31mERROR[39m[22m in [1m./node_modules/webpack/lib/serialization/FileMiddleware.js[39m[22m [1m[32m15:4-19[39m[22m
+[1mModule [1m[31mnot found[39m[22m[1m: [1m[31mError[39m[22m[1m: Can't resolve 'zlib' in 'D:\git_repos\project\gmp-eaudit\node_modules\webpack\lib\serialization'
+
+[1m[31mBREAKING CHANGE[39m[22m[1m: webpack < 5 used to include polyfills for node.js core modules by default.
+This is no longer the case. Verify if you need this module and configure a polyfill for it.
+
+If you want to include a polyfill, you need to:
+	- add a fallback 'resolve.fallback: { "zlib": require.resolve("browserify-zlib") }'
+	- install 'browserify-zlib'
+If you don't want to include a polyfill, you can use an empty module like this:
+	resolve.fallback: { "zlib": false }[39m[22m
+
+[1m[31mERROR[39m[22m in [1m./node_modules/webpack/lib/util/createHash.js[39m[22m [1m[32m162:38-55[39m[22m
+[1mModule [1m[31mnot found[39m[22m[1m: [1m[31mError[39m[22m[1m: Can't resolve 'crypto' in 'D:\git_repos\project\gmp-eaudit\node_modules\webpack\lib\util'
+
+[1m[31mBREAKING CHANGE[39m[22m[1m: webpack < 5 used to include polyfills for node.js core modules by default.
+This is no longer the case. Verify if you need this module and configure a polyfill for it.
+
+If you want to include a polyfill, you need to:
+	- add a fallback 'resolve.fallback: { "crypto": require.resolve("crypto-browserify") }'
+	- install 'crypto-browserify'
+If you don't want to include a polyfill, you can use an empty module like this:
+	resolve.fallback: { "crypto": false }[39m[22m
+
+[1m[31mERROR[39m[22m in [1m./node_modules/webpack/lib/util/fs.js[39m[22m [1m[32m8:13-28[39m[22m
+[1mModule [1m[31mnot found[39m[22m[1m: [1m[31mError[39m[22m[1m: Can't resolve 'path' in 'D:\git_repos\project\gmp-eaudit\node_modules\webpack\lib\util'
+
+[1m[31mBREAKING CHANGE[39m[22m[1m: webpack < 5 used to include polyfills for node.js core modules by default.
+This is no longer the case. Verify if you need this module and configure a polyfill for it.
+
+If you want to include a polyfill, you need to:
+	- add a fallback 'resolve.fallback: { "path": require.resolve("path-browserify") }'
+	- install 'path-browserify'
+If you don't want to include a polyfill, you can use an empty module like this:
+	resolve.fallback: { "path": false }[39m[22m
+
+[1m[31mERROR[39m[22m in [1m./node_modules/webpack/lib/util/identifier.js[39m[22m [1m[32m7:13-28[39m[22m
+[1mModule [1m[31mnot found[39m[22m[1m: [1m[31mError[39m[22m[1m: Can't resolve 'path' in 'D:\git_repos\project\gmp-eaudit\node_modules\webpack\lib\util'
+
+[1m[31mBREAKING CHANGE[39m[22m[1m: webpack < 5 used to include polyfills for node.js core modules by default.
+This is no longer the case. Verify if you need this module and configure a polyfill for it.
+
+If you want to include a polyfill, you need to:
+	- add a fallback 'resolve.fallback: { "path": require.resolve("path-browserify") }'
+	- install 'path-browserify'
+If you don't want to include a polyfill, you can use an empty module like this:
+	resolve.fallback: { "path": false }[39m[22m
+
+webpack compiled with [1m[31m49 errors[39m[22m and [1m[33m12 warnings[39m[22m

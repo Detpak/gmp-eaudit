@@ -18,7 +18,7 @@ class LoginController extends Controller
     public function show()
     {
         if (UserHelpers::isLoggedIn()) {
-            return Redirect::intended('admin');
+            return Redirect::intended('app');
         }
 
         return view('login');
@@ -27,7 +27,7 @@ class LoginController extends Controller
     public function auth(Request $request)
     {
         if (UserHelpers::isLoggedIn()) {
-            return Redirect::intended('admin');
+            return Redirect::intended('app');
         }
 
         $validator = Validator::make(
@@ -88,12 +88,20 @@ class LoginController extends Controller
         Session::put('eaudit_role', $user->role_id);
         Session::put('eaudit_token', "{$user->id}|{$token}");
 
-        return Redirect::intended('admin/dashboard');
+        return Redirect::intended('app');
     }
 
     public function deauth()
     {
-        ApiAccessToken::where('token', Session::get('eaudit_token'))->delete();
+        $currentToken = UserHelpers::getUserToken();
+        $tokens = ApiAccessToken::where('user_id', $currentToken->id)->get();
+
+        foreach ($tokens as $tokenData) {
+            if (Hash::check($currentToken->token, $tokenData->token)) {
+                $tokenData->delete();
+                break;
+            }
+        }
 
         Session::regenerate();
         Session::regenerateToken();

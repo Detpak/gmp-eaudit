@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AuditController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\LoginController;
 use App\Http\Controllers\TestbedController;
 use App\Http\Controllers\UsersController;
 use App\Http\Controllers\WorkCenterController;

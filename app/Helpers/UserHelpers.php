@@ -25,4 +25,10 @@ class UserHelpers
 
         return Session::get('eaudit_id');
     }
+
+    public static function getUserToken()
+    {
+        $token = explode('|', Session::get('eaudit_token'));
+        return (object)['id' => $token[0], 'token' => $token[1]];
+    }
 }
