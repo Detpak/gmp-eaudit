@@ -12,18 +12,6 @@ import { Button } from "react-bootstrap";
 export default class AuditCyclesLayout extends React.Component {
     constructor(props) {
         super(props);
-
-        this.state = {
-            serverSource: {
-                url: '/api/v1/fetch-cycles',
-                method: 'GET',
-                then: data => data.data.map((item) => [item.id, item.label, item.open_time, item.close_time ? item.close_time : '-']),
-                total: data => {
-                    return data.total;
-                }
-            }
-        };
-
         this.table = React.createRef();
         this.refreshTable = this.refreshTable.bind(this);
         this.startNewCycle = this.startNewCycle.bind(this);
