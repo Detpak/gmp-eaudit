@@ -9,6 +9,19 @@ export default class DynamicTable extends React.Component {
 
     constructor(props) {
         super(props);
+        this.currentPage = 0;
+
+        this.pagination = {
+            limit: 25,
+            page: this.currentPage,
+            server: {
+                url: (prev, page, _) => {
+                    this.currentPage = page;
+                    return `${prev}${prev.includes('?') ? '&' : '?'}page=${page + 1}`;
+                }
+            }
+        };
+
         this.props.server.headers = axios.defaults.headers.common;
         this.wrapper = React.createRef();
     }
@@ -24,15 +37,7 @@ export default class DynamicTable extends React.Component {
                     url: (prev, keyword) => `${prev}?search=${keyword}`
                 }
             },
-            pagination: {
-                limit: 25,
-                page: this.state.currentPage,
-                server: {
-                    url: (prev, page, _) => {
-                        return `${prev}${prev.includes('?') ? '&' : '?'}page=${page + 1}`
-                    }
-                }
-            },
+            pagination: this.pagination,
             sort: {
                 server: {
                     url: (prev, columns) => {
@@ -51,21 +56,35 @@ export default class DynamicTable extends React.Component {
             }
         });
 
-        this.grid.render(this.wrapper.current);
+        this.grid.render(this.wrapper.current)
+            .on('ready', () => {
+                const checkboxPlugin = this.grid.config.plugin.get('selected');
+                console.log(checkboxPlugin);
+
+                if (checkboxPlugin) {
+                    checkboxPlugin.props.store.on('updated', (state, _) => {
+                        console.log(this.props.onItemSelected, state);
+                        if (this.props.onItemSelected) {
+                            this.props.onItemSelected(state);
+                        }
+                    });
+                }
+            });
     }
 
     refreshTable() {
-        this.grid.forceRender();
+        this.pagination.page = this.currentPage;
+        this.grid.updateConfig({ pagination: this.pagination })
+            .forceRender();
     }
 
     render() {
         return (
-            <div className="h-100" ref={this.wrapper}></div>
+            <div className="h-100 pb-2" ref={this.wrapper}></div>
         );
     }
 
-    static idColumn()
-    {
+    static idColumn() {
         return {
             id: 'id',
             sort: false,
@@ -73,8 +92,7 @@ export default class DynamicTable extends React.Component {
         };
     }
 
-    static selectionColumn()
-    {
+    static selectionColumn() {
         return {
             id: 'selected',
             sort: false,

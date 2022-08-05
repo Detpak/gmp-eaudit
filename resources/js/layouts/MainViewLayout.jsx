@@ -1,38 +1,16 @@
-import React from 'react';
-import { faChartLine, faIndustry, faListCheck, faPowerOff, faUsers } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { Routes, Route, Navigate, Outlet, NavLink } from "react-router-dom";
+import React, { useState } from 'react';
 import DashboardLayout from './DashboardLayout';
 import AuditCyclesLayout from "./AuditCyclesLayout";
 import AuditRecordsLayout from "./AuditRecordsLayout";
 import RolesLayout from "./RolesLayout";
 import ManageUserLayout from "./ManageUserLayout";
-import { Toast } from 'react-bootstrap';
-import { rootUrl } from '../utils';
+import { Button, Toast } from 'react-bootstrap';
+import { faPowerOff } from '@fortawesome/free-solid-svg-icons';
+import { menus, rootUrl } from '../utils';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { PageLink, PageNavbar } from "../components/PageNav";
-
-const menus = [
-    {
-        name: 'Dashboard',
-        link: 'dashboard',
-        icon: faChartLine,
-    },
-    {
-        name: 'Audit',
-        link: 'audit',
-        icon: faListCheck,
-    },
-    {
-        name: 'Workplace',
-        link: 'workplace',
-        icon: faIndustry
-    },
-    {
-        name: 'Users',
-        link: 'users',
-        icon: faUsers
-    }
-];
+import { Routes, Route, Navigate, Outlet, NavLink } from "react-router-dom";
+import LoadingButton from '../components/LoadingButton';
 
 function Sidebar() {
     return (
@@ -84,6 +62,24 @@ function UsersOutlet() {
     );
 }
 
+function TestbedLayout() {
+    const [isLoading, setLoading] = useState(false);
+    const handleClick = () => {
+        setLoading(true);
+
+        new Promise((resolve) => setTimeout(resolve, 3000))
+            .then(() => {
+                setLoading(false);
+            })
+    };
+
+    return (
+        <div className="p-4">
+            <LoadingButton isLoading={isLoading} onClick={handleClick}>Test Loading Button</LoadingButton>
+        </div>
+    )
+}
+
 export function MainViewLayout() {
     const [toastMsgState, setToastMsgState, updateToastMsgState] = window.globalStateStore.useState("toastMsg");
     const closeToast = () => updateToastMsgState((value) => ({ shown: false, msg: value.msg }));
@@ -116,6 +112,8 @@ export function MainViewLayout() {
                                 <Route path="manage-user" element={<ManageUserLayout />} />
                                 <Route path="*" element={<Navigate to="/app/dashboard" replace />} />
                             </Route>
+
+                            {document.querySelector("meta[name='development']") && <Route path="/app/testbed" element={<TestbedLayout />} />}
 
                             <Route path="/app/*" element={<Navigate to="/app/dashboard" replace />} />
                         </Routes>

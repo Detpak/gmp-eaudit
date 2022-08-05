@@ -34,9 +34,9 @@ class UsersController extends Controller
         $accessInfo = $request->except(['userId', 'roleName', 'remarks']);
 
         Role::create([
-            'name' => $request->roleName,
-            'access_info' => json_encode($accessInfo),
-            'remarks' => $request->remarks
+           'name' => $request->roleName,
+           'access_info' => json_encode($accessInfo),
+           'remarks' => $request->remarks
         ]);
 
         return Response::json(['result' => 'ok']);
@@ -50,14 +50,10 @@ class UsersController extends Controller
         return [
             'roleName' => $role->name,
             'remarks' => $role->remarks,
-            'dashboardAccess' => isset($accessInfo->dashboardAccess) ? $accessInfo->dashboardAccess : null,
-            'auditAccess' => isset($accessInfo->auditAccess) ? $accessInfo->auditAccess : null,
-            'auditCycleAccess' => isset($accessInfo->auditCycleAccess) ? $accessInfo->auditCycleAccess : null,
-            'auditRecordAccess' => isset($accessInfo->auditRecordAccess) ? $accessInfo->auditRecordAccess : null,
-            'auditDetailAccess' => isset($accessInfo->auditDetailAccess) ? $accessInfo->auditDetailAccess : null,
-            'usersAccess' => isset($accessInfo->usersAccess) ? $accessInfo->usersAccess : null,
-            'usersRoleAccess' => isset($accessInfo->usersRoleAccess) ? $accessInfo->auditAccess : null,
-            'usersUserListAccess' => isset($accessInfo->usersUserListAccess) ? $accessInfo->usersUserListAccess : null,
+            'dashboard' => isset($accessInfo->dashboard) ? $accessInfo->dashboard : null,
+            'audit' => isset($accessInfo->audit) ? $accessInfo->audit : null,
+            'workplace' => isset($accessInfo->workplace) ? $accessInfo->workplace : null,
+            'users' => isset($accessInfo->users) ? $accessInfo->users : null,
         ];
     }
 

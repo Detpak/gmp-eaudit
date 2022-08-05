@@ -33,6 +33,10 @@
 
     <meta name="root-url" content="{{ url('') }}">
 
+    @if(env('APP_DEBUG'))
+    <meta name="development" content="1">
+    @endif
+
     <title>e-Audit</title>
 </head>
 <body>
