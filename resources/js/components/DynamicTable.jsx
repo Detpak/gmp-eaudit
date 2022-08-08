@@ -3,13 +3,10 @@ import { Grid } from "gridjs";
 import { RowSelection } from "gridjs-selection";
 
 export default class DynamicTable extends React.Component {
-    state = {
-        currentPage: 0
-    };
-
     constructor(props) {
         super(props);
         this.currentPage = 0;
+        this.eventRegistered = false;
 
         this.pagination = {
             limit: 25,
@@ -59,23 +56,22 @@ export default class DynamicTable extends React.Component {
         this.grid.render(this.wrapper.current)
             .on('ready', () => {
                 const checkboxPlugin = this.grid.config.plugin.get('selected');
-                console.log(checkboxPlugin);
 
-                if (checkboxPlugin) {
+                if (checkboxPlugin && !this.eventRegistered) {
                     checkboxPlugin.props.store.on('updated', (state, _) => {
-                        console.log(this.props.onItemSelected, state);
                         if (this.props.onItemSelected) {
                             this.props.onItemSelected(state);
                         }
                     });
+
+                    this.eventRegistered = true;
                 }
             });
     }
 
     refreshTable() {
-        this.pagination.page = this.currentPage;
-        this.grid.updateConfig({ pagination: this.pagination })
-            .forceRender();
+        //this.pagination.page = this.currentPage;
+        this.grid.forceRender();
     }
 
     render() {
