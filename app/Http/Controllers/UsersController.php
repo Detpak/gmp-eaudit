@@ -108,11 +108,9 @@ class UsersController extends Controller
             $updateColumn['name'] = $request->roleName;
         }
 
-        if ($request->remarks) {
-            $updateColumn['remarks'] = $request->remarks;
-        }
+        $updateColumn['remarks'] = $request->remarks;
 
-        $accessInfo = $request->except(['roleName', 'remarks']);
+        $accessInfo = $request->except(['id', 'roleName', 'remarks']);
 
         if (sizeof($accessInfo) != 0) {
             $updateColumn['access_info'] = $accessInfo;
@@ -140,6 +138,10 @@ class UsersController extends Controller
                 'login_id' => 'required|string|max:255',
                 'email' => 'nullable|string|email|max:255',
                 'role_id' => 'required|exists:roles,id'
+            ],
+            [],
+            [
+                'role_id' => 'user role'
             ]);
 
         if ($validator->fails()) {
@@ -187,15 +189,19 @@ class UsersController extends Controller
         if ($request->sort && $request->dir) {
             $query->orderBy($request->sort, $request->dir);
         }
+        else {
+            $query->orderBy('users.id', 'asc');
+        }
 
-        return $query->leftJoin('roles', 'roles.id', '=', 'users.role_id')
-                     ->select('users.id',
-                              'users.name',
-                              'users.employee_id',
-                              'users.login_id',
-                              'users.email',
-                              'roles.name as role_name')
-                     ->paginate(25);
+        $query->leftJoin('roles', 'roles.id', '=', 'users.role_id')
+              ->select('users.id',
+                       'users.name',
+                       'users.employee_id',
+                       'users.login_id',
+                       'users.email',
+                       'roles.name as role_name');
+
+        return $request->all ? $query->get() : $query->paginate(25);
     }
 
     public function apiDeleteUser($id)

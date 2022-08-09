@@ -39,7 +39,7 @@
         "gridjs-selection": "^4.0.0",
         "inter-ui": "^3.19.3",
         "jquery": "^3.6.0",
-        "react-bootstrap": "^2.5.0-beta.1",
+        "react-bootstrap": "^2.5.0",
         "react-router-dom": "^6.3.0",
         "state-pool": "^0.7.1",
         "uuid": "^8.3.2"

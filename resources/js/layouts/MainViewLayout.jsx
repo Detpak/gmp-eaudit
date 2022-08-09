@@ -11,6 +11,8 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { PageLink, PageNavbar } from "../components/PageNav";
 import { Routes, Route, Navigate, Outlet, NavLink } from "react-router-dom";
 import LoadingButton from '../components/LoadingButton';
+import DepartmentLayout from './DepartmentLayout';
+import WorkplaceAreaLayout from './WorkplaceAreaLayout';
 
 function Sidebar() {
     return (
@@ -43,9 +45,16 @@ function AuditOutlet() {
 }
 
 
-function WorkspaceOutlet() {
+function WorkplaceOutlet() {
     return (
-        <></>
+        <>
+            <PageNavbar>
+                <PageLink to="department">Department</PageLink>
+                <PageLink to="area">Area</PageLink>
+            </PageNavbar>
+
+            <Outlet />
+        </>
     );
 }
 
@@ -103,6 +112,13 @@ export function MainViewLayout() {
                                 <Route index element={<Navigate to="/app/audit/cycles" replace />} />
                                 <Route path="cycles" element={<AuditCyclesLayout />} />
                                 <Route path="records" element={<AuditRecordsLayout />} />
+                                <Route path="*" element={<Navigate to="/app/dashboard" replace />} />
+                            </Route>
+
+                            <Route path="/app/workplace" element={<WorkplaceOutlet />}>
+                                <Route index element={<Navigate to="/app/workplace/department" replace />} />
+                                <Route path="department" element={<DepartmentLayout />} />
+                                <Route path="area" element={<WorkplaceAreaLayout />} />
                                 <Route path="*" element={<Navigate to="/app/dashboard" replace />} />
                             </Route>
 

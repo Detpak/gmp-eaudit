@@ -3,8 +3,9 @@ import { menus, rootUrl } from "../utils";
 import { Accordion, Button, Form, Modal } from "react-bootstrap";
 import _ from "lodash";
 import DynamicTable from "../components/DynamicTable";
+import { showToastMsg } from "../legacy/utils";
 
-function AddRolesForm({ handleChange, isSubmitting, values, errors }) {
+function RolesForm({ handleChange, values, errors }) {
     return (
         <>
             <Form.Group className="mb-3" controlId="roleName">
@@ -17,20 +18,18 @@ function AddRolesForm({ handleChange, isSubmitting, values, errors }) {
                 <Form.Control as="textarea" name="remarks" rows={3} value={values.remarks} onChange={handleChange} isInvalid={!!errors.remarks} />
                 <Form.Control.Feedback type="invalid">{errors.remarks}</Form.Control.Feedback>
             </Form.Group>
-            <Accordion alwaysOpen>
-                {menus.map((menu) => (
-                    <Form.Group key={_.uniqueId()} className="mb-3">
-                        <Form.Label>{menu.name} access privilege</Form.Label>
-                        <Form.Select name={`${menu.link}`} value={values[menu.link]} onChange={handleChange}>
-                            {_.range(menu.maxAccessLevel + 1).map((level) => (
-                                <option key={level} value={level}>
-                                    {['No access', 'Allow access', 'Full access'][level]}
-                                </option>
-                            ))}
-                        </Form.Select>
-                    </Form.Group>
-                ))}
-            </Accordion>
+            {menus.map((menu) => (
+                <Form.Group key={_.uniqueId()} className="mb-3">
+                    <Form.Label>{menu.name} access privilege</Form.Label>
+                    <Form.Select name={`${menu.link}`} value={values[menu.link]} onChange={handleChange}>
+                        {_.range(menu.maxAccessLevel + 1).map((level) => (
+                            <option key={level} value={level}>
+                                {['No access', 'Allow access', 'Full access'][level]}
+                            </option>
+                        ))}
+                    </Form.Select>
+                </Form.Group>
+            ))}
         </>
     );
 }
@@ -49,15 +48,14 @@ export default function RolesUserLayout() {
         <CommonView
             addNewItem={{
                 name: "Add Role",
-                form: AddRolesForm,
+                form: RolesForm,
                 action: rootUrl('api/v1/add-role'),
                 initialValues: initialValues
             }}
             deleteSelectedItemAction={rootUrl('api/v1/delete-roles')}
             table={{
+                canSelect: true,
                 columns: [
-                    DynamicTable.idColumn(),
-                    DynamicTable.selectionColumn(),
                     {
                         id: 'name',
                         name: 'Name'
@@ -65,12 +63,22 @@ export default function RolesUserLayout() {
                     {
                         id: 'remarks',
                         name: 'Description'
-                    },
+                    }
                 ],
+                actionColumn: {
+                    deleteAction: rootUrl('api/v1/delete-role'),
+                    editForm: {
+                        name: "Edit Role",
+                        form: RolesForm,
+                        action: rootUrl('api/v1/edit-role'),
+                        fetchUrl: rootUrl('api/v1/get-role'),
+                        initialValues: { ...initialValues }
+                    }
+                },
                 source: {
                     url: rootUrl('/api/v1/fetch-roles'),
                     method: 'GET',
-                    then: data => data.data.map((item) => [item.id, item.name, (item.remarks || item.length > 0) ? item.remarks : '-']),
+                    produce: item => [item.name, (item.remarks || item.length > 0) ? item.remarks : '-'],
                     total: data => {
                         return data.total;
                     }
@@ -78,6 +86,8 @@ export default function RolesUserLayout() {
             }}
             messages={{
                 onItemAdded: "Role successfully added!",
+                onItemEdited: "Role successfully edited!",
+                onItemDeleted: "Role successfully deleted!",
                 onNoItemSelectedMsg: "Please select the user role to delete",
                 onDeleteSelectedItemConfirmMsg: "Do you really want to delete the selected role?",
                 onSelectedItemDeletedMsg: "The selected role successfully deleted!",
