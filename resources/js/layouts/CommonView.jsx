@@ -1,8 +1,8 @@
 import React from "react";
 import LoadingButton from "../components/LoadingButton";
-import { Accordion, Button, Form, Modal } from "react-bootstrap";
+import { Accordion, Button, Form, InputGroup, Modal } from "react-bootstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faArrowRotateRight, faPlus, faTrash } from "@fortawesome/free-solid-svg-icons";
+import { faArrowRotateRight, faPlus, faTrash, faXmark } from "@fortawesome/free-solid-svg-icons";
 import { faPenToSquare } from "@fortawesome/free-regular-svg-icons";
 import { PageContent, PageContentTopbar, PageContentView } from "../components/PageNav";
 import ModalForm from "../components/ModalForm";
@@ -19,63 +19,21 @@ export default class CommonView extends React.Component {
             addNewItemModalShown: false,
             editItemModalShown: false,
             editId: null,
-            selectedItems: null
+            selectedItems: {},
+            refresh: true,
+            searchKeyword: '',
         };
-
-        this.selectedItems = new Set();
-        this.tableColumns = [];
-
-        if (this.props.table.canSelect) {
-            this.tableColumns.push(DynamicTable.selectionColumn({
-                onCheck: (id, checked) => {
-                    if (checked) {
-                        this.selectedItems.add(id);
-                    }
-                    else {
-                        this.selectedItems.delete(id);
-                    }
-                }
-            }));
-        }
-
-        this.tableColumns.push(...this.props.table.columns);
-
-        if (this.props.table.actionColumn) {
-            this.tableColumns.push(CommonView.actionColumn({
-                deleteAction: this.props.table.actionColumn,
-                onDeleted: () => {
-                    showToastMsg(this.props.messages.onItemDeleted);
-                    this.refreshTable();
-                },
-                onEditClick: (editId) => this.setState({ editId: editId, editItemModalShown: true })
-            }));
-        }
-
-        this.props.table.source.then = data => data.data.map((item) => {
-            const retItem = [];
-
-            if (item.id) {
-                if (this.props.table.canSelect) {
-                    retItem.push(item.id);
-                }
-
-                retItem.push(...this.props.table.source.produce(item));
-
-                if (this.props.table.actionColumn) {
-                    retItem.push(item.id);
-                }
-            }
-
-            return retItem;
-        });
 
         this.table = React.createRef();
         this.deleteSelectedItem = this.deleteSelectedItem.bind(this);
         this.refreshTable = this.refreshTable.bind(this);
+        this.handleSearch = this.handleSearch.bind(this);
     }
 
     async deleteSelectedItem() {
-        if (!this.selectedItems || this.selectedItems.size == 0) {
+        const ids = Object.keys(this.state.selectedItems);
+
+        if (!this.state.selectedItems || ids.length == 0) {
             alert(this.props.messages.onNoItemSelectedMsg);
             return;
         }
@@ -83,7 +41,7 @@ export default class CommonView extends React.Component {
         if (!confirm(this.props.messages.onDeleteSelectedItemConfirmMsg)) return;
 
         const response = await axios.post(this.props.deleteSelectedItemAction,
-                                          { rowIds: Array.from(this.selectedItems) },
+                                          { rowIds: ids },
                                           { headers: { 'Content-Type': 'application/json' } });
 
         if (response.data.result == 'ok') {
@@ -93,7 +51,11 @@ export default class CommonView extends React.Component {
     }
 
     refreshTable() {
-        this.table.current.refreshTable();
+        this.setState({ refresh: !this.state.refresh }); // trigger refresh
+    }
+
+    handleSearch(ev) {
+        this.setState({ searchKeyword: ev.target.value });
     }
 
     render() {
@@ -104,15 +66,34 @@ export default class CommonView extends React.Component {
                         <FontAwesomeIcon icon={faPlus} className="me-1" /><>{this.props.addNewItem.name}</>
                     </Button>
                     <LoadingButton variant="danger" icon={faTrash} onClick={this.deleteSelectedItem} className="me-2">Delete Selected</LoadingButton>
-                    <Button variant="outline-primary" onClick={this.refreshTable}><FontAwesomeIcon icon={faArrowRotateRight} /></Button>
+                    <Button variant="outline-primary" onClick={this.refreshTable} className="me-2"><FontAwesomeIcon icon={faArrowRotateRight} /></Button>
+                    <Form.Group>
+                        <InputGroup>
+                            <Form.Control type="text" value={this.state.searchKeyword} onChange={this.handleSearch} placeholder="Search" />
+                            <Button variant="outline-secondary" onClick={() => this.setState({ searchKeyword: '' })}>
+                                <FontAwesomeIcon icon={faXmark} />
+                            </Button>
+                        </InputGroup>
+                    </Form.Group>
                 </PageContentTopbar>
 
                 <PageContentView>
                     <DynamicTable
-                        columns={this.tableColumns}
-                        server={this.props.table.source}
-                        onItemSelected={(items) => this.setState({ selectedItems: items })}
-                        ref={this.table} />
+                        refreshTrigger={this.state.refresh}
+                        columns={this.props.table.columns}
+                        selectedItems={this.state.selectedItems}
+                        onSelect={(state) => this.setState({ selectedItems: state })}
+                        searchKeyword={this.state.searchKeyword}
+                        actionColumn={{
+                            deleteAction: this.props.deleteItemAction,
+                            onEditClick: (id) => this.setState({ editItemModalShown: true, editId: id }),
+                            onDeleted: () => {
+                                showToastMsg(this.props.messages.onItemDeleted);
+                                this.refreshTable();
+                            }
+                        }}
+                        source={this.props.table.source}
+                        onItemSelected={(items) => this.setState({ selectedItems: items })}/>
                 </PageContentView>
 
                 <ModalForm
@@ -130,11 +111,12 @@ export default class CommonView extends React.Component {
                         }
                     }}
                 >
-                    {({ shown, handleChange, values, errors }) => {
+                    {({ shown, handleChange, values, setValues, errors }) => {
                         const formProps = {
                             shown: shown,
                             handleChange: handleChange,
                             values: values,
+                            setValues: setValues,
                             errors: errors,
                         };
 
@@ -143,12 +125,12 @@ export default class CommonView extends React.Component {
                 </ModalForm>
 
                 {
-                    this.props.table.actionColumn ?
+                    this.props.editItem ?
                     (<ModalForm
-                        title={this.props.table.actionColumn.editForm.name}
-                        action={this.props.table.actionColumn.editForm.action}
-                        fetchUrl={this.props.table.actionColumn.editForm.fetchUrl}
-                        initialValues={this.props.table.actionColumn.editForm.initialValues}
+                        title={this.props.editItem.name}
+                        action={this.props.editItem.action}
+                        fetchUrl={this.props.editItem.fetchUrl}
+                        initialValues={this.props.editItem.initialValues}
                         editId={this.state.editId}
                         show={this.state.editItemModalShown}
                         onClose={() => this.setState({ editItemModalShown: false })}
@@ -161,15 +143,16 @@ export default class CommonView extends React.Component {
                             }
                         }}
                         >
-                            {({ shown, handleChange, values, errors }) => {
+                            {({ shown, handleChange, values, setValues, errors }) => {
                                 const formProps = {
                                     shown: shown,
                                     handleChange: handleChange,
                                     values: values,
+                                    setValues: setValues,
                                     errors: errors,
                                 };
 
-                                return React.createElement(this.props.table.actionColumn.editForm.form, formProps);
+                                return React.createElement(this.props.editItem.form, formProps);
                             }}
                         </ModalForm>)
                         : null

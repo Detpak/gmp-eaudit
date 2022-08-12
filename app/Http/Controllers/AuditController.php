@@ -52,6 +52,6 @@ class AuditController extends Controller
             $query->orderBy('id', 'desc');
         }
 
-        return $query->paginate(25);
+        return $query->paginate($request->max);
     }
 }

@@ -18,3 +18,31 @@
 .backdrop-blur {
     backdrop-filter: blur(10px);
 }
+
+.table-column {
+    background: $white;
+}
+
+.table-column:hover {
+    background: $gray-200;
+}
+
+.select-list {
+    z-index: $zindex-dropdown;
+}
+
+.shimmer {
+    height: $font-size-base;
+    background: $gray-400;
+    animation: shimmer-animation 1s infinite alternate;
+}
+
+@keyframes shimmer-animation {
+    0% {
+      opacity: 0;
+    }
+
+    100% {
+      opacity: 1;
+    }
+}

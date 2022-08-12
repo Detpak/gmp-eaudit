@@ -2,10 +2,9 @@
 
 use App\Http\Controllers\AuditController;
 use App\Http\Controllers\DashboardController;
-use App\Http\Controllers\LoginController;
+use App\Http\Controllers\DepartmentController;
 use App\Http\Controllers\TestbedController;
 use App\Http\Controllers\UsersController;
-use App\Http\Controllers\WorkCenterController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -34,12 +33,12 @@ Route::prefix('/v1')->group(function() {
         Route::get('/fetch-cycles', [AuditController::class, 'apiFetchCycles']);
 
         // Work Center APIs
-        Route::post('/add-dept', [WorkCenterController::class, 'apiAddDepartment']);
-        Route::post('/edit-dept', [WorkCenterController::class, 'apiEditDepartment']);
-        Route::get('/get-dept/{id}', [WorkCenterController::class, 'apiGetDepartment']);
-        Route::get('/fetch-depts', [WorkCenterController::class, 'apiFetchDepartments']);
-        Route::get('/delete-dept/{id}', [WorkCenterController::class, 'apiDeleteDepartment']);
-        Route::post('/delete-depts', [WorkCenterController::class, 'apiDeleteDepartments']);
+        Route::post('/add-dept', [DepartmentController::class, 'apiAddDepartment']);
+        Route::post('/edit-dept', [DepartmentController::class, 'apiEditDepartment']);
+        Route::get('/get-dept/{id}', [DepartmentController::class, 'apiGetDepartment']);
+        Route::get('/fetch-depts', [DepartmentController::class, 'apiFetchDepartments']);
+        Route::get('/delete-dept/{id}', [DepartmentController::class, 'apiDeleteDepartment']);
+        Route::post('/delete-depts', [DepartmentController::class, 'apiDeleteDepartments']);
 
         // Role APIs
         Route::post('/add-role', [UsersController::class, 'apiAddRole']);
@@ -54,6 +53,7 @@ Route::prefix('/v1')->group(function() {
         Route::post('/add-user', [UsersController::class, 'apiAddUser']);
         Route::post('/edit-user', [UsersController::class, 'apiEditUser']);
         Route::get('/get-user/{id}', [UsersController::class, 'apiGetUser']);
+        Route::post('/get-users', [UsersController::class, 'apiGetUsers']);
         Route::get('/fetch-users', [UsersController::class, 'apiFetchUsers']);
         Route::get('/delete-user/{id}', [UsersController::class, 'apiDeleteUser']);
         Route::post('/delete-users', [UsersController::class, 'apiDeleteUsers']);

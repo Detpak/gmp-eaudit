@@ -173,6 +173,7 @@ export default function ModalForm({ action, fetchUrl, initialValues, title, show
                                 shown: show,
                                 handleChange: handleChange,
                                 values: values,
+                                setValues: setValues,
                                 errors: errors,
                             };
 

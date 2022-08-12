@@ -175,6 +175,15 @@ class UsersController extends Controller
         return User::find($id)->makeHidden(['id', 'created_at', 'updated_at']);
     }
 
+    public function apiGetUsers(Request $request)
+    {
+        if (!$request->ids) {
+            return Response::json(['result' => 'error'], 404);
+        }
+
+        return User::whereIn('id', $request->ids)->get();
+    }
+
     public function apiFetchUsers(Request $request)
     {
         $query = User::query();
@@ -201,7 +210,7 @@ class UsersController extends Controller
                        'users.email',
                        'roles.name as role_name');
 
-        return $request->all ? $query->get() : $query->paginate(25);
+        return $request->all ? $query->get() : $query->paginate($request->max);
     }
 
     public function apiDeleteUser($id)

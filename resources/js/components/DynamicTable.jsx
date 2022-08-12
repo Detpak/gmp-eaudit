@@ -1,113 +1,268 @@
 import React, { useEffect, useState } from "react";
 import { RowSelection } from "gridjs/plugins/selection";
 import { Grid } from "gridjs";
-import { _ } from "gridjs-react";
-import { Form } from "react-bootstrap";
+import { Button, Form, Pagination, Spinner, Table } from "react-bootstrap";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faTrash, faPenToSquare, faAngleLeft, faAngleRight, faSort, faSortUp, faSortDown } from "@fortawesome/free-solid-svg-icons";
+import _ from "lodash";
 
-export default class DynamicTable extends React.Component {
-    grid = null;
+const MAX_PAGES = 3;
 
-    constructor(props) {
-        super(props);
+export default function DynamicTable({ refreshTrigger, columns, selectedItems, onSelect, actionColumn, searchKeyword, source }) {
+    const thClassName = "p-0 table-column";
+    const tdClassName = "px-3 py-2";
+    const entriesList = _.range(1, 11).map((value) => value * 10); // 5, 10, 15, 20, ...
+    const [search, setSearch] = useState('');
+    const [sort, setSort] = useState(null);
+    const [listData, setListData] = useState([]);
+    const [currentPage, setCurrentPage] = useState(1);
+    const [isLoading, setLoading] = useState(false);
+    const [entries, setEntries] = useState(20);
+    const [numPages, setNumPages] = useState(null);
 
-        this.eventRegistered = false;
-        this.currentPage = 0;
-        this.pagination = {
-            limit: 25,
-            page: this.currentPage,
-            server: {
-                url: (prev, page, _) => {
-                    this.currentPage = page;
-                    return `${prev}${prev.includes('?') ? '&' : '?'}page=${page + 1}`;
-                }
+    const fetchData = async () => {
+        setLoading(true);
+
+        const params = {
+            search: searchKeyword,
+            page: currentPage,
+            max: entries
+        };
+
+        if (sort) {
+            switch (sort.dir) {
+                case 1:
+                    params.sort = sort.column;
+                    params.dir = 'asc';
+                    break;
+                case 2:
+                    params.sort = sort.column;
+                    params.dir = 'desc';
+                    break;
             }
-        };
-
-        this.config = {
-            fixedHeader: true,
-            columns: this.props.columns,
-            server: this.props.server,
-            search: {
-                debounceTimeout: 500,
-                server: {
-                    url: (prev, keyword) => `${prev}?search=${keyword}`
-                }
-            },
-            pagination: this.pagination,
-            sort: {
-                server: {
-                    url: (prev, columns) => {
-                        if (columns.length == 0) return `${prev}`;
-                        const sortBy = this.props.columns[columns[0].index].id;
-                        const dir = columns[0].direction > 0 ? 'asc' : 'desc';
-                        return `${prev}${prev.includes('?') ? '&' : '?'}sort=${sortBy}&dir=${dir}`;
-                    }
-                }
-            },
-            className: {
-                container: 'h-100 overflow-auto d-flex flex-column',
-                table: 'table table-hover align-middle',
-                th: 'bg-light px-3 py-2',
-                td: 'px-3 py-2'
-            }
-        };
-
-        this.grid = new Grid(this.config);
-
-        this.props.server.headers = axios.defaults.headers.common;
-        this.wrapper = React.createRef();
-    }
-
-    componentDidMount() {
-        this.grid.render(this.wrapper.current)
-            .on('ready', () => {
-                const checkboxPlugin = this.grid.config.plugin.get('selected');
-                if (checkboxPlugin && !this.eventRegistered) {
-                    checkboxPlugin.props.store.on('updated', (state, _) => {
-                        if (this.props.onItemSelected) {
-                            this.props.onItemSelected(state);
-                        }
-                    });
-                    this.eventRegistered = true;
-                }
-            });
-    }
-
-    refreshTable() {
-        this.pagination.page = this.currentPage;
-        this.grid.updateConfig({ pagination: this.pagination }).forceRender();
-    }
-
-    render() {
-        return (
-            <div className="h-100 pb-2" ref={this.wrapper}></div>
-        );
-    }
-
-    static idColumn() {
-        return {
-            id: 'id',
-            sort: false,
-            hidden: true,
-        };
-    }
-
-    // RowSelection plugin from Grid.js is quite buggy.
-    static selectionColumn(config) {
-        return {
-            id: 'selected',
-            sort: false,
-            formatter: (cell) => (_(<DynamicTable.SelectionCheck itemId={cell} {...config} />))
         }
-    }
 
-    static SelectionCheck({ itemId, onCheck }) {
-        const handleChange = (ev) => {
-            onCheck(itemId, ev.target.checked);
-        };
+        const response = await axios.get(source.url, { params: params });
 
-        return (
-            <input type="checkbox" className="w-100 mx-auto" onChange={handleChange}></input>
-        );
-    }
+        if (response.data.data) {
+            if (response.data.last_page < currentPage) {
+                setCurrentPage(response.data.last_page);
+            }
+
+            setNumPages(response.data.last_page);
+            setListData(response.data.data);
+            setLoading(false);
+        }
+    };
+
+    const handleDeleteClick = async (itemId) => {
+        const response = await axios.get(`${actionColumn.deleteAction}/${itemId}`);
+
+        if (response.data.result == 'ok') {
+            actionColumn.onDeleted();
+        }
+    };
+
+    const handleEntryChange = (ev) => {
+        setCurrentPage(1);
+        setEntries(ev.target.value);
+    };
+
+    const handleSelect = (id, checked) => {
+        const items = { ...selectedItems };
+
+        if (id in selectedItems) {
+            delete items[id];
+        }
+        else {
+            items[id] = checked;
+        }
+
+        onSelect(items);
+    };
+
+    const handleSort = (column) => {
+        if (sort && sort.column == column) {
+            const dir = (sort.dir + 1) % 3;
+
+            if (dir === 0) {
+                setSort(null);
+                return;
+            }
+
+            setSort({ column: column, dir: dir  });
+        }
+        else {
+            setSort({ column: column, dir: 1 });
+        }
+    };
+
+    useEffect(() => {
+        fetchData();
+    }, [refreshTrigger]);
+
+    useEffect(() => {
+        if (search != searchKeyword) {
+            setSearch(searchKeyword);
+
+            const timeout = setTimeout(() => {
+                fetchData();
+            }, 500);
+
+            return () => clearTimeout(timeout);
+        }
+
+        fetchData();
+    }, [searchKeyword, sort, entries, currentPage]);
+
+    return (
+        <div className="d-flex flex-column h-100">
+            <div className="flex-fill overflow-auto h-100 mb-3">
+                <Table hover borderless striped className="align-middle mb-0">
+                    <thead className="bg-white sticky-top">
+                        <tr>
+                            {selectedItems &&
+                                <th className={thClassName}>
+                                    <div className="px-3 py-2 border border-end-0">#</div>
+                                </th>
+                            }
+                            {columns.map((column) => (
+                                <th key={_.uniqueId()} className={thClassName} onClick={() => handleSort(column.id)}>
+                                    <div className="hstack px-3 py-2 border border-end-0">
+                                        <span className="user-select-none flex-fill">{column.name}</span>
+                                        <FontAwesomeIcon icon={sort && sort.column == column.id ? (sort.dir == 1 ? faSortUp : faSortDown) : faSort} />
+                                    </div>
+                                </th>
+                            ))}
+                            {actionColumn &&
+                                <th className={thClassName}>
+                                    <div className="px-3 py-2 border border-end-0">Action</div>
+                                </th>
+                            }
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {
+                            isLoading ? (
+                                // Show loading shimmer
+                                _.range(0, 5).map(() => (
+                                    <tr key={_.uniqueId()}>
+                                        {selectedItems &&
+                                            <td className={tdClassName}>
+                                                <input type="checkbox" className="form-check-input" disabled />
+                                            </td>
+                                        }
+                                        {columns.map((data) => (
+                                            <td key={_.uniqueId()} className={tdClassName}>
+                                                <div className="shimmer"></div>
+                                            </td>
+                                        ))}
+                                        {actionColumn &&
+                                            <td className={tdClassName}>
+                                                <Button size="sm" className="me-1" disabled><FontAwesomeIcon icon={faPenToSquare}/> Edit</Button>
+                                                <Button variant="danger" size="sm" disabled><FontAwesomeIcon icon={faTrash}/> Delete</Button>
+                                            </td>
+                                        }
+                                    </tr>
+                                ))
+                            ) : (
+                                listData.map((item) => (
+                                    <tr key={_.uniqueId()}>
+                                        {selectedItems &&
+                                            <td className={tdClassName}>
+                                                <input
+                                                    type="checkbox"
+                                                    className="form-check-input"
+                                                    defaultChecked={item.id in selectedItems ? selectedItems[item.id] : false}
+                                                    onChange={(ev) => handleSelect(item.id, ev.target.checked)}
+                                                />
+                                            </td>
+                                        }
+                                        {source.produce(item).map((data) => (
+                                            <td key={_.uniqueId()} className={tdClassName}>{data}</td>
+                                        ))}
+                                        {actionColumn &&
+                                            <td className={tdClassName}>
+                                                <Button size="sm" className="me-1" onClick={() => actionColumn.onEditClick(item.id) }><FontAwesomeIcon icon={faPenToSquare}/> Edit</Button>
+                                                <Button variant="danger" size="sm" onClick={() => handleDeleteClick(item.id)}><FontAwesomeIcon icon={faTrash}/> Delete</Button>
+                                            </td>
+                                        }
+                                    </tr>
+                                ))
+                            )
+                        }
+                    </tbody>
+                </Table>
+            </div>
+            <div className="d-flex align-items-center mb-3">
+                <div className="flex-fill hstack gap-1">
+                    <span>Show</span>
+                    <Form.Group>
+                        <Form.Select value={entries} onChange={handleEntryChange}>
+                            {entriesList.map((numEntries) => <option key={_.uniqueId()} value={numEntries}>{numEntries}</option>)}
+                        </Form.Select>
+                    </Form.Group>
+                    <span>entries</span>
+                </div>
+                {!(numPages == 1) &&
+                    <Pagination className="mb-0">
+                        <Pagination.Item disabled={isLoading || currentPage == 1} onClick={() => setCurrentPage(currentPage - 1)}>
+                            <FontAwesomeIcon icon={faAngleLeft} />
+                        </Pagination.Item>
+                        {
+                            numPages <= MAX_PAGES ? (
+                                _.range(1, numPages + 1).map((page) => (
+                                    <Pagination.Item
+                                        key={_.uniqueId()}
+                                        active={currentPage == page}
+                                        disabled={isLoading && currentPage != page}
+                                        onClick={() => setCurrentPage(page)}
+                                    >
+                                        {page}
+                                    </Pagination.Item>
+                                ))
+                            ) : (
+                                (() => {
+                                    const section = currentPage == 1 ? 0 : Math.floor((currentPage - 1) / MAX_PAGES);
+                                    const prevSection = (section - 1) * MAX_PAGES + 1;
+                                    const nextSection = (section + 1) * MAX_PAGES + 1;
+                                    const endSection = Math.floor((numPages - 1) / MAX_PAGES);
+                                    return (
+                                        <>
+                                            {section != 0 &&
+                                                <>
+                                                    <Pagination.Item disabled={isLoading} onClick={() => setCurrentPage(1)}>{1}</Pagination.Item>
+                                                    <Pagination.Ellipsis disabled={isLoading} onClick={() => setCurrentPage(prevSection)} />
+                                                </>
+                                            }
+                                            {_.range(1 + section * MAX_PAGES, Math.min(nextSection, numPages + 1)).map((page) => (
+                                                <Pagination.Item
+                                                    key={_.uniqueId()}
+                                                    active={currentPage == page}
+                                                    disabled={isLoading && currentPage != page}
+                                                    onClick={() => setCurrentPage(page)}
+                                                >
+                                                    {page}
+                                                </Pagination.Item>
+                                            ))}
+                                            {section != endSection &&
+                                                <>
+                                                    <Pagination.Ellipsis disabled={isLoading} onClick={() => setCurrentPage(nextSection)} />
+                                                    <Pagination.Item disabled={isLoading} onClick={() => setCurrentPage(numPages)}>{numPages}</Pagination.Item>
+                                                </>
+                                            }
+                                        </>
+                                    )
+                                })()
+                            )
+                        }
+                        <Pagination.Item disabled={isLoading || currentPage == numPages} onClick={() => setCurrentPage(currentPage + 1)}>
+                            <FontAwesomeIcon icon={faAngleRight} />
+                        </Pagination.Item>
+                    </Pagination>
+                }
+            </div>
+
+        </div>
+    );
 }

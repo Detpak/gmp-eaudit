@@ -52,36 +52,32 @@ export default function RolesUserLayout() {
                 action: rootUrl('api/v1/add-role'),
                 initialValues: initialValues
             }}
+            editItem={{
+                name: "Edit Role",
+                form: RolesForm,
+                action: rootUrl('api/v1/edit-role'),
+                fetchUrl: rootUrl('api/v1/get-role'),
+                initialValues: { ...initialValues }
+            }}
+            deleteItemAction={rootUrl('api/v1/delete-role')}
             deleteSelectedItemAction={rootUrl('api/v1/delete-roles')}
             table={{
                 canSelect: true,
                 columns: [
                     {
                         id: 'name',
-                        name: 'Name'
+                        name: 'Name',
                     },
                     {
                         id: 'remarks',
-                        name: 'Description'
+                        name: 'Description',
                     }
                 ],
-                actionColumn: {
-                    deleteAction: rootUrl('api/v1/delete-role'),
-                    editForm: {
-                        name: "Edit Role",
-                        form: RolesForm,
-                        action: rootUrl('api/v1/edit-role'),
-                        fetchUrl: rootUrl('api/v1/get-role'),
-                        initialValues: { ...initialValues }
-                    }
-                },
                 source: {
                     url: rootUrl('/api/v1/fetch-roles'),
                     method: 'GET',
                     produce: item => [item.name, (item.remarks || item.length > 0) ? item.remarks : '-'],
-                    total: data => {
-                        return data.total;
-                    }
+                    total: data => data.total
                 }
             }}
             messages={{
