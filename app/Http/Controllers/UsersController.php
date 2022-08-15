@@ -177,10 +177,6 @@ class UsersController extends Controller
 
     public function apiGetUsers(Request $request)
     {
-        if (!$request->ids) {
-            return Response::json(['result' => 'error'], 404);
-        }
-
         return User::whereIn('id', $request->ids)->get();
     }
 

@@ -1,7 +1,7 @@
 import { faTrash } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import axios from "axios";
-import { setNestedObjectValues } from "formik";
+import { setNestedObjectValues, validateYupSchema } from "formik";
 import _ from "lodash";
 import { useEffect, useState } from "react";
 import { Button, Form, ListGroup, Spinner } from "react-bootstrap";
@@ -13,34 +13,49 @@ function DepartmentForm({ shown, handleChange, values, setValues, errors }) {
     const [isLoading, setLoading] = useState(false);
     const [picList, setPicList] = useState({});
 
+    const fetchData = async () => {
+        if (values.pic_ids.length == 0) {
+            setLoading(false);
+            setPicList({});
+            return;
+        }
+
+        setLoading(true);
+        const data = { ids: values.pic_ids };
+        const response = await axios.post(rootUrl('api/v1/get-users'), data, { headers: { 'Content-Type': 'application/json' } });
+        setPicList(response.data);
+        setLoading(false);
+    }
+
     const handleDone = async (selectedItems) => {
         if (selectedItems.length == 0) {
             return;
         }
 
-        setLoading(true);
+        const newPicIds = new Set(values.pic_ids);
 
-        const data = { ids: selectedItems };
-        const response = await axios.post(rootUrl('api/v1/get-users'), data, { headers: { 'Content-Type': 'application/json' } });
-        const newPicList = { ...picList };
-
-        for (const item of response.data) {
-            newPicList[item.id] = item;
+        for (const id of selectedItems) {
+            newPicIds.add(id);
         }
 
-        setPicList(newPicList);
-        setLoading(false);
+        setValues({ ...values, pic_ids: Array.from(newPicIds) });
     };
 
     const handleRemove = (id) => {
-        const newPicList = { ...picList };
-        delete newPicList[id];
-        setPicList(newPicList);
+        const newPicIds = new Set(values.pic_ids);
+        newPicIds.delete(`${id}`);
+        setValues({ ...values, pic_ids: Array.from(newPicIds) });
     };
 
+    const handleRemoveAll = () => {
+        setValues({ ...values, pic_ids: [] });
+    }
+
     useEffect(() => {
-        setValues({ ...values, pic_ids: _.keys(picList) })
-    }, [picList]);
+        if (shown) {
+            fetchData();
+        }
+    }, [values.pic_ids]);
 
     return (
         <>
@@ -75,7 +90,7 @@ function DepartmentForm({ shown, handleChange, values, setValues, errors }) {
                     }}
                 </SearchList>
                 <div className="hstack gap-1 mb-2">
-                    <Button variant="danger" size="sm" disabled={_.keys(picList).length == 0} onClick={() => setPicList({})}>Remove All</Button>
+                    <Button variant="danger" size="sm" disabled={_.keys(picList).length == 0} onClick={handleRemoveAll}>Remove All</Button>
                 </div>
                 <div className="overflow-auto" style={{ maxHeight: 200 }}>
                     <ListGroup>
@@ -102,8 +117,8 @@ function DepartmentForm({ shown, handleChange, values, setValues, errors }) {
                         ))}
                     </ListGroup>
                 </div>
-
-                <Form.Control.Feedback type="invalid">{errors.pics}</Form.Control.Feedback>
+                <input type="hidden" className={!!errors.pic_ids ? 'is-invalid' : ''} />
+                <Form.Control.Feedback type="invalid">{errors.pic_ids}</Form.Control.Feedback>
             </Form.Group>
         </>
     );
@@ -114,7 +129,7 @@ export default function DepartmentLayout() {
         name: '',
         code: '',
         pic_ids: []
-    }
+    };
 
     return (
         <CommonView

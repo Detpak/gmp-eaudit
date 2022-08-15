@@ -5,6 +5,9 @@ import { Button, Form, Pagination, Spinner, Table } from "react-bootstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTrash, faPenToSquare, faAngleLeft, faAngleRight, faSort, faSortUp, faSortDown } from "@fortawesome/free-solid-svg-icons";
 import _ from "lodash";
+import LoadingButton from "./LoadingButton";
+import { useInRouterContext } from "react-router-dom";
+import { useRef } from "react";
 
 const MAX_PAGES = 3;
 
@@ -12,6 +15,7 @@ export default function DynamicTable({ refreshTrigger, columns, selectedItems, o
     const thClassName = "p-0 table-column";
     const tdClassName = "px-3 py-2";
     const entriesList = _.range(1, 11).map((value) => value * 10); // 5, 10, 15, 20, ...
+    const isInRouterContext = useInRouterContext();
     const [search, setSearch] = useState('');
     const [sort, setSort] = useState(null);
     const [listData, setListData] = useState([]);
@@ -19,15 +23,19 @@ export default function DynamicTable({ refreshTrigger, columns, selectedItems, o
     const [isLoading, setLoading] = useState(false);
     const [entries, setEntries] = useState(20);
     const [numPages, setNumPages] = useState(null);
+    const mounted = useRef(false);
 
     const fetchData = async () => {
         setLoading(true);
 
         const params = {
-            search: searchKeyword,
             page: currentPage,
             max: entries
         };
+
+        if (searchKeyword.length != 0) {
+            params.search = searchKeyword;
+        }
 
         if (sort) {
             switch (sort.dir) {
@@ -44,7 +52,7 @@ export default function DynamicTable({ refreshTrigger, columns, selectedItems, o
 
         const response = await axios.get(source.url, { params: params });
 
-        if (response.data.data) {
+        if (response.data.data && mounted.current) {
             if (response.data.last_page < currentPage) {
                 setCurrentPage(response.data.last_page);
             }
@@ -56,11 +64,7 @@ export default function DynamicTable({ refreshTrigger, columns, selectedItems, o
     };
 
     const handleDeleteClick = async (itemId) => {
-        const response = await axios.get(`${actionColumn.deleteAction}/${itemId}`);
-
-        if (response.data.result == 'ok') {
-            actionColumn.onDeleted();
-        }
+        await axios.get(`${actionColumn.deleteAction}/${itemId}`);
     };
 
     const handleEntryChange = (ev) => {
@@ -98,8 +102,9 @@ export default function DynamicTable({ refreshTrigger, columns, selectedItems, o
     };
 
     useEffect(() => {
-        fetchData();
-    }, [refreshTrigger]);
+        mounted.current = true;
+        return () => { mounted.current = false; };
+    }, [])
 
     useEffect(() => {
         if (search != searchKeyword) {
@@ -113,7 +118,7 @@ export default function DynamicTable({ refreshTrigger, columns, selectedItems, o
         }
 
         fetchData();
-    }, [searchKeyword, sort, entries, currentPage]);
+    }, [refreshTrigger, searchKeyword, sort, entries, currentPage]);
 
     return (
         <div className="d-flex flex-column h-100">
@@ -159,7 +164,7 @@ export default function DynamicTable({ refreshTrigger, columns, selectedItems, o
                                         ))}
                                         {actionColumn &&
                                             <td className={tdClassName}>
-                                                <Button size="sm" className="me-1" disabled><FontAwesomeIcon icon={faPenToSquare}/> Edit</Button>
+                                                <Button size="sm" className="me-1" disabled><FontAwesomeIcon icon={faPenToSquare}/> Edit/View</Button>
                                                 <Button variant="danger" size="sm" disabled><FontAwesomeIcon icon={faTrash}/> Delete</Button>
                                             </td>
                                         }
@@ -183,8 +188,16 @@ export default function DynamicTable({ refreshTrigger, columns, selectedItems, o
                                         ))}
                                         {actionColumn &&
                                             <td className={tdClassName}>
-                                                <Button size="sm" className="me-1" onClick={() => actionColumn.onEditClick(item.id) }><FontAwesomeIcon icon={faPenToSquare}/> Edit</Button>
-                                                <Button variant="danger" size="sm" onClick={() => handleDeleteClick(item.id)}><FontAwesomeIcon icon={faTrash}/> Delete</Button>
+                                                <Button size="sm" className="me-1" onClick={() => actionColumn.onEditClick(item.id)}><FontAwesomeIcon icon={faPenToSquare}/> Edit / View</Button>
+                                                <LoadingButton
+                                                    variant="danger"
+                                                    size="sm"
+                                                    icon={faTrash}
+                                                    onClick={() => handleDeleteClick(item.id)}
+                                                    afterLoading={() => fetchData()}
+                                                >
+                                                    Delete
+                                                </LoadingButton>
                                             </td>
                                         }
                                     </tr>
@@ -193,6 +206,12 @@ export default function DynamicTable({ refreshTrigger, columns, selectedItems, o
                         }
                     </tbody>
                 </Table>
+                {
+                    !isLoading && listData.length == 0 &&
+                        <div className="text-center p-4">
+                            No records available.
+                        </div>
+                }
             </div>
             <div className="d-flex align-items-center mb-3">
                 <div className="flex-fill hstack gap-1">
@@ -262,7 +281,6 @@ export default function DynamicTable({ refreshTrigger, columns, selectedItems, o
                     </Pagination>
                 }
             </div>
-
         </div>
     );
 }

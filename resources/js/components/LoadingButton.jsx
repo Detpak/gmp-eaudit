@@ -30,6 +30,10 @@ export default class LoadingButton extends React.Component {
                     this.setState({
                         isLoading: false
                     });
+
+                    if (this.props.afterLoading) {
+                        this.props.afterLoading();
+                    }
                 })
                 .catch((reason) => {
                     this.setState({
