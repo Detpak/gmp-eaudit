@@ -102,13 +102,22 @@ class UsersController extends Controller
             return Response::json(['result' => 'Data not found']);
         }
 
-        $updateColumn = [];
+        $validator = Validator::make(
+            $request->except(['id']),
+            [
+                'roleName' => 'required|string|unique:roles,name|max:255',
+                'remarks' => 'nullable|string|max:255',
+            ]
+        );
 
-        if ($request->roleName) {
-            $updateColumn['name'] = $request->roleName;
+        if ($validator->fails()) {
+            return Response::json(['formError' => $validator->errors()]);
         }
 
-        $updateColumn['remarks'] = $request->remarks;
+        $updateColumn = [
+            'name' => $request->roleName,
+            'remarks' => $request->remarks,
+        ];
 
         $accessInfo = $request->except(['id', 'roleName', 'remarks']);
 
@@ -157,6 +166,24 @@ class UsersController extends Controller
     {
         if (!$request->id) {
             return Response::json(['result' => 'error'], 404);
+        }
+
+        $validator = Validator::make(
+            $request->all(),
+            [
+                'name' => 'required|string|max:255',
+                'employee_id' => 'required|numeric',
+                'login_id' => 'required|string|max:255',
+                'email' => 'nullable|string|email|max:255',
+                'role_id' => 'required|exists:roles,id'
+            ],
+            [],
+            [
+                'role_id' => 'user role'
+            ]);
+
+        if ($validator->fails()) {
+            return Response::json(['formError' => $validator->errors()]);
         }
 
         $user = User::find($request->id);

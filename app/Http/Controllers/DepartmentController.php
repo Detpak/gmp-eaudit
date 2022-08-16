@@ -128,4 +128,9 @@ class DepartmentController extends Controller
 
         return Response::json(['result' => 'ok']);
     }
+
+    public function apiFetchOptions()
+    {
+        return Department::select('id', 'name')->get();
+    }
 }

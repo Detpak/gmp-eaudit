@@ -11,6 +11,7 @@ class Area extends Model
 
     protected $fillable = [
         'name',
+        'desc',
         'department_id'
     ];
 }

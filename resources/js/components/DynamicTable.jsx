@@ -3,7 +3,7 @@ import { RowSelection } from "gridjs/plugins/selection";
 import { Grid } from "gridjs";
 import { Button, Form, Pagination, Spinner, Table } from "react-bootstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faTrash, faPenToSquare, faAngleLeft, faAngleRight, faSort, faSortUp, faSortDown } from "@fortawesome/free-solid-svg-icons";
+import { faTrash, faPenToSquare, faAngleLeft, faAngleRight, faSort, faSortUp, faSortDown, faCheck } from "@fortawesome/free-solid-svg-icons";
 import _ from "lodash";
 import LoadingButton from "./LoadingButton";
 import { useInRouterContext } from "react-router-dom";
@@ -128,7 +128,7 @@ export default function DynamicTable({ refreshTrigger, columns, selectedItems, o
                         <tr>
                             {selectedItems &&
                                 <th className={thClassName}>
-                                    <div className="px-3 py-2 border border-end-0">#</div>
+                                    <div className="px-3 py-2 border border-end-0"><FontAwesomeIcon icon={faCheck} /></div>
                                 </th>
                             }
                             {columns.map((column) => (

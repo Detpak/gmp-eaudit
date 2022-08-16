@@ -41,6 +41,7 @@ Route::prefix('/v1')->group(function() {
         Route::get('/fetch-depts', [DepartmentController::class, 'apiFetchDepartments']);
         Route::get('/delete-dept/{id}', [DepartmentController::class, 'apiDeleteDepartment']);
         Route::post('/delete-depts', [DepartmentController::class, 'apiDeleteDepartments']);
+        Route::get('/fetch-dept-options', [DepartmentController::class, 'apiFetchOptions']);
 
         // Area APIs
         Route::post('/add-area', [AreaController::class, 'apiAdd']);

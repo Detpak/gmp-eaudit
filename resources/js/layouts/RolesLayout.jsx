@@ -4,17 +4,18 @@ import { Accordion, Button, Form, Modal } from "react-bootstrap";
 import _ from "lodash";
 import DynamicTable from "../components/DynamicTable";
 import { showToastMsg } from "../legacy/utils";
+import { OptionalSpan, RequiredSpan } from "../components/LabelSpan";
 
 function RolesForm({ handleChange, values, errors }) {
     return (
         <>
             <Form.Group className="mb-3" controlId="roleName">
-                <Form.Label>Role name</Form.Label>
+                <Form.Label>Role name <RequiredSpan /></Form.Label>
                 <Form.Control type="text" name="roleName" value={values.roleName} onChange={handleChange} isInvalid={!!errors.roleName} />
                 <Form.Control.Feedback type="invalid">{errors.roleName}</Form.Control.Feedback>
             </Form.Group>
             <Form.Group className="mb-3" controlId="remarks">
-                <Form.Label>Remarks</Form.Label>
+                <Form.Label>Remarks <OptionalSpan /></Form.Label>
                 <Form.Control as="textarea" name="remarks" rows={3} value={values.remarks} onChange={handleChange} isInvalid={!!errors.remarks} />
                 <Form.Control.Feedback type="invalid">{errors.remarks}</Form.Control.Feedback>
             </Form.Group>
@@ -76,7 +77,7 @@ export default function RolesUserLayout() {
                 source: {
                     url: rootUrl('/api/v1/fetch-roles'),
                     method: 'GET',
-                    produce: item => [item.name, (item.remarks || item.length > 0) ? item.remarks : '-'],
+                    produce: item => [item.name, (item.remarks && item.remarks.length > 0) ? item.remarks : '-'],
                     total: data => data.total
                 }
             }}
