@@ -41,8 +41,8 @@
 </head>
 <body>
     <main id="main-container">{{ $slot }}</main>
-    <script src="{{ asset('js/manifest.js') }}"></script>
-    <script src="{{ asset('js/vendor.js') }}"></script>
-    <script src="{{ asset('js/app.js') }}"></script>
+    <script src="{{ asset('js/manifest.js') }}?id={{ Str::random(16) }}"></script>
+    <script src="{{ asset('js/vendor.js') }}?id={{ Str::random(16) }}"></script>
+    <script src="{{ asset('js/app.js') }}?id={{ Str::random(16) }}"></script>
 </body>
 </html>
