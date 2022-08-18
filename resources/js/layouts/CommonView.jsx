@@ -104,7 +104,7 @@ export default class CommonView extends React.Component {
                     show={this.state.addNewItemModalShown}
                     onClose={() => this.setState({ addNewItemModalShown: false })}
                     submitBtn={{
-                        name: "Add",
+                        name: "Save",
                         icon: faPlus,
                         afterSubmit: () => {
                             showToastMsg(this.props.messages.onItemAdded);
@@ -137,7 +137,7 @@ export default class CommonView extends React.Component {
                         show={this.state.editItemModalShown}
                         onClose={() => this.setState({ editItemModalShown: false })}
                         submitBtn={{
-                            name: "Edit",
+                            name: "Save",
                             icon: faPenToSquare,
                             afterSubmit: () => {
                                 showToastMsg(this.props.messages.onItemEdited);
