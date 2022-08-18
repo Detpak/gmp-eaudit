@@ -123,7 +123,7 @@ export default function DynamicTable({ refreshTrigger, columns, selectedItems, o
     return (
         <div className="d-flex flex-column h-100">
             <div className="flex-fill overflow-auto h-100 mb-3">
-                <Table hover borderless striped className="align-middle mb-0">
+                <Table hover borderless striped className="align-middle table-nowrap mb-0">
                     <thead className="bg-white sticky-top">
                         <tr>
                             {selectedItems &&
@@ -133,7 +133,7 @@ export default function DynamicTable({ refreshTrigger, columns, selectedItems, o
                             }
                             {columns.map((column) => (
                                 <th key={_.uniqueId()} className={thClassName} onClick={() => handleSort(column.id)}>
-                                    <div className="hstack px-3 py-2 border border-end-0">
+                                    <div className="hstack gap-2 px-3 py-2 border border-end-0">
                                         <span className="user-select-none flex-fill">{column.name}</span>
                                         <FontAwesomeIcon icon={sort && sort.column == column.id ? (sort.dir == 1 ? faSortUp : faSortDown) : faSort} />
                                     </div>

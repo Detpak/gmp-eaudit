@@ -18,10 +18,15 @@ function EntityForm({ shown, handleChange, values, errors }) {
                         <Form.Control as="textarea" name="address_1" rows={2} value={values.address_1} onChange={handleChange} isInvalid={!!errors.address_1} />
                         <Form.Control.Feedback type="invalid">{errors.address_1}</Form.Control.Feedback>
                     </Form.Group>
-                    <Form.Group controlId="address_2">
+                    <Form.Group className="mb-3" controlId="address_2">
                         <Form.Label>Address 2 <OptionalSpan/></Form.Label>
                         <Form.Control as="textarea" name="address_2" rows={2} value={values.address_2} onChange={handleChange} isInvalid={!!errors.address_2} />
                         <Form.Control.Feedback type="invalid">{errors.address_2}</Form.Control.Feedback>
+                    </Form.Group>
+                    <Form.Group controlId="city">
+                        <Form.Label>City <RequiredSpan/></Form.Label>
+                        <Form.Control type="text" name="city" value={values.city} onChange={handleChange} isInvalid={!!errors.city} />
+                        <Form.Control.Feedback type="invalid">{errors.city}</Form.Control.Feedback>
                     </Form.Group>
                 </Col>
                 <Col>
@@ -51,8 +56,10 @@ export default function EntityLayout() {
         name: '',
         address_1: '',
         address_2: '',
+        city: '',
         zip: '',
         npwp: '',
+        desc: '',
     };
 
     return (
@@ -90,6 +97,10 @@ export default function EntityLayout() {
                         name: 'Address 2'
                     },
                     {
+                        id: 'city',
+                        name: 'City',
+                    },
+                    {
                         id: 'zip',
                         name: 'Zip Code'
                     },
@@ -109,6 +120,7 @@ export default function EntityLayout() {
                         item.name,
                         item.address_1 && item.address_1.length > 0 ? item.address_1 : '-',
                         item.address_2 && item.address_2.length > 0 ? item.address_2 : '-',
+                        item.city,
                         item.zip,
                         item.npwp,
                         item.desc && item.desc.length > 0 ? item.desc : '-',

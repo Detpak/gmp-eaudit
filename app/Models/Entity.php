@@ -13,6 +13,7 @@ class Entity extends Model
         'name',
         'address_1',
         'address_2',
+        'city',
         'zip',
         'npwp',
         'desc',

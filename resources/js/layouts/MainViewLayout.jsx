@@ -120,7 +120,7 @@ export function MainViewLayout() {
                             </Route>
 
                             <Route path="/app/workplace" element={<WorkplaceOutlet />}>
-                                <Route index element={<Navigate to="/app/workplace/department" replace />} />
+                                <Route index element={<Navigate to="/app/workplace/entity" replace />} />
                                 <Route path="entity" element={<EntityLayout />} />
                                 <Route path="division" element={<DivisionLayout />} />
                                 <Route path="department" element={<DepartmentLayout />} />

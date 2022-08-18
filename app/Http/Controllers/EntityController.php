@@ -18,13 +18,14 @@ class EntityController extends Controller
                 'name'          => 'required|string|max:255|unique:entities,name',
                 'address_1'     => 'required|string|max:65535',
                 'address_2'     => 'nullable|string|max:65535',
+                'city'          => 'required|string|max:255',
                 'zip'           => [ 'required', 'regex:/(^\d{5}$)|(^\d{9}$)|(^\d{5}-\d{4}$)/', 'max:255' ],
                 'npwp'          => [ 'required', 'regex:/(\d{2}).(\d{3}).(\d{3}).(\d)-(\d{3}).(\d{3})/' ],
                 'desc'          => 'nullable|string|max:65535',
             ],
             [
                 'zip.regex'     => 'The :attribute is invalid.',
-                'npwp.regex'    => 'The :attribute is invallid'
+                'npwp.regex'    => 'The :attribute is invalid.'
             ],
             [
                 'zip'           => 'zip code',
@@ -59,13 +60,14 @@ class EntityController extends Controller
                 'name'          => [ 'required', 'string', 'max:255', Rule::unique('entities', 'name')->ignore($request->id) ],
                 'address_1'     => 'required|string|max:65535',
                 'address_2'     => 'nullable|string|max:65535',
+                'city'          => 'required|string|max:255',
                 'zip'           => [ 'required', 'regex:/(^\d{5}$)|(^\d{9}$)|(^\d{5}-\d{4}$)/', 'max:255' ],
                 'npwp'          => [ 'required', 'regex:/(^\d{15}$)/', 'max:15' ],
                 'desc'          => 'nullable|string|max:65535',
             ],
             [
                 'zip.regex'     => 'The :attribute is invalid.',
-                'npwp.regex'    => 'The :attribute is invallid'
+                'npwp.regex'    => 'The :attribute is invalid.'
             ],
             [
                 'zip'           => 'zip code',

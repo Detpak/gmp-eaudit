@@ -27,6 +27,10 @@
     background: $gray-200;
 }
 
+.table-nowrap {
+    white-space: nowrap;
+}
+
 .select-list {
     z-index: $zindex-dropdown;
 }

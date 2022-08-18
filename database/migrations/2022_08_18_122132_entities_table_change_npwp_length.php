@@ -14,6 +14,7 @@ return new class extends Migration
     public function up()
     {
         Schema::table('entities', function (Blueprint $table) {
+            $table->string('city')->nullable();
             $table->string('npwp', 20)->nullable()->change();
         });
     }
@@ -26,7 +27,7 @@ return new class extends Migration
     public function down()
     {
         Schema::table('entities', function (Blueprint $table) {
-            $table->string('npwp', 15)->nullable()->change();
+            $table->dropColumn('city');
         });
     }
 };
