@@ -5,6 +5,7 @@ use App\Http\Controllers\AuditController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DepartmentController;
 use App\Http\Controllers\EntityController;
+use App\Http\Controllers\DivisionController;
 use App\Http\Controllers\TestbedController;
 use App\Http\Controllers\UsersController;
 use Illuminate\Http\Request;
@@ -41,6 +42,14 @@ Route::prefix('/v1')->group(function() {
         Route::get('/fetch-entities', [EntityController::class, 'apiFetch']);
         Route::get('/delete-entity/{id}', [EntityController::class, 'apiDelete']);
         Route::post('/delete-entities', [EntityController::class, 'apiDeleteSelected']);
+
+        // Division APIs
+        Route::post('/add-division', [DivisionController::class, 'apiAdd']);
+        Route::post('/edit-division', [DivisionController::class, 'apiEdit']);
+        Route::get('/get-division/{id}', [DivisionController::class, 'apiGet']);
+        Route::get('/fetch-divisions', [DivisionController::class, 'apiFetch']);
+        Route::get('/delete-division/{id}', [DivisionController::class, 'apiDelete']);
+        Route::post('/delete-divisions', [DivisionController::class, 'apiDeleteSelected']);
 
         // Department APIs
         Route::post('/add-dept', [DepartmentController::class, 'apiAddDepartment']);
