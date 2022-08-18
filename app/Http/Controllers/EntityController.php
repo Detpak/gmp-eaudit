@@ -62,7 +62,7 @@ class EntityController extends Controller
                 'address_2'     => 'nullable|string|max:65535',
                 'city'          => 'required|string|max:255',
                 'zip'           => [ 'required', 'regex:/(^\d{5}$)|(^\d{9}$)|(^\d{5}-\d{4}$)/', 'max:255' ],
-                'npwp'          => [ 'required', 'regex:/(^\d{15}$)/', 'max:15' ],
+                'npwp'          => [ 'required', 'regex:/(\d{2}).(\d{3}).(\d{3}).(\d)-(\d{3}).(\d{3})/' ],
                 'desc'          => 'nullable|string|max:65535',
             ],
             [
