@@ -84,7 +84,7 @@ export default class AuditCyclesLayout extends React.Component {
                             }
                         ]}
                         source={{
-                            url: rootUrl('/api/v1/fetch-cycles'),
+                            url: rootUrl('api/v1/fetch-cycles'),
                             method: 'GET',
                             produce: item => [item.label, item.open_time, item.close_time ? item.close_time : '-'],
                         }}

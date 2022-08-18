@@ -13,6 +13,8 @@ import { Routes, Route, Navigate, Outlet, NavLink } from "react-router-dom";
 import LoadingButton from '../components/LoadingButton';
 import DepartmentLayout from './DepartmentLayout';
 import WorkplaceAreaLayout from './WorkplaceAreaLayout';
+import EntityLayout from './EntityLayout';
+import DivisionLayout from './DivisionLayout';
 
 function Sidebar() {
     return (
@@ -49,6 +51,8 @@ function WorkplaceOutlet() {
     return (
         <>
             <PageNavbar>
+                <PageLink to="entity">Entity</PageLink>
+                <PageLink to="division">Division</PageLink>
                 <PageLink to="department">Department</PageLink>
                 <PageLink to="area">Area</PageLink>
             </PageNavbar>
@@ -117,6 +121,8 @@ export function MainViewLayout() {
 
                             <Route path="/app/workplace" element={<WorkplaceOutlet />}>
                                 <Route index element={<Navigate to="/app/workplace/department" replace />} />
+                                <Route path="entity" element={<EntityLayout />} />
+                                <Route path="division" element={<DivisionLayout />} />
                                 <Route path="department" element={<DepartmentLayout />} />
                                 <Route path="area" element={<WorkplaceAreaLayout />} />
                                 <Route path="*" element={<Navigate to="/app/dashboard" replace />} />

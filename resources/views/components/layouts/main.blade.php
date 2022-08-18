@@ -31,7 +31,7 @@
     <meta name="token" content="{{ Session::get('eaudit_token') }}">
     @endif
 
-    <meta name="root-url" content="{{ url('') }}">
+    <meta name="root-url" content="{{ asset('') }}">
 
     @if(env('APP_DEBUG'))
     <meta name="development" content="1">

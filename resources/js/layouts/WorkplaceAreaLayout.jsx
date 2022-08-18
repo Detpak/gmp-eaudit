@@ -87,7 +87,7 @@ export default function WorkplaceAreaLayout() {
                     }
                 ],
                 source: {
-                    url: rootUrl('/api/v1/fetch-areas'),
+                    url: rootUrl('api/v1/fetch-areas'),
                     method: 'GET',
                     produce: item => [item.name, item.dept_name, item.desc && item.desc.length > 0 ? item.desc : '-'],
                 }

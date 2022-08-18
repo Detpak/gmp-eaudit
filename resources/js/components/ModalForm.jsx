@@ -89,7 +89,7 @@ import $ from 'jquery';
 //     }
 // }
 
-export default function ModalForm({ action, fetchUrl, initialValues, title, show, onClose, submitBtn, editId, children }) {
+export default function ModalForm({ action, fetchUrl, initialValues, title, size, show, onClose, submitBtn, editId, children }) {
     if (typeof(children) !== 'function') {
         throw new Error('The modal form children is not a function');
     }
@@ -161,7 +161,7 @@ export default function ModalForm({ action, fetchUrl, initialValues, title, show
     };
 
     return (
-        <Modal show={show} onHide={onClose} onExited={handleExited}>
+        <Modal show={show} size={size} onHide={onClose} onExited={handleExited}>
             <Modal.Header closeButton>
                 <Modal.Title>{title}</Modal.Title>
             </Modal.Header>

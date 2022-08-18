@@ -105,7 +105,7 @@ class UsersController extends Controller
         $validator = Validator::make(
             $request->except(['id']),
             [
-                'roleName' => 'required|string|unique:roles,name|max:255',
+                'roleName' => 'required|string|max:255',
                 'remarks' => 'nullable|string|max:255',
             ]
         );

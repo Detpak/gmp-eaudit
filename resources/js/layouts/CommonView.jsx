@@ -98,6 +98,7 @@ export default class CommonView extends React.Component {
 
                 <ModalForm
                     title={this.props.addNewItem.name}
+                    size={this.props.addNewItem.size}
                     action={this.props.addNewItem.action}
                     initialValues={this.props.addNewItem.initialValues}
                     show={this.state.addNewItemModalShown}
@@ -128,6 +129,7 @@ export default class CommonView extends React.Component {
                     this.props.editItem ?
                     (<ModalForm
                         title={this.props.editItem.name}
+                        size={this.props.editItem.size}
                         action={this.props.editItem.action}
                         fetchUrl={this.props.editItem.fetchUrl}
                         initialValues={this.props.editItem.initialValues}

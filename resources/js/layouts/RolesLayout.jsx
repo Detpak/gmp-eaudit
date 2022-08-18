@@ -75,7 +75,7 @@ export default function RolesUserLayout() {
                     }
                 ],
                 source: {
-                    url: rootUrl('/api/v1/fetch-roles'),
+                    url: rootUrl('api/v1/fetch-roles'),
                     method: 'GET',
                     produce: item => [item.name, (item.remarks && item.remarks.length > 0) ? item.remarks : '-'],
                     total: data => data.total

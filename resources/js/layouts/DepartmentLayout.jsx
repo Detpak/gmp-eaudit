@@ -140,7 +140,7 @@ export default function DepartmentLayout() {
                 initialValues: initialValues
             }}
             editItem={{
-                name: "Edit User",
+                name: "Edit Department",
                 form: DepartmentForm,
                 action: rootUrl('api/v1/edit-dept'),
                 fetchUrl: rootUrl('api/v1/get-dept'),
@@ -161,7 +161,7 @@ export default function DepartmentLayout() {
                     },
                 ],
                 source: {
-                    url: rootUrl('/api/v1/fetch-depts'),
+                    url: rootUrl('api/v1/fetch-depts'),
                     method: 'GET',
                     produce: item => [item.name, item.code],
                     total: data => data.total

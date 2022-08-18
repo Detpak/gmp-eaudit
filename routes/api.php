@@ -4,6 +4,7 @@ use App\Http\Controllers\AreaController;
 use App\Http\Controllers\AuditController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DepartmentController;
+use App\Http\Controllers\EntityController;
 use App\Http\Controllers\TestbedController;
 use App\Http\Controllers\UsersController;
 use Illuminate\Http\Request;
@@ -32,6 +33,14 @@ Route::prefix('/v1')->group(function() {
         Route::post('/new-cycle', [AuditController::class, 'apiNewCycle']);
         Route::get('/get-active-cycle', [AuditController::class, 'apiGetActiveCycle']);
         Route::get('/fetch-cycles', [AuditController::class, 'apiFetchCycles']);
+
+        // Entity APIs
+        Route::post('/add-entity', [EntityController::class, 'apiAdd']);
+        Route::post('/edit-entity', [EntityController::class, 'apiEdit']);
+        Route::get('/get-entity/{id}', [EntityController::class, 'apiGet']);
+        Route::get('/fetch-entities', [EntityController::class, 'apiFetch']);
+        Route::get('/delete-entity/{id}', [EntityController::class, 'apiDelete']);
+        Route::post('/delete-entities', [EntityController::class, 'apiDeleteSelected']);
 
         // Department APIs
         Route::post('/add-dept', [DepartmentController::class, 'apiAddDepartment']);

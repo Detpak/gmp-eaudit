@@ -37,7 +37,7 @@ if (document.querySelector("meta[name='development']")) {
 }
 
 export function rootUrl(url) {
-    return window.rootUrl + (url[0] == '/' ? '' : '/') + url;
+    return window.rootUrl + url;
 }
 
 export function showToastMsg(msg) {
