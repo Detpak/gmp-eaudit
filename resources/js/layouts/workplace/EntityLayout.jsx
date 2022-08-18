@@ -1,7 +1,7 @@
 import { Col, Container, Form, Row } from "react-bootstrap";
-import { OptionalSpan, RequiredSpan } from "../components/LabelSpan";
-import { rootUrl } from "../utils";
-import CommonView from "./CommonView";
+import { OptionalSpan, RequiredSpan } from "../../components/LabelSpan";
+import { rootUrl } from "../../utils";
+import CommonView from "../CommonView";
 
 function EntityForm({ shown, handleChange, values, errors }) {
     return (

@@ -1,10 +1,8 @@
-import CommonView from "./CommonView";
-import { menus, rootUrl } from "../utils";
+import CommonView from "../CommonView";
+import { menus, rootUrl } from "../../utils";
 import { Accordion, Button, Form, Modal } from "react-bootstrap";
 import _ from "lodash";
-import DynamicTable from "../components/DynamicTable";
-import { showToastMsg } from "../legacy/utils";
-import { OptionalSpan, RequiredSpan } from "../components/LabelSpan";
+import { OptionalSpan, RequiredSpan } from "../../components/LabelSpan";
 
 function RolesForm({ handleChange, values, errors }) {
     return (

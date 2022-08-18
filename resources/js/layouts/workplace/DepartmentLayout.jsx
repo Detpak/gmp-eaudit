@@ -5,9 +5,9 @@ import { setNestedObjectValues, validateYupSchema } from "formik";
 import _ from "lodash";
 import { useEffect, useState } from "react";
 import { Button, Form, ListGroup, Spinner } from "react-bootstrap";
-import SearchList from "../components/SearchList";
-import { rootUrl } from "../utils";
-import CommonView from "./CommonView";
+import SearchList from "../../components/SearchList";
+import { rootUrl } from "../../utils";
+import CommonView from "../CommonView";
 
 function DepartmentForm({ shown, handleChange, values, setValues, errors }) {
     const [isLoading, setLoading] = useState(false);

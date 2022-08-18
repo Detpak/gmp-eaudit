@@ -1,5 +1,5 @@
 import './bootstrap';
-import '../sass/app.scss'
+import '../sass/app.scss';
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { MainViewLayout } from './layouts/MainViewLayout';

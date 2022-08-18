@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import DashboardLayout from './DashboardLayout';
-import AuditCyclesLayout from "./AuditCyclesLayout";
-import AuditRecordsLayout from "./AuditRecordsLayout";
-import RolesLayout from "./RolesLayout";
-import ManageUserLayout from "./ManageUserLayout";
+import AuditCyclesLayout from "./audit/AuditCyclesLayout";
+import AuditRecordsLayout from "./audit/AuditRecordsLayout";
+import RolesLayout from "./users/RolesLayout";
+import ManageUserLayout from "./users/ManageUserLayout";
 import { Button, Toast } from 'react-bootstrap';
 import { faPowerOff } from '@fortawesome/free-solid-svg-icons';
 import { menus, rootUrl } from '../utils';
@@ -11,10 +11,10 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { PageLink, PageNavbar } from "../components/PageNav";
 import { Routes, Route, Navigate, Outlet, NavLink } from "react-router-dom";
 import LoadingButton from '../components/LoadingButton';
-import DepartmentLayout from './DepartmentLayout';
-import WorkplaceAreaLayout from './WorkplaceAreaLayout';
-import EntityLayout from './EntityLayout';
-import DivisionLayout from './DivisionLayout';
+import DepartmentLayout from './workplace/DepartmentLayout';
+import WorkplaceAreaLayout from './workplace/WorkplaceAreaLayout';
+import EntityLayout from './workplace/EntityLayout';
+import DivisionLayout from './workplace/DivisionLayout';
 
 function Sidebar() {
     return (

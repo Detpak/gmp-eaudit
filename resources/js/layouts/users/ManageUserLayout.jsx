@@ -1,9 +1,9 @@
 import _ from "lodash";
 import { useEffect, useState } from "react";
 import { Form } from "react-bootstrap";
-import { OptionalSpan, RequiredSpan } from "../components/LabelSpan";
-import { rootUrl } from "../utils";
-import CommonView from "./CommonView";
+import { OptionalSpan, RequiredSpan } from "../../components/LabelSpan";
+import { rootUrl } from "../../utils";
+import CommonView from "../CommonView";
 
 function UserForm({ shown, handleChange, values, errors }) {
     const [isLoadingRole, setLoadingRole] = useState(false);

@@ -1,10 +1,10 @@
 import axios from "axios";
-import CommonView from "./CommonView";
+import CommonView from "./../CommonView";
 import { Form } from "react-bootstrap";
-import { rootUrl } from "../utils";
+import { rootUrl } from "../../utils";
 import { useState } from "react";
 import { useEffect } from "react";
-import { OptionalSpan, RequiredSpan } from "../components/LabelSpan";
+import { OptionalSpan, RequiredSpan } from "../../components/LabelSpan";
 
 function WorkplaceAreaForm({ shown, handleChange, values, setValues, errors }) {
     const [isLoading, setLoading] = useState(false);

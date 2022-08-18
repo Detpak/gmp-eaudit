@@ -1,11 +1,11 @@
 import React from "react";
 import axios from "axios";
-import DynamicTable from "../components/DynamicTable";
-import LoadingButton from "../components/LoadingButton";
+import DynamicTable from "../../components/DynamicTable";
+import LoadingButton from "../../components/LoadingButton";
 import { faArrowRotateRight, faPlus, faXmark } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { showToastMsg, rootUrl } from "../utils";
-import { PageContent, PageContentTopbar, PageContentView } from "../components/PageNav";
+import { showToastMsg, rootUrl } from "../../utils";
+import { PageContent, PageContentTopbar, PageContentView } from "../../components/PageNav";
 import "gridjs/dist/theme/mermaid.css";
 import { Button, Form, InputGroup } from "react-bootstrap";
 
