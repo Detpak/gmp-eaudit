@@ -120,7 +120,7 @@ export default function EntityLayout() {
                         item.name,
                         item.address_1 && item.address_1.length > 0 ? item.address_1 : '-',
                         item.address_2 && item.address_2.length > 0 ? item.address_2 : '-',
-                        item.city && item.entity.length > 0 ? item.city : '-',
+                        item.city && item.city.length > 0 ? item.city : '-',
                         item.zip,
                         item.npwp,
                         item.desc && item.desc.length > 0 ? item.desc : '-',
