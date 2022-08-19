@@ -161,7 +161,7 @@ export default function ModalForm({ action, fetchUrl, initialValues, title, size
     };
 
     return (
-        <Modal show={show} size={size} onHide={onClose} onExited={handleExited}>
+        <Modal show={show} size={size} backdrop="static" onHide={onClose} onExited={handleExited}>
             <Modal.Header closeButton>
                 <Modal.Title>{title}</Modal.Title>
             </Modal.Header>
