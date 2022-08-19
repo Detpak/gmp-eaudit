@@ -13,10 +13,8 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('divisions', function (Blueprint $table) {
-            $table->id();
-            $table->string('name');
-            $table->timestamps();
+        Schema::table('divisions', function (Blueprint $table) {
+            $table->foreignId('entity_id')->constrained('entities')->nullable();
         });
     }
 
@@ -27,6 +25,9 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('divisions');
+        Schema::table('divisions', function (Blueprint $table) {
+            $table->dropForeign(['entity_id']);
+            $table->dropColumn('entity_id');
+        });
     }
 };
