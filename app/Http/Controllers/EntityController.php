@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Entity;
+use App\Helpers\CommonHelpers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Response;
 use Illuminate\Support\Facades\Validator;
@@ -111,12 +112,22 @@ class EntityController extends Controller
             $query->orderBy($request->sort, $request->dir);
         }
 
+        $query->withCount('divisions');
+
         return $query->paginate($request->max);
     }
 
     public function apiDelete($id)
     {
-        Entity::find($id)->delete();
+        $entity = Entity::withCount('divisions')->find($id);
+
+        if ($entity->divisions_count > 0) {
+            $subject = CommonHelpers::getSubjectWord($entity->divisions_count);
+            return ['error' => "Cannot delete entity. There {$subject} {$entity->divisions_count} registered division(s) under the entity."];
+        }
+
+        $entity->delete();
+
         return ['result' => 'ok'];
     }
 
@@ -128,5 +139,10 @@ class EntityController extends Controller
 
         Entity::whereIn('id', $request->rowIds)->delete();
         return ['result' => 'ok'];
+    }
+
+    public function apiFetchOptions()
+    {
+        return Entity::select('id', 'name')->get();
     }
 }

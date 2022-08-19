@@ -18,4 +18,9 @@ class Entity extends Model
         'npwp',
         'desc',
     ];
+
+    public function divisions()
+    {
+        return $this->hasMany(Division::class, 'entity_id');
+    }
 }

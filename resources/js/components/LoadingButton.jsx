@@ -2,13 +2,14 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { TimeScale } from "chart.js";
 import React from "react";
 import { Button, Spinner } from "react-bootstrap";
+import { showToastMsg } from "../utils";
 
 export default class LoadingButton extends React.Component {
     constructor(props) {
         super(props);
 
         this.state = {
-            isLoading: false
+            isLoading: false,
         };
 
         this.handledManually = this.props.isLoading != null;
@@ -28,7 +29,7 @@ export default class LoadingButton extends React.Component {
             if (!this.handledManually) {
                 result.then(() => {
                     this.setState({
-                        isLoading: false
+                        isLoading: false,
                     });
 
                     if (this.props.afterLoading) {
@@ -39,6 +40,8 @@ export default class LoadingButton extends React.Component {
                     this.setState({
                         isLoading: false
                     });
+
+                    showToastMsg(reason.message);
                 });
             }
         }

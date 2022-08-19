@@ -8,6 +8,7 @@ import _ from "lodash";
 import LoadingButton from "./LoadingButton";
 import { useInRouterContext } from "react-router-dom";
 import { useRef } from "react";
+import { showToastMsg } from "../utils";
 
 const MAX_PAGES = 3;
 
@@ -64,7 +65,11 @@ export default function DynamicTable({ refreshTrigger, columns, selectedItems, o
     };
 
     const handleDeleteClick = async (itemId) => {
-        await axios.get(`${actionColumn.deleteAction}/${itemId}`);
+        const response = await axios.get(`${actionColumn.deleteAction}/${itemId}`);
+
+        if (response.data.error) {
+            throw Error(response.data.error);
+        }
     };
 
     const handleEntryChange = (ev) => {
@@ -131,17 +136,20 @@ export default function DynamicTable({ refreshTrigger, columns, selectedItems, o
                                     <div className="px-3 py-2 border border-end-0"><FontAwesomeIcon icon={faCheck} /></div>
                                 </th>
                             }
-                            {columns.map((column) => (
-                                <th key={_.uniqueId()} className={thClassName} onClick={() => handleSort(column.id)}>
-                                    <div className="hstack gap-2 px-3 py-2 border border-end-0">
-                                        <span className="user-select-none flex-fill">{column.name}</span>
-                                        <FontAwesomeIcon icon={sort && sort.column == column.id ? (sort.dir == 1 ? faSortUp : faSortDown) : faSort} />
-                                    </div>
-                                </th>
-                            ))}
+                            {columns.map((column) => {
+                                const sortable = !('sortable' in column) ? true : column.sortable;
+                                return (
+                                    <th key={_.uniqueId()} className={thClassName} onClick={() => sortable && handleSort(column.id)}>
+                                        <div className="hstack gap-3 px-3 py-2 border border-end-0">
+                                            <span className="user-select-none flex-fill">{column.name}</span>
+                                            {sortable && <FontAwesomeIcon icon={sort && sort.column == column.id ? (sort.dir == 1 ? faSortUp : faSortDown) : faSort} />}
+                                        </div>
+                                    </th>
+                                )
+                            })}
                             {actionColumn &&
                                 <th className={thClassName}>
-                                    <div className="px-3 py-2 border border-end-0">Action</div>
+                                    <div className="px-3 py-2 border">Action</div>
                                 </th>
                             }
                         </tr>

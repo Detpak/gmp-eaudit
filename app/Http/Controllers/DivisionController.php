@@ -76,6 +76,11 @@ class DivisionController extends Controller
             $query->orderBy($request->sort, $request->dir);
         }
 
+        $query->leftJoin('entities', 'entities.id', '=', 'divisions.entity_id')
+            ->select('divisions.id',
+                     'divisions.name',
+                     'entities.name as entity_name');
+
         return $query->paginate($request->max);
     }
 

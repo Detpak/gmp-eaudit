@@ -112,6 +112,11 @@ export default function EntityLayout() {
                         id: 'desc',
                         name: 'Description'
                     },
+                    {
+                        sortable: false,
+                        id: 'divisions_count',
+                        name: '# Divisions'
+                    },
                 ],
                 source: {
                     url: rootUrl('api/v1/fetch-entities'),
@@ -124,6 +129,7 @@ export default function EntityLayout() {
                         item.zip,
                         item.npwp,
                         item.desc && item.desc.length > 0 ? item.desc : '-',
+                        item.divisions_count,
                     ],
                 }
             }}

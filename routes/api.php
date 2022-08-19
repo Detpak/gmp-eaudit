@@ -42,6 +42,7 @@ Route::prefix('/v1')->group(function() {
         Route::get('/fetch-entities', [EntityController::class, 'apiFetch']);
         Route::get('/delete-entity/{id}', [EntityController::class, 'apiDelete']);
         Route::post('/delete-entities', [EntityController::class, 'apiDeleteSelected']);
+        Route::get('/fetch-entity-options', [EntityController::class, 'apiFetchOptions']);
 
         // Division APIs
         Route::post('/add-division', [DivisionController::class, 'apiAdd']);
