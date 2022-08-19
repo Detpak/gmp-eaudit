@@ -16,6 +16,12 @@ class AdminSeeder extends Seeder
      */
     public function run()
     {
+        Role::create([
+            'name' => 'Administrator',
+            'access_info' => '{}',
+            'remarks' => ''
+        ]);
+
         User::create([
             'name' => 'TestAdmin',
             'employee_id' => '1',
