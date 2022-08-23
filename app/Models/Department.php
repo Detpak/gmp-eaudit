@@ -11,11 +11,17 @@ class Department extends Model
 
     protected $fillable = [
         'name',
-        'code'
+        'code',
+        'division_id'
     ];
 
     public function pics()
     {
         return $this->belongsToMany(User::class, 'department_pics', 'dept_id', 'user_id');
+    }
+
+    public function areas()
+    {
+        return $this->hasMany(Area::class, 'department_id');
     }
 }

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\CommonHelpers;
 use App\Models\Role;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -75,7 +76,13 @@ class UsersController extends Controller
 
     public function apiDeleteRole($id)
     {
-        Role::find($id)->delete();
+        $role = Role::withCount('users')->find($id);
+
+        if ($role->users_count > 0) {
+            $subject = CommonHelpers::getSubjectWord($role->users_count);
+            return ['error' => "Cannot delete role \"{$role->name}\". There {$subject} {$role->users_count} registered user(s) under the role."];
+        }
+
         return Response::json(['result' => 'ok']);
     }
 
@@ -85,8 +92,21 @@ class UsersController extends Controller
             return Response::json(['result' => 'error'], 404);
         }
 
-        Role::whereIn('id', $request->rowIds)->delete();
+        $roles = Role::withCount('users')->whereIn('id', $request->rowIds);
+        $errorCount = 0;
 
+        foreach ($roles->get() as $role) {
+            if ($role->users_count > 0) {
+                $errorCount += $role->users_count;
+            }
+        }
+
+        if ($errorCount > 0) {
+            $subject = CommonHelpers::getSubjectWord($errorCount);
+            return ['error' => "Cannot delete roles. There {$subject} {$errorCount} registered user(s) under some roles."];
+        }
+
+        $roles->delete();
         return Response::json(['result' => 'ok']);
     }
 

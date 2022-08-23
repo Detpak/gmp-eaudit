@@ -48,6 +48,10 @@ export default class CommonView extends React.Component {
             showToastMsg(this.props.messages.onSelectedItemDeletedMsg);
             this.refreshTable();
         }
+
+        if (response.data.error) {
+            showToastMsg(response.data.error);
+        }
     }
 
     refreshTable() {

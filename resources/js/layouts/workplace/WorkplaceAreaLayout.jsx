@@ -8,16 +8,25 @@ import { OptionalSpan, RequiredSpan } from "../../components/LabelSpan";
 
 function WorkplaceAreaForm({ shown, handleChange, values, setValues, errors }) {
     const [isLoading, setLoading] = useState(false);
+    const [plants, setPlants] = useState([]);
     const [departments, setDepartments] = useState([]);
+
+    const fetchData = async () => {
+        return {
+            departments: (await axios.get(rootUrl('api/v1/fetch-dept-options'))).data,
+            plants: (await axios.get(rootUrl('api/v1/fetch-plant-options'))).data
+        };
+    };
 
     useEffect(() => {
         if (shown) {
+            console.log('fetch');
             setLoading(true);
-            axios.get(rootUrl('api/v1/fetch-dept-options'))
-                .then((response) => {
-                    setDepartments(response.data);
-                    setLoading(false);
-                });
+            fetchData().then((values) => {
+                setPlants(values.plants);
+                setDepartments(values.departments);
+                setLoading(false);
+            });
         }
     }, [shown]);
 
@@ -27,6 +36,16 @@ function WorkplaceAreaForm({ shown, handleChange, values, setValues, errors }) {
                 <Form.Label>Name <RequiredSpan /></Form.Label>
                 <Form.Control type="text" name="name" value={values.name} onChange={handleChange} isInvalid={!!errors.name} />
                 <Form.Control.Feedback type="invalid">{errors.name}</Form.Control.Feedback>
+            </Form.Group>
+            <Form.Group className="mb-3" controlId="plant_id">
+                <Form.Label>Plant <RequiredSpan /></Form.Label>
+                <Form.Select name="plant_id" value={values.plant_id} onChange={handleChange} isInvalid={!!errors.plant_id} disabled={isLoading}>
+                    <option value="" disabled>-- Please select plant --</option>
+                    {plants.map((data) => (
+                        <option key={_.uniqueId()} value={data.id}>{data.name}</option>
+                    ))}
+                </Form.Select>
+                <Form.Control.Feedback type="invalid">{errors.plant_id}</Form.Control.Feedback>
             </Form.Group>
             <Form.Group className="mb-3" controlId="department_id">
                 <Form.Label>Department <RequiredSpan /></Form.Label>
@@ -50,6 +69,7 @@ export default function WorkplaceAreaLayout() {
     const initialValues = {
         name: '',
         desc: '',
+        plant_id: '',
         department_id: ''
     };
 
@@ -78,6 +98,10 @@ export default function WorkplaceAreaLayout() {
                         name: 'Area Name'
                     },
                     {
+                        id: 'plant_name',
+                        name: 'Plant Name'
+                    },
+                    {
                         id: 'dept_name',
                         name: 'Department Name'
                     },
@@ -89,7 +113,12 @@ export default function WorkplaceAreaLayout() {
                 source: {
                     url: rootUrl('api/v1/fetch-areas'),
                     method: 'GET',
-                    produce: item => [item.name, item.dept_name, item.desc && item.desc.length > 0 ? item.desc : '-'],
+                    produce: item => [
+                        item.name,
+                        item.plant_name,
+                        item.dept_name,
+                        item.desc && item.desc.length > 0 ? item.desc : '-'
+                    ],
                 }
             }}
             messages={{

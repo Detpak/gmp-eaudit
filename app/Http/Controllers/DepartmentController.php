@@ -2,12 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\CommonHelpers;
 use App\Models\Department;
 use App\Models\DepartmentPIC;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Response;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\Rule;
 
 class DepartmentController extends Controller
 {
@@ -16,12 +18,16 @@ class DepartmentController extends Controller
         $validator = Validator::make(
             $request->all(),
             [
-                'name' => 'required|string|max:255',
-                'code' => 'required|numeric|unique:departments,code',
-                'pic_ids' => 'required'
+                'name'              => 'required|string|max:255',
+                'code'              => 'required|numeric|unique:departments,code',
+                'division_id'       => 'required|exist:divisions,id',
+                'pic_ids'           => 'required'
             ],
             [
-                'pic_ids.required' => 'The PIC(s) must be filled.'
+                'pic_ids.required'  => 'The PIC(s) must be filled.'
+            ],
+            [
+                'division_id'       => 'division'
             ]);
 
         if ($validator->fails()) {
@@ -49,6 +55,25 @@ class DepartmentController extends Controller
 
         if (!$data) {
             return Response::json(['result' => 'Data not found']);
+        }
+
+        $validator = Validator::make(
+            $request->all(),
+            [
+                'name'              => 'required|string|max:255',
+                'code'              => ['required', 'numeric', Rule::unique('departments', 'code')->ignore($request->id)],
+                'division_id'       => 'required|exists:divisions,id',
+                'pic_ids'           => 'required'
+            ],
+            [
+                'pic_ids.required'  => 'The PIC(s) must be filled.'
+            ],
+            [
+                'division_id'       => 'division'
+            ]);
+
+        if ($validator->fails()) {
+            return ['formError' => $validator->errors()];
         }
 
         $data->update($request->except('id'));
@@ -108,25 +133,54 @@ class DepartmentController extends Controller
             $query->orderBy($request->sort, $request->dir);
         }
 
-        return $query->select('id', 'name', 'code')->paginate($request->max);
+        $query->leftJoin('divisions', 'divisions.id', '=', 'departments.division_id')
+            ->select('departments.id',
+                     'departments.name',
+                     'departments.code',
+                     'divisions.name as division_name');
+
+        return $query->paginate($request->max);
     }
 
     public function apiDeleteDepartment($id)
     {
+        $department = Department::withCount('areas')->find($id);
+
+        if ($department->areas_count > 0) {
+            $subject = CommonHelpers::getSubjectWord($department->areas_count);
+            return ['error' => "Cannot delete department. There {$subject} {$department->areas_count} registered area(s) under the deparment."];
+        }
+
         DepartmentPIC::where('dept_id', $id)->delete();
-        Department::find($id)->delete();
+        $department->delete();
+
         return ['result' => 'ok'];
     }
 
     public function apiDeleteDepartments(Request $request)
     {
-        if (!$request->has('rowIds')) {
+        if (!$request->rowIds) {
             return Response::json(['result' => 'error'], 404);
         }
 
-        Department::whereIn('id', $request->rowIds)->delete();
+        $departments = Department::withCount('areas')->whereIn('id', $request->rowIds);
+        $errorCount = 0;
 
-        return Response::json(['result' => 'ok']);
+        foreach ($departments->get() as $department) {
+            if ($department->areas_count > 0) {
+                $errorCount += $department->areas_count;
+            }
+        }
+
+        if ($errorCount > 0) {
+            $subject = CommonHelpers::getSubjectWord($errorCount);
+            return ['error' => "Cannot delete departments. There {$subject} {$errorCount} registered area(s) under some departments."];
+        }
+
+        DepartmentPIC::whereIn('dept_id', $request->rowIds)->delete();
+        $departments->delete();
+
+        return ['result' => 'ok'];
     }
 
     public function apiFetchOptions()

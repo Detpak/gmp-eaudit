@@ -58,12 +58,12 @@ class EntityController extends Controller
         $validator = Validator::make(
             $request->all(),
             [
-                'name'          => [ 'required', 'string', 'max:255', Rule::unique('entities', 'name')->ignore($request->id) ],
+                'name'          => ['required', 'string', 'max:255', Rule::unique('entities', 'name')->ignore($request->id)],
                 'address_1'     => 'required|string|max:65535',
                 'address_2'     => 'nullable|string|max:65535',
                 'city'          => 'required|string|max:255',
-                'zip'           => [ 'required', 'regex:/(^\d{5}$)|(^\d{9}$)|(^\d{5}-\d{4}$)/', 'max:255' ],
-                'npwp'          => [ 'required', 'regex:/(\d{2}).(\d{3}).(\d{3}).(\d)-(\d{3}).(\d{3})/' ],
+                'zip'           => ['required', 'regex:/(^\d{5}$)|(^\d{9}$)|(^\d{5}-\d{4}$)/', 'max:255'],
+                'npwp'          => ['required', 'regex:/(\d{2}).(\d{3}).(\d{3}).(\d)-(\d{3}).(\d{3})/'],
                 'desc'          => 'nullable|string|max:65535',
             ],
             [
@@ -104,6 +104,7 @@ class EntityController extends Controller
             $query->where('name', 'LIKE', "%{$request->search}%")
                 ->orWhere('address_1', 'LIKE', "%{$request->search}%")
                 ->orWhere('address_2', 'LIKE', "%{$request->search}%")
+                ->orWhere('code', 'LIKE', "%{$request->search}%")
                 ->orWhere('zip', 'LIKE', "%{$request->search}%")
                 ->orWhere('npwp', 'LIKE', "%{$request->search}%");
         }
@@ -137,7 +138,22 @@ class EntityController extends Controller
             return Response::json(['result' => 'error'], 404);
         }
 
-        Entity::whereIn('id', $request->rowIds)->delete();
+        $entities = Entity::withCount('divisions')->whereIn('id', $request->rowIds);
+        $errorCount = 0;
+
+        foreach ($entities->get() as $entity) {
+            if ($entity->divisions_count > 0) {
+                $errorCount += $entity->divisions_count;
+            }
+        }
+
+        if ($errorCount > 0) {
+            $subject = CommonHelpers::getSubjectWord($errorCount);
+            return ['error' => "Cannot delete entities. There {$subject} {$errorCount} registered division(s) under some entities."];
+        }
+
+        $entities->delete();
+
         return ['result' => 'ok'];
     }
 

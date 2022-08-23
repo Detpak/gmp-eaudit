@@ -13,8 +13,15 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::table('divisions', function (Blueprint $table) {
+        Schema::create('plants', function (Blueprint $table) {
+            $table->id();
+            $table->string('code', 4);
+            $table->string('name');
+            $table->text('address');
+            $table->string('city');
+            $table->string('zip');
             $table->foreignId('entity_id')->nullable()->constrained('entities');
+            $table->timestamps();
         });
     }
 
@@ -25,9 +32,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::table('divisions', function (Blueprint $table) {
-            $table->dropForeign(['entity_id']);
-            $table->dropColumn('entity_id');
-        });
+        Schema::dropIfExists('plants');
     }
 };

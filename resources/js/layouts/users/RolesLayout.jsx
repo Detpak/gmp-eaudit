@@ -14,7 +14,7 @@ function RolesForm({ handleChange, values, errors }) {
             </Form.Group>
             <Form.Group className="mb-3" controlId="remarks">
                 <Form.Label>Remarks <OptionalSpan /></Form.Label>
-                <Form.Control as="textarea" name="remarks" rows={3} value={values.remarks} onChange={handleChange} isInvalid={!!errors.remarks} />
+                <Form.Control as="textarea" name="remarks" rows={2} value={values.remarks} onChange={handleChange} isInvalid={!!errors.remarks} />
                 <Form.Control.Feedback type="invalid">{errors.remarks}</Form.Control.Feedback>
             </Form.Group>
             {menus.map((menu) => (

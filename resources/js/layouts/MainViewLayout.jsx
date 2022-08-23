@@ -15,6 +15,7 @@ import DepartmentLayout from './workplace/DepartmentLayout';
 import WorkplaceAreaLayout from './workplace/WorkplaceAreaLayout';
 import EntityLayout from './workplace/EntityLayout';
 import DivisionLayout from './workplace/DivisionLayout';
+import PlantLayout from './workplace/PlantLayout';
 
 function Sidebar() {
     return (
@@ -53,6 +54,7 @@ function WorkplaceOutlet() {
             <PageNavbar>
                 <PageLink to="entity">Entity</PageLink>
                 <PageLink to="division">Division</PageLink>
+                <PageLink to="plant">Plant</PageLink>
                 <PageLink to="department">Department</PageLink>
                 <PageLink to="area">Area</PageLink>
             </PageNavbar>
@@ -95,7 +97,7 @@ function TestbedLayout() {
 
 export function MainViewLayout() {
     const [toastMsgState, setToastMsgState, updateToastMsgState] = window.globalStateStore.useState("toastMsg");
-    const closeToast = () => updateToastMsgState((value) => ({ shown: false, msg: value.msg }));
+    const closeToast = () => updateToastMsgState((value) => ({ toastShown: false, msg: value.msg }));
 
     return (
         <>
@@ -123,6 +125,7 @@ export function MainViewLayout() {
                                 <Route index element={<Navigate to="/app/workplace/entity" replace />} />
                                 <Route path="entity" element={<EntityLayout />} />
                                 <Route path="division" element={<DivisionLayout />} />
+                                <Route path="plant" element={<PlantLayout />} />
                                 <Route path="department" element={<DepartmentLayout />} />
                                 <Route path="area" element={<WorkplaceAreaLayout />} />
                                 <Route path="*" element={<Navigate to="/app/dashboard" replace />} />
@@ -144,7 +147,7 @@ export function MainViewLayout() {
             </div>
 
             <div className="position-fixed top-0 start-50 translate-middle-x p-3">
-                <Toast onClose={closeToast} show={toastMsgState.shown} delay={5000} autohide>
+                <Toast onClose={closeToast} show={toastMsgState.toastShown} delay={5000} autohide>
                     <Toast.Body>{toastMsgState.msg}</Toast.Body>
                 </Toast>
             </div>

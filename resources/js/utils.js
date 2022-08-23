@@ -41,5 +41,5 @@ export function rootUrl(url) {
 }
 
 export function showToastMsg(msg) {
-    window.globalStateStore.getState("toastMsg").updateValue((value) => ({ shown: true, msg: msg }));
+    window.globalStateStore.getState("toastMsg").updateValue((value) => ({ toastShown: true, msg: msg }));
 }

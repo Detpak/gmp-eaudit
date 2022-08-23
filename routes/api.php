@@ -6,6 +6,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DepartmentController;
 use App\Http\Controllers\EntityController;
 use App\Http\Controllers\DivisionController;
+use App\Http\Controllers\PlantController;
 use App\Http\Controllers\TestbedController;
 use App\Http\Controllers\UsersController;
 use Illuminate\Http\Request;
@@ -51,6 +52,16 @@ Route::prefix('/v1')->group(function() {
         Route::get('/fetch-divisions', [DivisionController::class, 'apiFetch']);
         Route::get('/delete-division/{id}', [DivisionController::class, 'apiDelete']);
         Route::post('/delete-divisions', [DivisionController::class, 'apiDeleteSelected']);
+        Route::get('/fetch-division-options', [DivisionController::class, 'apiFetchOptions']);
+
+        // Plant APIs
+        Route::post('/add-plant', [PlantController::class, 'apiAdd']);
+        Route::post('/edit-plant', [PlantController::class, 'apiEdit']);
+        Route::get('/get-plant/{id}', [PlantController::class, 'apiGet']);
+        Route::get('/fetch-plants', [PlantController::class, 'apiFetch']);
+        Route::get('/delete-plant/{id}', [PlantController::class, 'apiDelete']);
+        Route::post('/delete-plants', [PlantController::class, 'apiDeleteSelected']);
+        Route::get('/fetch-plant-options', [PlantController::class, 'apiFetchOptions']);
 
         // Department APIs
         Route::post('/add-dept', [DepartmentController::class, 'apiAddDepartment']);

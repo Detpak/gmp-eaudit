@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\CommonHelpers;
 use App\Models\Division;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Response;
@@ -86,7 +87,14 @@ class DivisionController extends Controller
 
     public function apiDelete($id)
     {
-        Division::find($id)->delete();
+        $division = Division::withCount('departments')->find($id);
+
+        if ($division->departments_count > 0) {
+            $subject = CommonHelpers::getSubjectWord($division->departments_count);
+            return ['error' => "Cannot delete division. There {$subject} {$division->departments_count} registered department(s) under the division."];
+        }
+
+        $division->delete();
         return ['result' => 'ok'];
     }
 
@@ -96,7 +104,27 @@ class DivisionController extends Controller
             return Response::json(['result' => 'error'], 404);
         }
 
-        Division::whereIn('id', $request->rowIds)->delete();
+        $divisions = Division::withCount('departments')->whereIn('id', $request->rowIds);
+        $errorCount = 0;
+
+        foreach ($divisions->get() as $division) {
+            if ($division->departments_count > 0) {
+                $errorCount += $division->departments_count;
+            }
+        }
+
+        if ($errorCount > 0) {
+            $subject = CommonHelpers::getSubjectWord($errorCount);
+            return ['error' => "Cannot delete divisions. There {$subject} {$errorCount} registered department(s) under some divisions."];
+        }
+
+        $divisions->delete();
+
         return ['result' => 'ok'];
+    }
+
+    public function apiFetchOptions()
+    {
+        return Division::select('id', 'name')->get();
     }
 }

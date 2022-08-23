@@ -16,12 +16,14 @@ class AreaController extends Controller
             [
                 'name' => 'required|string|max:255',
                 'desc' => 'nullable|string|max:255',
+                'plant_id' => 'required|exists:plants,id',
                 'department_id' => 'required|exists:departments,id'
             ],
             [],
             [
                 'desc' => 'description',
-                'department_id' => 'department'
+                'plant_id' => 'plant',
+                'department_id' => 'department',
             ]);
 
         if ($validator->fails()) {
@@ -36,16 +38,18 @@ class AreaController extends Controller
     public function apiEdit(Request $request)
     {
         $validator = Validator::make(
-            $request->except('id'),
+            $request->all(),
             [
                 'name' => 'required|string|max:255',
                 'desc' => 'nullable|string|max:255',
+                'plant_id' => 'required|exists:plants,id',
                 'department_id' => 'required|exists:departments,id'
             ],
             [],
             [
                 'desc' => 'description',
-                'department_id' => 'department'
+                'plant_id' => 'plant',
+                'department_id' => 'department',
             ]);
 
         if ($validator->fails()) {
@@ -81,6 +85,7 @@ class AreaController extends Controller
         if ($request->search) {
             $query->where('areas.name', 'LIKE', "%{$request->search}%")
                 ->orWhere('areas.desc', 'LIKE', "%{$request->search}%")
+                ->orWhere('plants.name', 'LIKE', "%{$request->search}%")
                 ->orWhere('departments.name', 'LIKE', "%{$request->search}%");
         }
 
@@ -89,9 +94,11 @@ class AreaController extends Controller
         }
 
         $query->leftJoin('departments', 'departments.id', '=', 'areas.department_id')
+            ->leftJoin('plants', 'plants.id', '=', 'areas.plant_id')
             ->select('areas.id',
                      'areas.name',
                      'areas.desc',
+                     'plants.name as plant_name',
                      'departments.name as dept_name');
 
         return $query->paginate($request->max);

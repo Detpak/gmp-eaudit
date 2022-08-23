@@ -5,13 +5,27 @@ import { setNestedObjectValues, validateYupSchema } from "formik";
 import _ from "lodash";
 import { useEffect, useState } from "react";
 import { Button, Form, ListGroup, Spinner } from "react-bootstrap";
+import { RequiredSpan } from "../../components/LabelSpan";
 import SearchList from "../../components/SearchList";
 import { rootUrl } from "../../utils";
 import CommonView from "../CommonView";
 
 function DepartmentForm({ shown, handleChange, values, setValues, errors }) {
     const [isLoading, setLoading] = useState(false);
+    const [isLoadingOptions, setLoadingOptions] = useState(false);
     const [picList, setPicList] = useState({});
+    const [divisions, setDivisions] = useState([]);
+
+    useEffect(() => {
+        if (shown) {
+            setLoadingOptions(true);
+            axios.get(rootUrl('api/v1/fetch-division-options'))
+                .then((response) => {
+                    setDivisions(response.data);
+                    setLoadingOptions(false);
+                });
+        }
+    }, [shown]);
 
     const fetchData = async () => {
         if (values.pic_ids.length == 0) {
@@ -60,17 +74,27 @@ function DepartmentForm({ shown, handleChange, values, setValues, errors }) {
     return (
         <>
             <Form.Group className="mb-3" controlId="name">
-                <Form.Label>Name</Form.Label>
+                <Form.Label>Name <RequiredSpan /></Form.Label>
                 <Form.Control type="text" name="name" value={values.name} onChange={handleChange} isInvalid={!!errors.name}/>
                 <Form.Control.Feedback type="invalid">{errors.name}</Form.Control.Feedback>
             </Form.Group>
             <Form.Group className="mb-3" controlId="code">
-                <Form.Label>Code</Form.Label>
+                <Form.Label>Code <RequiredSpan /></Form.Label>
                 <Form.Control type="text" name="code" value={values.code} onChange={handleChange} isInvalid={!!errors.code}/>
                 <Form.Control.Feedback type="invalid">{errors.code}</Form.Control.Feedback>
             </Form.Group>
+            <Form.Group className="mb-3" controlId="division_id">
+                <Form.Label>Division <RequiredSpan /></Form.Label>
+                <Form.Select name="division_id" value={values.division_id} onChange={handleChange} isInvalid={!!errors.division_id} disabled={isLoading && isLoadingOptions}>
+                    <option value="" disabled>-- Please select entity --</option>
+                    {divisions.map((data) => (
+                        <option key={_.uniqueId()} value={data.id}>{data.name}</option>
+                    ))}
+                </Form.Select>
+                <Form.Control.Feedback type="invalid">{errors.division_id}</Form.Control.Feedback>
+            </Form.Group>
             <Form.Group className="mb-3" controlId="pics">
-                <Form.Label>PIC(s) (Person in Charge)</Form.Label>
+                <Form.Label>PIC(s) (Person in Charge) <RequiredSpan /></Form.Label>
                 <SearchList
                     height="200px"
                     placeholder="Add PIC(s)..."
@@ -128,6 +152,7 @@ export default function DepartmentLayout() {
     const initialValues = {
         name: '',
         code: '',
+        division_id: '',
         pic_ids: []
     };
 
@@ -159,11 +184,19 @@ export default function DepartmentLayout() {
                         id: 'code',
                         name: 'Code'
                     },
+                    {
+                        id: 'division_name',
+                        name: 'Division'
+                    },
                 ],
                 source: {
                     url: rootUrl('api/v1/fetch-depts'),
                     method: 'GET',
-                    produce: item => [item.name, item.code],
+                    produce: item => [
+                        item.name,
+                        item.code,
+                        item.division_name && item.division_name.length > 0 ? item.division_name : '-'
+                    ],
                     total: data => data.total
                 }
             }}

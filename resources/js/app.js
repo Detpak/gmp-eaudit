@@ -19,7 +19,7 @@ $(function() {
     window.rootUrl = document.querySelector("meta[name='root-url']").content;
 
     window.globalStateStore = createStore();
-    window.globalStateStore.setState("toastMsg", { shown: false, msg: "" });
+    window.globalStateStore.setState("toastMsg", { toastShown: false, msg: "" });
 
     if (window.appToken && document.getElementById('main-container')) {
         ReactDOM.render(<BrowserRouter><MainViewLayout /></BrowserRouter>, document.getElementById('main-container'));

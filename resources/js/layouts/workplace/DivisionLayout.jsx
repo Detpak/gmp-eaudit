@@ -6,14 +6,14 @@ import CommonView from "../CommonView";
 
 function DivisionForm({ shown, handleChange, values, errors }) {
     const [isLoading, setLoading] = useState(false);
-    const [divisions, setDivisions] = useState([]);
+    const [entities, setEntities] = useState([]);
 
     useEffect(() => {
         if (shown) {
             setLoading(true);
             axios.get(rootUrl('api/v1/fetch-entity-options'))
                 .then((response) => {
-                    setDivisions(response.data);
+                    setEntities(response.data);
                     setLoading(false);
                 });
         }
@@ -29,8 +29,8 @@ function DivisionForm({ shown, handleChange, values, errors }) {
             <Form.Group className="mb-3" controlId="entity_id">
                 <Form.Label>Entity <RequiredSpan /></Form.Label>
                 <Form.Select name="entity_id" value={values.entity_id} onChange={handleChange} isInvalid={!!errors.entity_id} disabled={isLoading}>
-                    <option value="" disabled>-- Please select department --</option>
-                    {divisions.map((data) => (
+                    <option value="" disabled>-- Please select entity --</option>
+                    {entities.map((data) => (
                         <option key={_.uniqueId()} value={data.id}>{data.name}</option>
                     ))}
                 </Form.Select>
@@ -73,7 +73,7 @@ export default function DivisionLayout() {
                     },
                     {
                         id: 'entity_name',
-                        name: 'Entity Name'
+                        name: 'Entity'
                     },
                 ],
                 source: {
