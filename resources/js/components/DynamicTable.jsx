@@ -13,8 +13,12 @@ import { showToastMsg } from "../utils";
 const MAX_PAGES = 3;
 
 export default function DynamicTable({ refreshTrigger, columns, selectedItems, onSelect, actionColumn, searchKeyword, source }) {
-    const thClassName = "p-0 table-column";
+    const thClassName = "p-0 table-column sticky-top bg-white";
+    const thFixedLeftClassName = "p-0 table-column table-header-fixed-left bg-white";
+    const thFixedRightClassName = "p-0 table-column table-header-fixed-right bg-white";
     const tdClassName = "px-3 py-2";
+    const tdFixedLeftClassName = "px-3 table-column-fixed-left py-2";
+    const tdFixedRightClassName = "px-3 table-column-fixed-right py-2";
     const entriesList = _.range(1, 11).map((value) => value * 10); // 5, 10, 15, 20, ...
     const isInRouterContext = useInRouterContext();
     const [search, setSearch] = useState('');
@@ -129,18 +133,18 @@ export default function DynamicTable({ refreshTrigger, columns, selectedItems, o
         <div className="d-flex flex-column h-100">
             <div className="flex-fill overflow-auto h-100 mb-3">
                 <Table hover borderless striped className="align-middle table-nowrap mb-0">
-                    <thead className="bg-white sticky-top">
+                    <thead>
                         <tr>
                             {selectedItems &&
-                                <th className={thClassName}>
-                                    <div className="px-3 py-2 border border-end-0"><FontAwesomeIcon icon={faCheck} /></div>
+                                <th className={thFixedLeftClassName}>
+                                    <div className="px-3 py-2 border"><FontAwesomeIcon icon={faCheck} /></div>
                                 </th>
                             }
                             {columns.map((column) => {
                                 const sortable = !('sortable' in column) ? true : column.sortable;
                                 return (
                                     <th key={_.uniqueId()} className={thClassName} onClick={() => sortable && handleSort(column.id)}>
-                                        <div className="hstack gap-3 px-3 py-2 border border-end-0">
+                                        <div className="hstack gap-3 px-3 py-2 border border-start-0">
                                             <span className="user-select-none flex-fill">{column.name}</span>
                                             {sortable && <FontAwesomeIcon icon={sort && sort.column == column.id ? (sort.dir == 1 ? faSortUp : faSortDown) : faSort} />}
                                         </div>
@@ -148,7 +152,7 @@ export default function DynamicTable({ refreshTrigger, columns, selectedItems, o
                                 )
                             })}
                             {actionColumn &&
-                                <th className={thClassName}>
+                                <th className={thFixedRightClassName}>
                                     <div className="px-3 py-2 border">Action</div>
                                 </th>
                             }
@@ -161,7 +165,7 @@ export default function DynamicTable({ refreshTrigger, columns, selectedItems, o
                                 _.range(0, 5).map(() => (
                                     <tr key={_.uniqueId()}>
                                         {selectedItems &&
-                                            <td className={tdClassName}>
+                                            <td className={tdFixedLeftClassName}>
                                                 <input type="checkbox" className="form-check-input" disabled />
                                             </td>
                                         }
@@ -171,7 +175,7 @@ export default function DynamicTable({ refreshTrigger, columns, selectedItems, o
                                             </td>
                                         ))}
                                         {actionColumn &&
-                                            <td className={tdClassName}>
+                                            <td className={tdFixedRightClassName}>
                                                 <Button size="sm" className="me-1" disabled><FontAwesomeIcon icon={faPenToSquare}/> Edit/View</Button>
                                                 <Button variant="danger" size="sm" disabled><FontAwesomeIcon icon={faTrash}/> Delete</Button>
                                             </td>
@@ -182,7 +186,7 @@ export default function DynamicTable({ refreshTrigger, columns, selectedItems, o
                                 listData.map((item) => (
                                     <tr key={_.uniqueId()}>
                                         {selectedItems &&
-                                            <td className={tdClassName}>
+                                            <td className={tdFixedLeftClassName}>
                                                 <input
                                                     type="checkbox"
                                                     className="form-check-input"
@@ -195,7 +199,7 @@ export default function DynamicTable({ refreshTrigger, columns, selectedItems, o
                                             <td key={_.uniqueId()} className={tdClassName}>{data}</td>
                                         ))}
                                         {actionColumn &&
-                                            <td className={tdClassName}>
+                                            <td className={tdFixedRightClassName}>
                                                 <Button size="sm" className="me-1" onClick={() => actionColumn.onEditClick(item.id)}><FontAwesomeIcon icon={faPenToSquare}/> Edit / View</Button>
                                                 <LoadingButton
                                                     variant="danger"

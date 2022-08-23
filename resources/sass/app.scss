@@ -28,7 +28,36 @@
 }
 
 .table-nowrap {
+    --bs-table-bg: white;
     white-space: nowrap;
+}
+
+.table-header-fixed-left {
+    position: -webkit-sticky;
+    position: sticky;
+    top: 0;
+    left: 0;
+    z-index: $zindex-fixed;
+}
+
+.table-header-fixed-right {
+    position: -webkit-sticky;
+    position: sticky;
+    top: 0;
+    right: 0;
+    z-index: $zindex-fixed;
+}
+
+.table-column-fixed-left {
+    position: -webkit-sticky;
+    position: sticky;
+    left: 0;
+}
+
+.table-column-fixed-right {
+    position: -webkit-sticky;
+    position: sticky;
+    right: 0;
 }
 
 .select-list {
