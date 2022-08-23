@@ -122,6 +122,11 @@ export default function PlantLayout() {
                         id: 'entity_name',
                         name: 'Entity Name'
                     },
+                    {
+                        sortable: false,
+                        id: 'areas_count',
+                        name: '# Areas'
+                    },
                 ],
                 source: {
                     url: rootUrl('api/v1/fetch-plants'),
@@ -133,6 +138,7 @@ export default function PlantLayout() {
                         item.city,
                         item.zip,
                         item.entity_name,
+                        item.areas_count,
                     ],
                 }
             }}

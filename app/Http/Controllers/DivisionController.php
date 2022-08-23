@@ -80,7 +80,8 @@ class DivisionController extends Controller
         $query->leftJoin('entities', 'entities.id', '=', 'divisions.entity_id')
             ->select('divisions.id',
                      'divisions.name',
-                     'entities.name as entity_name');
+                     'entities.name as entity_name')
+            ->withCount('departments');
 
         return $query->paginate($request->max);
     }

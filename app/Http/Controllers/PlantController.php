@@ -114,7 +114,8 @@ class PlantController extends Controller
                      'plants.address',
                      'plants.city',
                      'plants.zip',
-                     'entities.name as entity_name');
+                     'entities.name as entity_name')
+            ->withCount('areas');
 
         return $query->paginate($request->max);
     }

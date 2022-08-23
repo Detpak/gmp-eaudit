@@ -188,6 +188,11 @@ export default function DepartmentLayout() {
                         id: 'division_name',
                         name: 'Division'
                     },
+                    {
+                        //selectable: false,
+                        id: 'areas_count',
+                        name: '# Areas'
+                    },
                 ],
                 source: {
                     url: rootUrl('api/v1/fetch-depts'),
@@ -195,7 +200,8 @@ export default function DepartmentLayout() {
                     produce: item => [
                         item.name,
                         item.code,
-                        item.division_name && item.division_name.length > 0 ? item.division_name : '-'
+                        item.division_name && item.division_name.length > 0 ? item.division_name : '-',
+                        item.areas_count
                     ],
                     total: data => data.total
                 }

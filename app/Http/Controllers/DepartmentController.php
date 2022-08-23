@@ -137,7 +137,8 @@ class DepartmentController extends Controller
             ->select('departments.id',
                      'departments.name',
                      'departments.code',
-                     'divisions.name as division_name');
+                     'divisions.name as division_name')
+            ->withCount('areas');
 
         return $query->paginate($request->max);
     }

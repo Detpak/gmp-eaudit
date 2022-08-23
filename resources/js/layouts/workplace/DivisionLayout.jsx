@@ -75,11 +75,19 @@ export default function DivisionLayout() {
                         id: 'entity_name',
                         name: 'Entity'
                     },
+                    {
+                        id: 'departments_count',
+                        name: '# Department'
+                    },
                 ],
                 source: {
                     url: rootUrl('api/v1/fetch-divisions'),
                     method: 'GET',
-                    produce: item => [item.name, item.entity_name],
+                    produce: item => [
+                        item.name,
+                        item.entity_name,
+                        item.departments_count,
+                    ],
                 }
             }}
             messages={{
