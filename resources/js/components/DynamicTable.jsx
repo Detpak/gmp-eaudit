@@ -13,9 +13,9 @@ import { showToastMsg } from "../utils";
 const MAX_PAGES = 3;
 
 export default function DynamicTable({ refreshTrigger, columns, selectedItems, onSelect, actionColumn, searchKeyword, source }) {
-    const thClassName = "p-0 table-column sticky-top bg-white";
-    const thFixedLeftClassName = "p-0 table-column table-header-fixed-left bg-white";
-    const thFixedRightClassName = "p-0 table-column table-header-fixed-right bg-white";
+    const thClassName = "p-0 table-column sticky-top";
+    const thFixedLeftClassName = "p-0 table-column table-header-fixed-left";
+    const thFixedRightClassName = "p-0 table-column table-header-fixed-right";
     const tdClassName = "px-3 py-2";
     const tdFixedLeftClassName = "px-3 table-column-fixed-left py-2";
     const tdFixedRightClassName = "px-3 table-column-fixed-right py-2";

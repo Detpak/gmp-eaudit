@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AreaController;
 use App\Http\Controllers\AuditController;
+use App\Http\Controllers\CriteriaController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DepartmentController;
 use App\Http\Controllers\EntityController;
@@ -35,6 +36,15 @@ Route::prefix('/v1')->group(function() {
         Route::post('/new-cycle', [AuditController::class, 'apiNewCycle']);
         Route::get('/get-active-cycle', [AuditController::class, 'apiGetActiveCycle']);
         Route::get('/fetch-cycles', [AuditController::class, 'apiFetchCycles']);
+
+        // Criteria APIs
+        Route::post('/add-criteria', [CriteriaController::class, 'apiAdd']);
+        Route::post('/edit-criteria', [CriteriaController::class, 'apiEdit']);
+        Route::get('/get-criteria/{id}', [CriteriaController::class, 'apiGet']);
+        Route::get('/fetch-criterias', [CriteriaController::class, 'apiFetch']);
+        Route::get('/delete-criteria/{id}', [CriteriaController::class, 'apiDelete']);
+        Route::post('/delete-criterias', [CriteriaController::class, 'apiDeleteSelected']);
+        Route::get('/fetch-criteria-options', [CriteriaController::class, 'apiFetchOptions']);
 
         // Entity APIs
         Route::post('/add-entity', [EntityController::class, 'apiAdd']);

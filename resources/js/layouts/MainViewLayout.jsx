@@ -16,6 +16,8 @@ import WorkplaceAreaLayout from './workplace/WorkplaceAreaLayout';
 import EntityLayout from './workplace/EntityLayout';
 import DivisionLayout from './workplace/DivisionLayout';
 import PlantLayout from './workplace/PlantLayout';
+import CriteriaLayout from './evaluation/CriteriaLayout';
+import CriteriaGroupLayout from './evaluation/CriteriaGroupLayout';
 
 function Sidebar() {
     return (
@@ -47,6 +49,18 @@ function AuditOutlet() {
     );
 }
 
+function EvaluationOutlet() {
+    return (
+        <>
+            <PageNavbar>
+                <PageLink to="criteria">Criteria</PageLink>
+                <PageLink to="criteria-group">Criteria Group</PageLink>
+            </PageNavbar>
+
+            <Outlet />
+        </>
+    );
+}
 
 function WorkplaceOutlet() {
     return (
@@ -119,6 +133,12 @@ export function MainViewLayout() {
                                 <Route path="cycles" element={<AuditCyclesLayout />} />
                                 <Route path="records" element={<AuditRecordsLayout />} />
                                 <Route path="*" element={<Navigate to="/app/dashboard" replace />} />
+                            </Route>
+
+                            <Route path="/app/evaluation" element={<EvaluationOutlet />}>
+                                <Route index element={<Navigate to="/app/evaluation/criteria" replace />} />
+                                <Route path="criteria" element={<CriteriaLayout />} />
+                                <Route path="criteria-group" element={<CriteriaGroupLayout />} />
                             </Route>
 
                             <Route path="/app/workplace" element={<WorkplaceOutlet />}>

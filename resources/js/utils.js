@@ -1,4 +1,4 @@
-import { faChartLine, faFlaskVial, faIndustry, faListCheck, faPowerOff, faUsers } from '@fortawesome/free-solid-svg-icons';
+import { faChartLine, faFlaskVial, faIndustry, faListCheck, faPercent, faPowerOff, faUsers } from '@fortawesome/free-solid-svg-icons';
 
 export const menus = [
     {
@@ -11,6 +11,12 @@ export const menus = [
         name: 'Audit',
         link: 'audit',
         icon: faListCheck,
+        maxAccessLevel: 2,
+    },
+    {
+        name: 'Evaluation',
+        link: 'evaluation',
+        icon: faPercent,
         maxAccessLevel: 2,
     },
     {
