@@ -167,7 +167,7 @@ export function MainViewLayout() {
             </div>
 
             <div className="position-fixed top-0 start-50 translate-middle-x p-3">
-                <Toast onClose={closeToast} show={toastMsgState.toastShown} delay={5000} autohide>
+                <Toast onClose={closeToast} show={toastMsgState.toastShown} delay={3000} autohide>
                     <Toast.Body>{toastMsgState.msg}</Toast.Body>
                 </Toast>
             </div>

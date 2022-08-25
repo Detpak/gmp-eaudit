@@ -10,6 +10,7 @@ class CriteriaGroup extends Model
     use HasFactory;
 
     protected $fillable = [
+        'code',
         'name',
         'remarks',
     ];

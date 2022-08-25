@@ -114,7 +114,7 @@ export default function SearchList({ source, height, placeholder, onDone, childr
         {
             showList ? (
                 <div className="position-relative select-list">
-                    <Card className="position-absolute w-100">
+                    <Card className="position-absolute w-100 shadow">
                         <Card.Body className="h-100">
                             <div className="d-flex flex-column h-100 mb-3">
                                 <div className="d-flex mb-3">

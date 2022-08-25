@@ -75,7 +75,7 @@ export default function CriteriaLayout() {
                     produce: item => [
                         item.code,
                         item.name,
-                        item.weight,
+                        `${item.weight}%`,
                     ],
                 }
             }}

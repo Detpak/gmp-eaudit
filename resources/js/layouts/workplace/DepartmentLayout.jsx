@@ -1,19 +1,17 @@
 import { faTrash } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import axios from "axios";
-import { setNestedObjectValues, validateYupSchema } from "formik";
 import _ from "lodash";
 import { useEffect, useState } from "react";
 import { Button, Form, ListGroup, Spinner } from "react-bootstrap";
 import { RequiredSpan } from "../../components/LabelSpan";
+import ListView from "../../components/ListView";
 import SearchList from "../../components/SearchList";
 import { rootUrl } from "../../utils";
 import CommonView from "../CommonView";
 
 function DepartmentForm({ shown, handleChange, values, setValues, errors }) {
-    const [isLoading, setLoading] = useState(false);
-    const [isLoadingOptions, setLoadingOptions] = useState(false);
-    const [picList, setPicList] = useState({});
+    const [isLoadingOptions, setLoadingOptions] = useState(true);
     const [divisions, setDivisions] = useState([]);
 
     useEffect(() => {
@@ -26,20 +24,6 @@ function DepartmentForm({ shown, handleChange, values, setValues, errors }) {
                 });
         }
     }, [shown]);
-
-    const fetchData = async () => {
-        if (values.pic_ids.length == 0) {
-            setLoading(false);
-            setPicList({});
-            return;
-        }
-
-        setLoading(true);
-        const data = { ids: values.pic_ids };
-        const response = await axios.post(rootUrl('api/v1/get-users'), data, { headers: { 'Content-Type': 'application/json' } });
-        setPicList(response.data);
-        setLoading(false);
-    }
 
     const handleDone = async (selectedItems) => {
         if (selectedItems.length == 0) {
@@ -65,12 +49,6 @@ function DepartmentForm({ shown, handleChange, values, setValues, errors }) {
         setValues({ ...values, pic_ids: [] });
     }
 
-    useEffect(() => {
-        if (shown) {
-            fetchData();
-        }
-    }, [values.pic_ids]);
-
     return (
         <>
             <Form.Group className="mb-3" controlId="name">
@@ -85,7 +63,7 @@ function DepartmentForm({ shown, handleChange, values, setValues, errors }) {
             </Form.Group>
             <Form.Group className="mb-3" controlId="division_id">
                 <Form.Label>Division <RequiredSpan /></Form.Label>
-                <Form.Select name="division_id" value={values.division_id} onChange={handleChange} isInvalid={!!errors.division_id} disabled={isLoading && isLoadingOptions}>
+                <Form.Select name="division_id" value={values.division_id} onChange={handleChange} isInvalid={!!errors.division_id} disabled={isLoadingOptions}>
                     <option value="" disabled>-- Please select entity --</option>
                     {divisions.map((data) => (
                         <option key={_.uniqueId()} value={data.id}>{data.name}</option>
@@ -93,7 +71,7 @@ function DepartmentForm({ shown, handleChange, values, setValues, errors }) {
                 </Form.Select>
                 <Form.Control.Feedback type="invalid">{errors.division_id}</Form.Control.Feedback>
             </Form.Group>
-            <Form.Group className="mb-3" controlId="pics">
+            <Form.Group controlId="pics">
                 <Form.Label>PIC(s) (Person in Charge) <RequiredSpan /></Form.Label>
                 <SearchList
                     height="200px"
@@ -113,34 +91,18 @@ function DepartmentForm({ shown, handleChange, values, setValues, errors }) {
                         )
                     }}
                 </SearchList>
-                <div className="hstack gap-1 mb-2">
-                    <Button variant="danger" size="sm" disabled={_.keys(picList).length == 0} onClick={handleRemoveAll}>Remove All</Button>
-                </div>
-                <div className="overflow-auto" style={{ maxHeight: 200 }}>
-                    <ListGroup>
-                        {
-                            (isLoading) ? (
-                                <ListGroup.Item className="text-center">
-                                    <Spinner animation="border" size="sm" /> Loading...
-                                </ListGroup.Item>
-                            ) : (
-                                (_.keys(picList).length == 0) ? (
-                                    <ListGroup.Item className="text-center">No PIC(s) selected</ListGroup.Item>
-                                ) : (
-                                    null
-                                )
-                            )
-                        }
-                        {!isLoading && _.values(picList).map(item => (
-                            <ListGroup.Item key={_.uniqueId()} className="hstack gap-3">
-                                <span className="me-auto text-truncate">{item.name} <small>({item.email})</small></span>
-                                <Button variant="danger" size="sm" disabled={_.keys(picList).length == 0} onClick={() => handleRemove(item.id)}>
-                                    <FontAwesomeIcon icon={faTrash} />
-                                </Button>
-                            </ListGroup.Item>
-                        ))}
-                    </ListGroup>
-                </div>
+                <ListView
+                    ids={values.pic_ids}
+                    fetchUrl={rootUrl('api/v1/get-users')}
+                    handleRemove={handleRemove}
+                    handleRemoveAll={handleRemoveAll}
+                >
+                    {({ item }) => {
+                        return (
+                            <span className="me-auto text-truncate">{item.name} <small>({item.email})</small></span>
+                        )
+                    }}
+                </ListView>
                 <input type="hidden" className={!!errors.pic_ids ? 'is-invalid' : ''} />
                 <Form.Control.Feedback type="invalid">{errors.pic_ids}</Form.Control.Feedback>
             </Form.Group>

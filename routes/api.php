@@ -3,6 +3,7 @@
 use App\Http\Controllers\AreaController;
 use App\Http\Controllers\AuditController;
 use App\Http\Controllers\CriteriaController;
+use App\Http\Controllers\CriteriaGroupController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DepartmentController;
 use App\Http\Controllers\EntityController;
@@ -44,7 +45,15 @@ Route::prefix('/v1')->group(function() {
         Route::get('/fetch-criterias', [CriteriaController::class, 'apiFetch']);
         Route::get('/delete-criteria/{id}', [CriteriaController::class, 'apiDelete']);
         Route::post('/delete-criterias', [CriteriaController::class, 'apiDeleteSelected']);
-        Route::get('/fetch-criteria-options', [CriteriaController::class, 'apiFetchOptions']);
+        Route::post('/get-criterias', [CriteriaController::class, 'apiGetSelected']);
+
+        // Criteria APIs
+        Route::post('/add-criteria-group', [CriteriaGroupController::class, 'apiAdd']);
+        Route::post('/edit-criteria-group', [CriteriaGroupController::class, 'apiEdit']);
+        Route::get('/get-criteria-group/{id}', [CriteriaGroupController::class, 'apiGet']);
+        Route::get('/fetch-criteria-groups', [CriteriaGroupController::class, 'apiFetch']);
+        Route::get('/delete-criteria-group/{id}', [CriteriaGroupController::class, 'apiDelete']);
+        Route::post('/delete-criteria-groups', [CriteriaGroupController::class, 'apiDeleteSelected']);
 
         // Entity APIs
         Route::post('/add-entity', [EntityController::class, 'apiAdd']);

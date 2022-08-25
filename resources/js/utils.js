@@ -1,4 +1,5 @@
 import { faChartLine, faFlaskVial, faIndustry, faListCheck, faPercent, faPowerOff, faUsers } from '@fortawesome/free-solid-svg-icons';
+import React from 'react';
 
 export const menus = [
     {
@@ -48,4 +49,16 @@ export function rootUrl(url) {
 
 export function showToastMsg(msg) {
     window.globalStateStore.getState("toastMsg").updateValue((value) => ({ toastShown: true, msg: msg }));
+}
+
+export function useIsMounted() {
+    const isMounted = React.useRef(true);
+
+    React.useEffect(() => {
+        return () => {
+          isMounted.current = false;
+        };
+    }, []);
+
+    return isMounted;
 }

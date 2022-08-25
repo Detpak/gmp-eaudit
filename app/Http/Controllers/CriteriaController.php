@@ -126,4 +126,9 @@ class CriteriaController extends Controller
 
         return ['result' => 'ok'];
     }
+
+    public function apiGetSelected(Request $request)
+    {
+        return Criteria::whereIn('id', $request->ids)->get();
+    }
 }

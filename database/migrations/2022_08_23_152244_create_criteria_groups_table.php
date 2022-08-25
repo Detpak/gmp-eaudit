@@ -15,6 +15,7 @@ return new class extends Migration
     {
         Schema::create('criteria_groups', function (Blueprint $table) {
             $table->id();
+            $table->string('code', 16);
             $table->string('name');
             $table->text('remarks');
             $table->timestamps();

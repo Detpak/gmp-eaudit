@@ -60,6 +60,7 @@ function WorkplaceAreaForm({ shown, handleChange, values, setValues, errors }) {
             <Form.Group className="mb-3" controlId="desc">
                 <Form.Label>Description <OptionalSpan /></Form.Label>
                 <Form.Control as="textarea" name="desc" rows={3} value={values.desc} onChange={handleChange} isInvalid={!!errors.desc} />
+                <Form.Control.Feedback type="invalid">{errors.desc}</Form.Control.Feedback>
             </Form.Group>
         </>
     );
