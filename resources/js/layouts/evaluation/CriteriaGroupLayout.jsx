@@ -94,9 +94,9 @@ function CriteriaGroupForm({ shown, handleChange, values, setValues, errors }) {
                                 )
                             }}
                         </ListView>
-                        <input type="hidden" name="weight" className={!!errors.criteria_ids || !!errors.weight ? 'is-invalid' : ''} value={values.weight} />
+                        <input type="hidden" name="weight" className={!!errors.criteria_ids || !!errors.weight ? 'is-invalid' : ''} value={values.weight} onChange={() => {}} />
                         <Form.Control.Feedback type="invalid">{errors.criteria_ids ? errors.criteria_ids : errors.weight}</Form.Control.Feedback>
-                        <div className="mt-1">Total Weight: <span className={values.weight != 100 ? "text-danger" : "text-success"}>{values.weight}%</span></div>
+                        <div className="mt-1">Total Weight: <span className={`fw-bold ${values.weight != 100 ? "text-danger" : "text-success"}`}>{values.weight}%</span></div>
                     </Form.Group>
                 </Col>
             </Row>

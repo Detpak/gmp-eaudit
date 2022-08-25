@@ -176,8 +176,8 @@ export default function DynamicTable({ refreshTrigger, columns, selectedItems, o
                                         ))}
                                         {actionColumn &&
                                             <td className={tdFixedRightClassName}>
-                                                <Button size="sm" className="me-1" disabled><FontAwesomeIcon icon={faPenToSquare}/> Edit/View</Button>
-                                                <Button variant="danger" size="sm" disabled><FontAwesomeIcon icon={faTrash}/> Delete</Button>
+                                                <Button size="sm" className="me-1" disabled><FontAwesomeIcon icon={faPenToSquare}/></Button>
+                                                <Button variant="danger" size="sm" disabled><FontAwesomeIcon icon={faTrash}/></Button>
                                             </td>
                                         }
                                     </tr>
@@ -200,16 +200,14 @@ export default function DynamicTable({ refreshTrigger, columns, selectedItems, o
                                         ))}
                                         {actionColumn &&
                                             <td className={tdFixedRightClassName}>
-                                                <Button size="sm" className="me-1" onClick={() => actionColumn.onEditClick(item.id)}><FontAwesomeIcon icon={faPenToSquare}/> Edit / View</Button>
+                                                <Button size="sm" className="me-1" onClick={() => actionColumn.onEditClick(item.id)}><FontAwesomeIcon icon={faPenToSquare}/></Button>
                                                 <LoadingButton
                                                     variant="danger"
                                                     size="sm"
                                                     icon={faTrash}
                                                     onClick={() => handleDeleteClick(item.id)}
                                                     afterLoading={() => fetchData()}
-                                                >
-                                                    Delete
-                                                </LoadingButton>
+                                                />
                                             </td>
                                         }
                                     </tr>

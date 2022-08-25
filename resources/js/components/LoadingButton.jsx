@@ -63,7 +63,7 @@ export default class LoadingButton extends React.Component {
                         <Spinner as="span" animation="border" size="sm" role="status" aria-hidden="true" className="me-1" />
                     ) : (
                         this.props.icon ?  (
-                            <FontAwesomeIcon icon={this.props.icon} className="me-1" />
+                            <FontAwesomeIcon icon={this.props.icon} className={this.props.children ? "me-1" : ''} />
                         ) : (
                             <></>
                         )

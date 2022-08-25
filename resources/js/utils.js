@@ -15,8 +15,8 @@ export const menus = [
         maxAccessLevel: 2,
     },
     {
-        name: 'Evaluation',
-        link: 'evaluation',
+        name: 'Parameters',
+        link: 'parameters',
         icon: faPercent,
         maxAccessLevel: 2,
     },

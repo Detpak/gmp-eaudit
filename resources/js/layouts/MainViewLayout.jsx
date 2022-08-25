@@ -49,7 +49,7 @@ function AuditOutlet() {
     );
 }
 
-function EvaluationOutlet() {
+function ParametersOutlet() {
     return (
         <>
             <PageNavbar>
@@ -83,7 +83,7 @@ function UsersOutlet() {
         <>
             <PageNavbar>
                 <PageLink to="roles">Roles</PageLink>
-                <PageLink to="manage-user">Manage User</PageLink>
+                <PageLink to="manage-user">User Management</PageLink>
             </PageNavbar>
 
             <Outlet />
@@ -135,8 +135,8 @@ export function MainViewLayout() {
                                 <Route path="*" element={<Navigate to="/app/dashboard" replace />} />
                             </Route>
 
-                            <Route path="/app/evaluation" element={<EvaluationOutlet />}>
-                                <Route index element={<Navigate to="/app/evaluation/criteria" replace />} />
+                            <Route path="/app/parameters" element={<ParametersOutlet />}>
+                                <Route index element={<Navigate to="/app/parameters/criteria" replace />} />
                                 <Route path="criteria" element={<CriteriaLayout />} />
                                 <Route path="criteria-group" element={<CriteriaGroupLayout />} />
                             </Route>

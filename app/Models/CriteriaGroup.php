@@ -14,4 +14,9 @@ class CriteriaGroup extends Model
         'name',
         'remarks',
     ];
+
+    public function criterias()
+    {
+        //return $this->morphToMany();
+    }
 }
