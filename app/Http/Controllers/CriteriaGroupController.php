@@ -63,7 +63,7 @@ class CriteriaGroupController extends Controller
                 return "{$value['criteria_id']}";
             });
 
-        return $attr->merge(['criteria_ids' => $criteriaIds]);
+        return $attr->merge(['criteria_ids' => $criteriaIds, 'weight' => 0]);
     }
 
     public function apiFetch(Request $request)

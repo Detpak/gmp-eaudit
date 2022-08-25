@@ -89,7 +89,7 @@ function CriteriaGroupForm({ shown, handleChange, values, setValues, errors }) {
                                 return (
                                     <>
                                         <span className="me-auto text-truncate">{item.name}</span>
-                                        <small>{item.code} ({item.weight})</small>
+                                        <small>{item.code} ({item.weight}%)</small>
                                     </>
                                 )
                             }}
