@@ -109,7 +109,13 @@ export default function ManageUserLayout() {
                 source: {
                     url: rootUrl('api/v1/fetch-users'),
                     method: 'GET',
-                    produce: item => [item.name, item.employee_id, item.login_id, item.email, item.role_name],
+                    produce: item => [
+                        item.name,
+                        item.employee_id,
+                        item.login_id,
+                        item.email && item.email.length > 0 ? item.email : '-',
+                        item.role_name
+                    ],
                 }
             }}
             messages={{

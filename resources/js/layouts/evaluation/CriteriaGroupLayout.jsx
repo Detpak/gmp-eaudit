@@ -146,6 +146,11 @@ export default function CriteriaGroupLayout() {
                     {
                         id: 'remarks',
                         name: 'Remarks'
+                    },
+                    {
+                        sortable: false,
+                        id: 'criterias_count',
+                        name: 'Number of Criteria(s)'
                     }
                 ],
                 source: {
@@ -155,6 +160,7 @@ export default function CriteriaGroupLayout() {
                         item.code,
                         item.name,
                         item.remarks,
+                        item.criterias_count,
                     ],
                 }
             }}

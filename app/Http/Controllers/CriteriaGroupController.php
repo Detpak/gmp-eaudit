@@ -80,6 +80,8 @@ class CriteriaGroupController extends Controller
             $query->orderBy($request->sort, $request->dir);
         }
 
+        $query->withCount('criterias');
+
         return $query->paginate($request->max);
     }
 }

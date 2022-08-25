@@ -17,6 +17,6 @@ class CriteriaGroup extends Model
 
     public function criterias()
     {
-        //return $this->morphToMany();
+        return $this->belongsToMany(Criteria::class, 'criteria_group_params', 'group_id', 'criteria_id');
     }
 }

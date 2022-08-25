@@ -37,7 +37,7 @@
     <meta name="development" content="1">
     @endif
 
-    <title>e-Audit</title>
+    <title>MyAudit+</title>
 </head>
 <body>
     <main id="main-container">{{ $slot }}</main>
