@@ -60,7 +60,7 @@ export default class LoadingButton extends React.Component {
                 {
                     (this.handledManually ? this.props.isLoading : this.state.isLoading) ? (
                         // Show the spinner animation in loading state
-                        <Spinner as="span" animation="border" size="sm" role="status" aria-hidden="true" className="me-1" />
+                        <Spinner as="span" animation="border" size="sm" role="status" aria-hidden="true" className={this.props.children ? "me-1" : ''} />
                     ) : (
                         this.props.icon ?  (
                             <FontAwesomeIcon icon={this.props.icon} className={this.props.children ? "me-1" : ''} />
