@@ -68,6 +68,10 @@ export default function CriteriaLayout() {
                         id: 'weight',
                         name: 'Weight (%)'
                     },
+                    {
+                        id: 'groups_count',
+                        name: '# Registered Groups'
+                    }
                 ],
                 source: {
                     url: rootUrl('api/v1/fetch-criterias'),
@@ -76,6 +80,7 @@ export default function CriteriaLayout() {
                         item.code,
                         item.name,
                         `${item.weight}%`,
+                        item.groups_count
                     ],
                 }
             }}

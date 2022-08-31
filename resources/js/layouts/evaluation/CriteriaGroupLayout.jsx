@@ -1,6 +1,8 @@
+import { faWarning } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useState } from "react";
 import { useRef } from "react";
-import { Col, Form, Row } from "react-bootstrap";
+import { Col, Form, OverlayTrigger, Row, Table, Tooltip } from "react-bootstrap";
 import { OptionalSpan, RequiredSpan } from "../../components/LabelSpan";
 import ListView from "../../components/ListView";
 import SearchList from "../../components/SearchList";
@@ -148,9 +150,17 @@ export default function CriteriaGroupLayout() {
                         name: 'Remarks'
                     },
                     {
-                        sortable: false,
                         id: 'criterias_count',
-                        name: 'Number of Criteria(s)'
+                        name: 'Number of Criterias'
+                    },
+                    {
+                        id: 'criterias_sum_weight',
+                        name: 'Total Weight (%)'
+                    },
+                    {
+                        sortable: false,
+                        id: 'criterias',
+                        name: 'Criterias',
                     }
                 ],
                 source: {
@@ -161,7 +171,26 @@ export default function CriteriaGroupLayout() {
                         item.name,
                         item.remarks,
                         item.criterias_count,
-                    ],
+                        item.criterias_sum_weight != 100 ? (
+                            <OverlayTrigger
+                                placement="right"
+                                overlay={(props) => (
+                                    <Tooltip id="total-weight-tooltip" {...props}>
+                                        Total weight <b>must</b> be 100%
+                                    </Tooltip>
+                                )}
+                            >
+                                <span className="fw-bold text-danger">
+                                    {item.criterias_sum_weight}% <FontAwesomeIcon icon={faWarning} />
+                                </span>
+                            </OverlayTrigger>
+                        ) : (
+                            <span className="fw-bold text-success">
+                                    {item.criterias_sum_weight}%
+                            </span>
+                        ),
+                        item.criterias.map(criteria => criteria.code).join(', '),
+                    ]
                 }
             }}
             messages={{

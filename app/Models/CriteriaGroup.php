@@ -19,4 +19,9 @@ class CriteriaGroup extends Model
     {
         return $this->belongsToMany(Criteria::class, 'criteria_group_params', 'group_id', 'criteria_id');
     }
+
+    public function totalWeight()
+    {
+        return $this->belongsToMany(Criteria::class, 'criteria_group_params', 'group_id', 'criteria_id');
+    }
 }

@@ -7,6 +7,7 @@ use App\Models\CriteriaGroup;
 use App\Models\CriteriaGroupParam;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Response;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
@@ -120,11 +121,18 @@ class CriteriaGroupController extends Controller
                 ->orWhere('remarks', 'LIKE', "%{$request->search}%");
         }
 
+        if (!$request->noparam) {
+            $query->with('criterias', function($query) {
+                    $query->select('code')
+                          ->orderBy('code');
+                })
+                ->withSum('criterias', 'weight')
+                ->withCount('criterias');
+        }
+
         if ($request->sort && $request->dir) {
             $query->orderBy($request->sort, $request->dir);
         }
-
-        $query->withCount('criterias');
 
         return $query->paginate($request->max);
     }

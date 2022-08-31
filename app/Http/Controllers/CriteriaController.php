@@ -80,6 +80,8 @@ class CriteriaController extends Controller
                 ->orWhere('weight', 'LIKE', "%{$request->search}%");
         }
 
+        $query->withCount('groups');
+
         if ($request->sort && $request->dir) {
             $query->orderBy($request->sort, $request->dir);
         }
