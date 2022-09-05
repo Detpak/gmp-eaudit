@@ -272,4 +272,10 @@ class UsersController extends Controller
 
         return Response::json(['result' => 'ok']);
     }
+
+    public function apiGetCurrentUser(Request $request)
+    {
+        $tokenSplit = explode('|', $request->bearerToken()); // [0] = user id, [1] = token
+        return ['result' => User::find($tokenSplit[0])];
+    }
 }

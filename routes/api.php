@@ -117,6 +117,7 @@ Route::prefix('/v1')->group(function() {
         Route::get('/fetch-users', [UsersController::class, 'apiFetchUsers']);
         Route::get('/delete-user/{id}', [UsersController::class, 'apiDeleteUser']);
         Route::post('/delete-users', [UsersController::class, 'apiDeleteUsers']);
+        Route::get('/get-current-user', [UsersController::class, 'apiGetCurrentUser']);
     });
 
     if (env('APP_ENV') != 'production') {

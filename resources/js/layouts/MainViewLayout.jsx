@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Button, Toast } from 'react-bootstrap';
-import { faPowerOff } from '@fortawesome/free-solid-svg-icons';
+import { faCheck, faPowerOff } from '@fortawesome/free-solid-svg-icons';
 import { menus, rootUrl } from '../utils';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { PageLink, PageNavbar } from "../components/PageNav";
@@ -118,6 +118,10 @@ export function MainViewLayout() {
             <div className="d-flex flex-row main">
                 <div className="d-flex flex-column min-vh-100 p-2 bg-primary bg-gradient text-white" style={{ minWidth: '100px' }}>
                     <Sidebar />
+                    <a role="button" href={rootUrl('audit')} className="text-white mb-3">
+                        <FontAwesomeIcon icon={faCheck} className="menu-icon d-block mx-auto"/>
+                        <div className="menu-text text-center m-0">Audit</div>
+                    </a>
                     <a role="button" href={rootUrl('deauth')} className="text-white">
                         <FontAwesomeIcon icon={faPowerOff} className="menu-icon d-block mx-auto"/>
                         <div className="menu-text text-center m-0">Logout</div>

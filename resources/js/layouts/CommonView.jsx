@@ -105,6 +105,7 @@ export default class CommonView extends React.Component {
                     size={this.props.addNewItem.size}
                     action={this.props.addNewItem.action}
                     initialValues={this.props.addNewItem.initialValues}
+                    closeButton={true}
                     show={this.state.addNewItemModalShown}
                     onClose={() => this.setState({ addNewItemModalShown: false })}
                     submitBtn={{
@@ -138,6 +139,7 @@ export default class CommonView extends React.Component {
                         fetchUrl={this.props.editItem.fetchUrl}
                         initialValues={this.props.editItem.initialValues}
                         editId={this.state.editId}
+                        closeButton={true}
                         show={this.state.editItemModalShown}
                         onClose={() => this.setState({ editItemModalShown: false })}
                         submitBtn={{

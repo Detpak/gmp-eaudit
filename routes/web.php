@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AppController;
 use App\Http\Controllers\AuditController;
+use App\Http\Controllers\AuditProcessController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\LoginController;
 use App\Http\Controllers\TestbedController;
@@ -27,6 +28,7 @@ Route::middleware('admin')->group(function() {
     Route::get('/deauth', [LoginController::class, 'deauth']);
     Route::get('/app', function() { return redirect()->intended('/app/dashboard'); });
     Route::view('/app/{path?}', 'main_view')->where('path', '.*');
+    Route::view('/audit', 'audit');
 
     // Route::prefix('/admin')->group(function() {
     //     Route::get('/', function() { return redirect()->intended('admin/dashboard'); });

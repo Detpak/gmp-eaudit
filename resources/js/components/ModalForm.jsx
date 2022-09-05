@@ -89,7 +89,7 @@ import $ from 'jquery';
 //     }
 // }
 
-export default function ModalForm({ action, fetchUrl, initialValues, title, size, show, onClose, submitBtn, editId, children }) {
+export default function ModalForm({ action, fetchUrl, initialValues, title, size, show, onClose, submitBtn, editId, children, closeButton }) {
     if (typeof(children) !== 'function') {
         throw new Error('The modal form children is not a function');
     }
@@ -144,7 +144,9 @@ export default function ModalForm({ action, fetchUrl, initialValues, title, size
             return;
         }
 
-        onClose();
+        if (onClose) {
+            onClose();
+        }
 
         if (submitBtn.afterSubmit) {
             submitBtn.afterSubmit();
@@ -162,7 +164,7 @@ export default function ModalForm({ action, fetchUrl, initialValues, title, size
 
     return (
         <Modal show={show} size={size} backdrop="static" onHide={onClose} onExited={handleExited}>
-            <Modal.Header closeButton>
+            <Modal.Header closeButton={closeButton}>
                 <Modal.Title>{title}</Modal.Title>
             </Modal.Header>
             <Form noValidate onSubmit={handleSubmit} ref={formRef}>
@@ -182,7 +184,7 @@ export default function ModalForm({ action, fetchUrl, initialValues, title, size
                     </fieldset>
                 </Modal.Body>
                 <Modal.Footer>
-                    <Button variant="secondary" onClick={onClose}>Close</Button>
+                    {onClose && <Button variant="secondary" onClick={onClose}>Close</Button>}
                     <LoadingButton type="submit" variant="primary" icon={submitBtn.icon} isLoading={isSubmitting}>{submitBtn.name}</LoadingButton>
                 </Modal.Footer>
             </Form>

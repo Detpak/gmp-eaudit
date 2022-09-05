@@ -37,6 +37,10 @@
     <meta name="development" content="1">
     @endif
 
+    @isset($page)
+    <meta name="page" content="{{ $page }}">
+    @endisset
+
     <title>MyAudit+</title>
 </head>
 <body>

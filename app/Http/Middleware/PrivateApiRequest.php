@@ -29,6 +29,7 @@ class PrivateApiRequest
         $accessTokens = ApiAccessToken::where('user_id', $tokenSplit[0])->get();
         $result = false;
 
+        // Find matching tokens
         foreach ($accessTokens as $accessToken) {
             if (Hash::check($tokenSplit[1], $accessToken->token)) {
                 $result = true;
