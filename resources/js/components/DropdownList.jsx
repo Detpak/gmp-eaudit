@@ -26,7 +26,7 @@ export default function DropdownList({ title }) {
         const timeout = setTimeout(() => {
             setCanFetch(true);
             setListData([]);
-            fetchData(searchKeyword, page, append);
+            fetchData(search, page, append);
         }, 500);
 
         return () => clearTimeout(timeout);
