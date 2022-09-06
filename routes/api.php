@@ -51,6 +51,7 @@ Route::prefix('/v1')->group(function() {
         Route::post('/add-criteria-group', [CriteriaGroupController::class, 'apiAdd']);
         Route::post('/edit-criteria-group', [CriteriaGroupController::class, 'apiEdit']);
         Route::get('/get-criteria-group/{id}', [CriteriaGroupController::class, 'apiGet']);
+        Route::get('/get-criteria-group-params/{id}', [CriteriaGroupController::class, 'apiGetParams']);
         Route::get('/fetch-criteria-groups', [CriteriaGroupController::class, 'apiFetch']);
         Route::get('/delete-criteria-group/{id}', [CriteriaGroupController::class, 'apiDelete']);
         Route::post('/delete-criteria-groups', [CriteriaGroupController::class, 'apiDeleteSelected']);

@@ -111,6 +111,24 @@ class CriteriaGroupController extends Controller
         return $attr->merge(['criteria_ids' => $criteriaIds, 'weight' => 0]);
     }
 
+    public function apiGetParams($id)
+    {
+        $dept = CriteriaGroup::find($id);
+
+        if (!$dept) {
+            return Response::json(['result' => 'Data not found']);
+        }
+
+        $criteriaIds = CriteriaGroupParam::select('criteria_id')
+            ->where('group_id', $id)
+            ->get()
+            ->map(function($value) {
+                return $value['criteria_id'];
+            });
+
+        return Criteria::whereIn('id', $criteriaIds)->get();
+    }
+
     public function apiFetch(Request $request)
     {
         $query = CriteriaGroup::query();
