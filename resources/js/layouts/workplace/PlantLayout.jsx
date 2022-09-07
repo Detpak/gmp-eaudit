@@ -54,8 +54,8 @@ function PlantForm({ shown, handleChange, values, errors }) {
                         <Form.Label>Entity <RequiredSpan /></Form.Label>
                         <Form.Select name="entity_id" value={values.entity_id} onChange={handleChange} isInvalid={!!errors.entity_id} disabled={isLoading}>
                             <option value="" disabled>-- Please select entity --</option>
-                            {entities.map((data) => (
-                                <option key={_.uniqueId()} value={data.id}>{data.name}</option>
+                            {entities.map((data, index) => (
+                                <option key={index} value={data.id}>{data.name}</option>
                             ))}
                         </Form.Select>
                         <Form.Control.Feedback type="invalid">{errors.entity_id}</Form.Control.Feedback>

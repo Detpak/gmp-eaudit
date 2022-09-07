@@ -123,8 +123,8 @@ export default function SearchList({ source, height, placeholder, onDone, childr
                                 </div>
                                 <div className="flex-fill overflow-auto" style={{ maxHeight: height }} onScroll={handleScroll}>
                                     <ListGroup>
-                                        {listData.map((item) => (
-                                            <ListGroup.Item key={_.uniqueId()}>
+                                        {listData.map((item, index) => (
+                                            <ListGroup.Item key={index}>
                                                 <div className="d-flex">
                                                     <Form.Group className="align-self-center me-3">
                                                         <Form.Check

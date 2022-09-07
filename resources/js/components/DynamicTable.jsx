@@ -140,10 +140,10 @@ export default function DynamicTable({ refreshTrigger, columns, selectedItems, o
                                     <div className="px-3 py-2 border"><FontAwesomeIcon icon={faCheck} /></div>
                                 </th>
                             }
-                            {columns.map((column) => {
+                            {columns.map((column, index) => {
                                 const sortable = !('sortable' in column) ? true : column.sortable;
                                 return (
-                                    <th key={_.uniqueId()} className={thClassName} onClick={() => sortable && handleSort(column.id)}>
+                                    <th key={index} className={thClassName} onClick={() => sortable && handleSort(column.id)}>
                                         <div className="hstack gap-3 px-3 py-2 border border-start-0">
                                             <span className="user-select-none flex-fill">{column.name}</span>
                                             {sortable && <FontAwesomeIcon icon={sort && sort.column == column.id ? (sort.dir == 1 ? faSortUp : faSortDown) : faSort} />}
@@ -162,15 +162,15 @@ export default function DynamicTable({ refreshTrigger, columns, selectedItems, o
                         {
                             isLoading ? (
                                 // Show loading shimmer
-                                _.range(0, 5).map(() => (
-                                    <tr key={_.uniqueId()}>
+                                _.range(0, 5).map((_, index) => (
+                                    <tr key={index}>
                                         {selectedItems &&
                                             <td className={tdFixedLeftClassName}>
                                                 <input type="checkbox" className="form-check-input" disabled />
                                             </td>
                                         }
-                                        {columns.map((data) => (
-                                            <td key={_.uniqueId()} className={tdClassName}>
+                                        {columns.map((data, columnIndex) => (
+                                            <td key={columnIndex} className={tdClassName}>
                                                 <div className="shimmer"></div>
                                             </td>
                                         ))}
@@ -183,8 +183,8 @@ export default function DynamicTable({ refreshTrigger, columns, selectedItems, o
                                     </tr>
                                 ))
                             ) : (
-                                listData.map((item) => (
-                                    <tr key={_.uniqueId()}>
+                                listData.map((item, index) => (
+                                    <tr key={index}>
                                         {selectedItems &&
                                             <td className={tdFixedLeftClassName}>
                                                 <input
@@ -195,8 +195,8 @@ export default function DynamicTable({ refreshTrigger, columns, selectedItems, o
                                                 />
                                             </td>
                                         }
-                                        {source.produce(item).map((data) => (
-                                            <td key={_.uniqueId()} className={tdClassName}>{data}</td>
+                                        {source.produce(item).map((data, columnIndex) => (
+                                            <td key={columnIndex} className={tdClassName}>{data}</td>
                                         ))}
                                         {actionColumn &&
                                             <td className={tdFixedRightClassName}>
@@ -228,7 +228,7 @@ export default function DynamicTable({ refreshTrigger, columns, selectedItems, o
                     <span>Show</span>
                     <Form.Group>
                         <Form.Select value={entries} onChange={handleEntryChange}>
-                            {entriesList.map((numEntries) => <option key={_.uniqueId()} value={numEntries}>{numEntries}</option>)}
+                            {entriesList.map((numEntries, index) => <option key={index} value={numEntries}>{numEntries}</option>)}
                         </Form.Select>
                     </Form.Group>
                     <span>entries</span>
@@ -240,9 +240,9 @@ export default function DynamicTable({ refreshTrigger, columns, selectedItems, o
                         </Pagination.Item>
                         {
                             numPages <= MAX_PAGES ? (
-                                _.range(1, numPages + 1).map((page) => (
+                                _.range(1, numPages + 1).map((page, index) => (
                                     <Pagination.Item
-                                        key={_.uniqueId()}
+                                        key={index}
                                         active={currentPage == page}
                                         disabled={isLoading && currentPage != page}
                                         onClick={() => setCurrentPage(page)}
@@ -264,9 +264,9 @@ export default function DynamicTable({ refreshTrigger, columns, selectedItems, o
                                                     <Pagination.Ellipsis disabled={isLoading} onClick={() => setCurrentPage(prevSection)} />
                                                 </>
                                             }
-                                            {_.range(1 + section * MAX_PAGES, Math.min(nextSection, numPages + 1)).map((page) => (
+                                            {_.range(1 + section * MAX_PAGES, Math.min(nextSection, numPages + 1)).map((page, index) => (
                                                 <Pagination.Item
-                                                    key={_.uniqueId()}
+                                                    key={index}
                                                     active={currentPage == page}
                                                     disabled={isLoading && currentPage != page}
                                                     onClick={() => setCurrentPage(page)}

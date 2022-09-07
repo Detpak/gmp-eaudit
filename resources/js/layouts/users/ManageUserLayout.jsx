@@ -47,8 +47,8 @@ function UserForm({ shown, handleChange, values, errors }) {
                 <Form.Label>Role <RequiredSpan/></Form.Label>
                 <Form.Select name="role_id" value={values.role_id} onChange={handleChange} isInvalid={!!errors.role_id} disabled={isLoadingRole}>
                     <option value="" disabled>-- Please select user role --</option>
-                    {roles.map((data) => (
-                        <option key={_.uniqueId()} value={data.id}>{data.name}</option>
+                    {roles.map((data, index) => (
+                        <option key={index} value={data.id}>{data.name}</option>
                     ))}
                 </Form.Select>
                 <Form.Control.Feedback type="invalid">{errors.role_id}</Form.Control.Feedback>

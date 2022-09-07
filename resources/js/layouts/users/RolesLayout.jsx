@@ -17,8 +17,8 @@ function RolesForm({ handleChange, values, errors }) {
                 <Form.Control as="textarea" name="remarks" rows={2} value={values.remarks} onChange={handleChange} isInvalid={!!errors.remarks} />
                 <Form.Control.Feedback type="invalid">{errors.remarks}</Form.Control.Feedback>
             </Form.Group>
-            {menus.map((menu) => (
-                <Form.Group key={_.uniqueId()} className="mb-3">
+            {menus.map((menu, index) => (
+                <Form.Group key={index} className="mb-3">
                     <Form.Label>{menu.name} access privilege</Form.Label>
                     <Form.Select name={`${menu.link}`} value={values[menu.link]} onChange={handleChange}>
                         {_.range(menu.maxAccessLevel + 1).map((level) => (

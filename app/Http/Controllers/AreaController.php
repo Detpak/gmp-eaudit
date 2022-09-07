@@ -98,6 +98,7 @@ class AreaController extends Controller
             ->select('areas.id',
                      'areas.name',
                      'areas.desc',
+                     'areas.department_id',
                      'plants.name as plant_name',
                      'departments.name as dept_name');
 

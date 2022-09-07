@@ -65,8 +65,8 @@ function DepartmentForm({ shown, handleChange, values, setValues, errors }) {
                 <Form.Label>Division <RequiredSpan /></Form.Label>
                 <Form.Select name="division_id" value={values.division_id} onChange={handleChange} isInvalid={!!errors.division_id} disabled={isLoadingOptions}>
                     <option value="" disabled>-- Please select entity --</option>
-                    {divisions.map((data) => (
-                        <option key={_.uniqueId()} value={data.id}>{data.name}</option>
+                    {divisions.map((data, index) => (
+                        <option key={index} value={data.id}>{data.name}</option>
                     ))}
                 </Form.Select>
                 <Form.Control.Feedback type="invalid">{errors.division_id}</Form.Control.Feedback>

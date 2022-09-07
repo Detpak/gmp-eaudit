@@ -81,22 +81,22 @@ export default function DropdownList({ source, selectedItem, setSelectedItem, ca
                 </Dropdown.Toggle>
             </div>
 
-            <Dropdown.Menu className="w-100">
+            <Dropdown.Menu className="w-100 shadow">
                 <Dropdown.Header>
                     <Form.Control type="text" placeholder="Search" value={search} onChange={(ev) => setSearch(ev.target.value)} />
                 </Dropdown.Header>
 
                 <div className="overflow-auto" style={{ maxHeight: 200 }} onScroll={handleScroll}>
                     {listData.map((item, index) => (
-                        <Dropdown.Item key={_.uniqueId()} eventKey={index} className="py-2">
+                        <Dropdown.Item key={index} eventKey={index} className="py-2">
                             {React.createElement(children, { data: item })}
                         </Dropdown.Item>
                     ))}
                     {
                         canFetch && isLoading && (
-                            <Dropdown.Item className="py-2 text-center">
+                            <div className="py-2 text-center">
                                 <span className="text-secondary"><Spinner animation="border" size="sm" /> Loading...</span>
-                            </Dropdown.Item>
+                            </div>
                         )
                     }
                 </div>

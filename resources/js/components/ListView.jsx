@@ -50,8 +50,8 @@ export default function ListView({ ids, fetchUrl, onDoneLoading, handleRemoveAll
                             (data.length == 0) ? (
                                 <ListGroup.Item className="text-center">No PIC(s) selected</ListGroup.Item>
                             ) : (
-                                data.map(item => (
-                                    <ListGroup.Item key={_.uniqueId()} className="hstack gap-3">
+                                data.map((item, index) => (
+                                    <ListGroup.Item key={index} className="hstack gap-3">
                                         {React.createElement(children, { item: item })}
                                         <Button variant="danger" size="sm" disabled={data.length == 0} onClick={() => handleRemove(item.id)}>
                                             <FontAwesomeIcon icon={faTrash} />

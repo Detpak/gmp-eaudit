@@ -20,7 +20,6 @@ function WorkplaceAreaForm({ shown, handleChange, values, setValues, errors }) {
 
     useEffect(() => {
         if (shown) {
-            console.log('fetch');
             setLoading(true);
             fetchData().then((values) => {
                 setPlants(values.plants);
@@ -41,8 +40,8 @@ function WorkplaceAreaForm({ shown, handleChange, values, setValues, errors }) {
                 <Form.Label>Plant <RequiredSpan /></Form.Label>
                 <Form.Select name="plant_id" value={values.plant_id} onChange={handleChange} isInvalid={!!errors.plant_id} disabled={isLoading}>
                     <option value="" disabled>-- Please select plant --</option>
-                    {plants.map((data) => (
-                        <option key={_.uniqueId()} value={data.id}>{data.name}</option>
+                    {plants.map((data, index) => (
+                        <option key={index} value={data.id}>{data.name}</option>
                     ))}
                 </Form.Select>
                 <Form.Control.Feedback type="invalid">{errors.plant_id}</Form.Control.Feedback>
@@ -51,8 +50,8 @@ function WorkplaceAreaForm({ shown, handleChange, values, setValues, errors }) {
                 <Form.Label>Department <RequiredSpan /></Form.Label>
                 <Form.Select name="department_id" value={values.department_id} onChange={handleChange} isInvalid={!!errors.department_id} disabled={isLoading}>
                     <option value="" disabled>-- Please select department --</option>
-                    {departments.map((data) => (
-                        <option key={_.uniqueId()} value={data.id}>{data.name}</option>
+                    {departments.map((data, index) => (
+                        <option key={index} value={data.id}>{data.name}</option>
                     ))}
                 </Form.Select>
                 <Form.Control.Feedback type="invalid">{errors.department_id}</Form.Control.Feedback>
