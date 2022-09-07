@@ -17,6 +17,7 @@ function RolesForm({ handleChange, values, errors }) {
                 <Form.Control as="textarea" name="remarks" rows={2} value={values.remarks} onChange={handleChange} isInvalid={!!errors.remarks} />
                 <Form.Control.Feedback type="invalid">{errors.remarks}</Form.Control.Feedback>
             </Form.Group>
+            <Form.Check className="mb-3" type="checkbox" name="auditee" label="Auditee" value={values.auditee} onChange={handleChange} />
             {menus.map((menu, index) => (
                 <Form.Group key={index} className="mb-3">
                     <Form.Label>{menu.name} access privilege</Form.Label>
@@ -37,6 +38,7 @@ export default function RolesUserLayout() {
     const initialValues = {
         roleName: '',
         remarks: '',
+        auditee: false,
     };
 
     for (const menu of menus) {
@@ -68,6 +70,10 @@ export default function RolesUserLayout() {
                         name: 'Name',
                     },
                     {
+                        id: 'auditee',
+                        name: 'Auditee?',
+                    },
+                    {
                         id: 'remarks',
                         name: 'Description',
                     }
@@ -75,7 +81,11 @@ export default function RolesUserLayout() {
                 source: {
                     url: rootUrl('api/v1/fetch-roles'),
                     method: 'GET',
-                    produce: item => [item.name, (item.remarks && item.remarks.length > 0) ? item.remarks : '-'],
+                    produce: item => [
+                        item.name,
+                        item.auditee != 0 ? 'Yes' : 'No',
+                        (item.remarks && item.remarks.length > 0) ? item.remarks : '-'
+                    ],
                     total: data => data.total
                 }
             }}

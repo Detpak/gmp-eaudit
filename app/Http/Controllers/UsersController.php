@@ -25,6 +25,7 @@ class UsersController extends Controller
             [
                 'roleName' => 'required|string|unique:roles,name|max:255',
                 'remarks' => 'nullable|string|max:255',
+                'auditee' => 'required'
             ]
         );
 
@@ -35,9 +36,10 @@ class UsersController extends Controller
         $accessInfo = $request->except(['userId', 'roleName', 'remarks']);
 
         Role::create([
-           'name' => $request->roleName,
-           'access_info' => json_encode($accessInfo),
-           'remarks' => $request->remarks
+            'name' => $request->roleName,
+            'access_info' => json_encode($accessInfo),
+            'remarks' => $request->remarks,
+            'auditee' => $request->auditee ? 1 : 0
         ]);
 
         return Response::json(['result' => 'ok']);
@@ -51,6 +53,7 @@ class UsersController extends Controller
         return [
             'roleName' => $role->name,
             'remarks' => $role->remarks,
+            'auditee' => $role->auditee,
             'dashboard' => isset($accessInfo->dashboard) ? $accessInfo->dashboard : null,
             'audit' => isset($accessInfo->audit) ? $accessInfo->audit : null,
             'workplace' => isset($accessInfo->workplace) ? $accessInfo->workplace : null,
@@ -127,6 +130,7 @@ class UsersController extends Controller
             [
                 'roleName' => 'required|string|max:255',
                 'remarks' => 'nullable|string|max:255',
+                'auditee' => 'required'
             ]
         );
 
@@ -137,6 +141,7 @@ class UsersController extends Controller
         $updateColumn = [
             'name' => $request->roleName,
             'remarks' => $request->remarks,
+            'auditee' => $request->auditee ? 1 : 0
         ];
 
         $accessInfo = $request->except(['id', 'roleName', 'remarks']);
