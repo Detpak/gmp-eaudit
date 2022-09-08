@@ -86,15 +86,18 @@ export default function AuditProcessLayout() {
                             let tmpTotalWeight = 0;
                             let tmpCriteriaPassed = 0;
                             let tmpCriteriaFailed = 0;
+                            let index = 0;
 
                             for (const criteria of criterias) {
-                                if (passes[criteria.id] == null) {
+                                if (!passes[index].fail) {
                                     tmpTotalWeight += criteria.weight;
                                     tmpCriteriaPassed += 1;
                                 }
                                 else {
                                     tmpCriteriaFailed += 1;
                                 }
+
+                                index++;
                             }
 
                             setTotalWeight(tmpTotalWeight);
@@ -125,7 +128,7 @@ export default function AuditProcessLayout() {
                             }
 
                             setCriteriaPasses(tmpCriteriaPasses);
-                            recalculateSummary(criteriaPasses);
+                            recalculateSummary(tmpCriteriaPasses);
                         };
 
                         useEffect(() => {
