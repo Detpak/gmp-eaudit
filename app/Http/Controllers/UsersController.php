@@ -258,6 +258,11 @@ class UsersController extends Controller
                        'users.email',
                        'roles.name as role_name');
 
+        if($request->only_auditee) {
+            $query->where('roles.auditee', 1);
+        }
+
+
         return $request->all ? $query->get() : $query->paginate($request->max);
     }
 

@@ -76,7 +76,7 @@ function DepartmentForm({ shown, handleChange, values, setValues, errors }) {
                 <SearchList
                     height="200px"
                     placeholder="Add PIC(s)..."
-                    source={rootUrl('api/v1/fetch-users')}
+                    source={rootUrl('api/v1/fetch-users?only_auditee=true')}
                     onDone={handleDone}
                 >
                     {({ data }) => {
@@ -155,6 +155,11 @@ export default function DepartmentLayout() {
                         id: 'areas_count',
                         name: '# Areas'
                     },
+                    {
+                        sortable: false,
+                        id: 'pics',
+                        name: 'PIC(s)'
+                    },
                 ],
                 source: {
                     url: rootUrl('api/v1/fetch-depts'),
@@ -163,7 +168,8 @@ export default function DepartmentLayout() {
                         item.name,
                         item.code,
                         item.division_name && item.division_name.length > 0 ? item.division_name : '-',
-                        item.areas_count
+                        item.areas_count,
+                        item.pics.map(pic => pic.name).join(', '),
                     ],
                     total: data => data.total
                 }
