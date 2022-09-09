@@ -21,24 +21,32 @@ export default class AuditCyclesLayout extends React.Component {
         this.startNewCycle = this.startNewCycle.bind(this);
         this.refreshTable = this.refreshTable.bind(this);
         this.handleSearch = this.handleSearch.bind(this);
+        this.closeOrReopenCycle = this.closeOrReopenCycle.bind(this);
     }
 
     async startNewCycle() {
-        // Check if there is a current active cycle before starting the new one
-        const activeCycle = await axios.get(rootUrl('api/v1/get-active-cycle'));
-
-        if (activeCycle.data.result && !confirm('The current audit cycle has not yet been finished. Are you sure you want to start a new cycle?')) {
-            return;
-        }
-
         const newCycle = await axios.post(rootUrl('api/v1/new-cycle'));
 
         if (newCycle.data.result == 'ok') {
             showToastMsg("New cycle has been started.");
             this.refreshTable();
         }
+    }
 
-        return;
+    async closeOrReopenCycle(id, close) {
+        console.log(id);
+        const response = await axios.get(rootUrl(`api/v1/close-or-reopen-cycle/${id}?close=${close}`));
+
+        if (response.data.result === 'ok') {
+            if (close) {
+                showToastMsg('Cycle has been closed!');
+            }
+            else {
+                showToastMsg('Cycle has been reopened!');
+            }
+
+            this.refreshTable();
+        }
     }
 
     refreshTable() {
@@ -81,12 +89,39 @@ export default class AuditCyclesLayout extends React.Component {
                             {
                                 id: 'close_time',
                                 name: 'Close Time'
+                            },
+                            {
+                                sortable: false,
+                                id: 'controls',
+                                name: 'Action'
                             }
                         ]}
                         source={{
                             url: rootUrl('api/v1/fetch-cycles'),
                             method: 'GET',
-                            produce: item => [item.label, item.open_time, item.close_time ? item.close_time : '-'],
+                            produce: item => [
+                                item.label,
+                                item.open_time,
+                                item.close_time ? item.close_time : '-',
+                                item.close_time ?
+                                    <LoadingButton
+                                        type="button"
+                                        variant="primary"
+                                        size="sm"
+                                        onClick={async () => await this.closeOrReopenCycle(item.id, 0)}
+                                    >
+                                        Reopen
+                                    </LoadingButton>
+                                    :
+                                    <LoadingButton
+                                        type="button"
+                                        variant="danger"
+                                        size="sm"
+                                        onClick={async () => await this.closeOrReopenCycle(item.id, 1)}
+                                    >
+                                        Close
+                                    </LoadingButton>
+                            ],
                         }}
                     />
                 </PageContentView>

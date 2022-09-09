@@ -100,6 +100,7 @@ class AreaController extends Controller
                      'areas.desc',
                      'areas.department_id',
                      'plants.name as plant_name',
+                     'plants.code as plant_code',
                      'departments.name as dept_name');
 
         return $query->paginate($request->max);

@@ -6,6 +6,7 @@ use App\Models\AuditCycle;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Response;
 
 class AuditController extends Controller
 {
@@ -21,8 +22,6 @@ class AuditController extends Controller
 
         // Close current cycle
         if ($activeCycle) {
-            $activeCycle->close_time = Carbon::now()->toDateTimeString();
-            $activeCycle->save();
             $lastId = $activeCycle->id + 1;
         }
 
@@ -53,5 +52,25 @@ class AuditController extends Controller
         }
 
         return $query->paginate($request->max);
+    }
+
+    public function apiCloseOrReopen(Request $request, $id)
+    {
+        $cycle = AuditCycle::find($id);
+
+        if (!$cycle) {
+            return Response::json(['result' => 'Data not found.'], 404);
+        }
+
+        if ($request->close == '1') {
+            $cycle->close_time = Carbon::now()->toDateTimeString();
+        }
+        else {
+            $cycle->close_time = null;
+        }
+
+        $cycle->save();
+
+        return ['result' => 'ok'];
     }
 }

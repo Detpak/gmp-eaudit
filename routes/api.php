@@ -37,6 +37,7 @@ Route::prefix('/v1')->group(function() {
         Route::post('/new-cycle', [AuditController::class, 'apiNewCycle']);
         Route::get('/get-active-cycle', [AuditController::class, 'apiGetActiveCycle']);
         Route::get('/fetch-cycles', [AuditController::class, 'apiFetchCycles']);
+        Route::get('/close-or-reopen-cycle/{id}', [AuditController::class, 'apiCloseOrReopen']);
 
         // Criteria APIs
         Route::post('/add-criteria', [CriteriaController::class, 'apiAdd']);

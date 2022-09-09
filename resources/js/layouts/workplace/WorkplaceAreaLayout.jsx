@@ -41,7 +41,7 @@ function WorkplaceAreaForm({ shown, handleChange, values, setValues, errors }) {
                 <Form.Select name="plant_id" value={values.plant_id} onChange={handleChange} isInvalid={!!errors.plant_id} disabled={isLoading}>
                     <option value="" disabled>-- Please select plant --</option>
                     {plants.map((data, index) => (
-                        <option key={index} value={data.id}>{data.name}</option>
+                        <option key={index} value={data.id}>{data.name} ({data.code})</option>
                     ))}
                 </Form.Select>
                 <Form.Control.Feedback type="invalid">{errors.plant_id}</Form.Control.Feedback>
@@ -115,7 +115,7 @@ export default function WorkplaceAreaLayout() {
                     method: 'GET',
                     produce: item => [
                         item.name,
-                        item.plant_name,
+                        <>{item.plant_name} ({item.plant_code})</>,
                         item.dept_name,
                         item.desc && item.desc.length > 0 ? item.desc : '-'
                     ],

@@ -160,6 +160,6 @@ class PlantController extends Controller
 
     public function apiFetchOptions()
     {
-        return Plant::select('id', 'name')->get();
+        return Plant::select('id', 'name', 'code')->get();
     }
 }
