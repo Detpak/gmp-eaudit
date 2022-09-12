@@ -1,7 +1,7 @@
 <?php
 
 use App\Http\Controllers\AreaController;
-use App\Http\Controllers\AuditController;
+use App\Http\Controllers\AuditCycleController;
 use App\Http\Controllers\CriteriaController;
 use App\Http\Controllers\CriteriaGroupController;
 use App\Http\Controllers\DashboardController;
@@ -34,10 +34,10 @@ Route::prefix('/v1')->group(function() {
         Route::post('/get-chart', [DashboardController::class, 'apiGetChart']);
 
         // Audit APIs
-        Route::post('/new-cycle', [AuditController::class, 'apiNewCycle']);
-        Route::get('/get-active-cycle', [AuditController::class, 'apiGetActiveCycle']);
-        Route::get('/fetch-cycles', [AuditController::class, 'apiFetchCycles']);
-        Route::get('/close-or-reopen-cycle/{id}', [AuditController::class, 'apiCloseOrReopen']);
+        Route::post('/new-cycle', [AuditCycleController::class, 'apiNewCycle']);
+        Route::get('/get-active-cycle', [AuditCycleController::class, 'apiGetActiveCycle']);
+        Route::get('/fetch-cycles', [AuditCycleController::class, 'apiFetchCycles']);
+        Route::get('/close-or-reopen-cycle/{id}', [AuditCycleController::class, 'apiCloseOrReopen']);
 
         // Criteria APIs
         Route::post('/add-criteria', [CriteriaController::class, 'apiAdd']);

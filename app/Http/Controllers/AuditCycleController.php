@@ -8,7 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Response;
 
-class AuditController extends Controller
+class AuditCycleController extends Controller
 {
     public function show()
     {
@@ -39,9 +39,16 @@ class AuditController extends Controller
         $query = AuditCycle::query()->select('id', 'label', 'open_time', 'close_time');
 
         if ($request->search) {
-            $query->where('label', 'LIKE', "%{$request->search}%")
-                ->orWhere('open_time', 'LIKE', "%{$request->search}%")
-                ->orWhere('close_time', 'LIKE', "%{$request->search}%");
+            $query->where('label', 'LIKE', "%{$request->search}%");
+
+            if ($request->list != '1') {
+                $query->orWhere('open_time', 'LIKE', "%{$request->search}%")
+                      ->orWhere('close_time', 'LIKE', "%{$request->search}%");
+            }
+        }
+
+        if ($request->list == '1') {
+            $query->whereNull('close_time');
         }
 
         if ($request->sort && $request->dir) {

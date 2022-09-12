@@ -81,7 +81,7 @@ export default function DropdownList({ source, selectedItem, setSelectedItem, ca
                 </Dropdown.Toggle>
             </div>
 
-            <Dropdown.Menu className="w-100 shadow">
+            <Dropdown.Menu className="w-100 shadow" flip={false}>
                 <Dropdown.Header>
                     <Form.Control type="text" placeholder="Search" value={search} onChange={(ev) => setSearch(ev.target.value)} />
                 </Dropdown.Header>
