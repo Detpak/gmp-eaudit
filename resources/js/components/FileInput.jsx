@@ -1,16 +1,17 @@
 import { faTrash } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useEffect } from "react";
-import { Button, ListGroup } from "react-bootstrap";
+import { Button, Image, ListGroup } from "react-bootstrap";
 
 export default function FileInput({ files, setFiles, className, children, ...rest }) {
     return (
         <div className={className}>
             {files.length > 0 &&
                 <ListGroup className="mb-2">
-                    {files.map((data, index) => (
+                    {files.map((file, index) => (
                         <ListGroup.Item key={index} className="hstack gap-2">
-                            <div className="text-truncate me-auto">{data.name}</div>
+                            {file.type.includes('image') && <Image src={URL.createObjectURL(file)} style={{ maxWidth: 38, maxHeight: 38, objectFit: 'contain' }} />}
+                            <div className="text-truncate me-auto">{file.name}</div>
                             <Button
                                 variant="danger"
                                 onClick={() => {
