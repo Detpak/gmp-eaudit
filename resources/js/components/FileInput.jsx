@@ -9,7 +9,7 @@ export default function FileInput({ files, setFiles, className, children, ...res
     const [thumbnails, setThumbnails] = useState([]);
 
     useEffect(() => {
-        setThumbnails(files.map((file) => URL.createObjectURL(file)));
+        setThumbnails(files.map((file) => file.type.includes('image') ? URL.createObjectURL(file) : null));
     }, [files])
 
     return (
@@ -18,16 +18,19 @@ export default function FileInput({ files, setFiles, className, children, ...res
                 <ListGroup className="mb-2">
                     {files.map((file, index) => (
                         <ListGroup.Item key={index} className="hstack gap-2">
-                            <Image
-                                src={thumbnails[index]}
-                                style={{
-                                    width: 38,
-                                    height: 38,
-                                    maxWidth: 38,
-                                    maxHeight: 38,
-                                    objectFit: 'contain'
-                                }}
-                            />
+                            {file &&
+                                <Image
+                                    src={thumbnails[index]}
+                                    style={{
+                                        width: 38,
+                                        height: 38,
+                                        maxWidth: 38,
+                                        maxHeight: 38,
+                                        objectFit: 'contain'
+                                    }}
+                                />
+                            }
+
                             <div className="text-truncate me-auto">{file.name}</div>
                             <Button
                                 variant="danger"
