@@ -5,7 +5,7 @@ import _ from "lodash";
 import React, { useState } from "react";
 import { useRef } from "react";
 import { useEffect } from "react";
-import { Button, Form, Image, ListGroup, Modal, Spinner, Table } from "react-bootstrap";
+import { Button, Card, Form, Image, ListGroup, Modal, Spinner, Table } from "react-bootstrap";
 import DropdownList from "../components/DropdownList";
 import FileInput from "../components/FileInput";
 import LoadingButton from "../components/LoadingButton";
@@ -179,7 +179,7 @@ export default function AuditProcessLayout() {
     }, []);
 
     return (
-        <>
+        <Card className="audit-card w-auto mx-sm-auto mx-2 my-2">
             {isLoading || message != null ? (
                 <div className="p-4">
                     <div className="text-center">
@@ -192,11 +192,11 @@ export default function AuditProcessLayout() {
                     </div>
                 </div>
             ) : (
-                <Modal show={true}>
-                    <Modal.Header>
-                        <Modal.Title>Submit Finding</Modal.Title>
-                    </Modal.Header>
-                    <Modal.Body>
+                <>
+                    <Card.Header className="p-3">
+                        <h3 className="fw-bold display-spacing m-0">Submit Finding</h3>
+                    </Card.Header>
+                    <Card.Body className="card-body">
                         <Table className="align-middle">
                             <tbody>
                                 <tr>
@@ -209,7 +209,6 @@ export default function AuditProcessLayout() {
                                 </tr>
                             </tbody>
                         </Table>
-
                         <Form.Group className="mb-3">
                             <Form.Label>Cycle</Form.Label>
                             <DropdownList
@@ -224,7 +223,6 @@ export default function AuditProcessLayout() {
                                 )}
                             </DropdownList>
                         </Form.Group>
-
                         <Form.Group className="mb-3">
                             <Form.Label>Area</Form.Label>
                             <DropdownList
@@ -254,7 +252,6 @@ export default function AuditProcessLayout() {
                                 </>
                             )}
                         </Form.Group>
-
                         <Form.Group>
                             <Form.Label>Criteria Group</Form.Label>
                             <DropdownList
@@ -274,97 +271,95 @@ export default function AuditProcessLayout() {
                                         <Spinner animation="border" size="sm" /> Loading
                                     </div>
                                     :
-                                    (
-                                        criterias.map((data, index) => {
-                                            return (
-                                                <ListGroup.Item key={index}>
-                                                    <div className="hstack gap-2">
-                                                        <div className="text-truncate me-auto">
-                                                            <div className="fw-bold text-truncate">{data.name}</div>
-                                                            <small>{data.code} (Weight: +{data.weight}%)</small>
-                                                        </div>
-                                                        <div className="btn-group" role="group">
-                                                            <input
-                                                                type="radio"
-                                                                className="btn-check"
-                                                                name={data.id}
-                                                                value={true}
-                                                                checked={!criteriaPasses[index].fail}
-                                                                onChange={(ev) => handlePassesBtn(ev, index)}
-                                                                id={`${index}_0`}
-                                                                autoComplete="off" />
-                                                            <label className="btn btn-outline-success" htmlFor={`${index}_0`}>Pass</label>
-                                                            <input
-                                                                type="radio"
-                                                                className="btn-check"
-                                                                name={data.id}
-                                                                value={false}
-                                                                checked={criteriaPasses[index].fail}
-                                                                onChange={(ev) => handlePassesBtn(ev, index)}
-                                                                id={`${index}_1`}
-                                                                autoComplete="off"/>
-                                                            <label className="btn btn-outline-danger" htmlFor={`${index}_1`}>Fail</label>
-                                                        </div>
+                                    criterias.map((data, index) => {
+                                        return (
+                                            <ListGroup.Item key={index}>
+                                                <div className="hstack gap-2">
+                                                    <div className="text-truncate me-auto">
+                                                        <div className="fw-bold text-truncate">{data.name}</div>
+                                                        <small>{data.code} (Weight: +{data.weight}%)</small>
                                                     </div>
-                                                    {criteriaPasses[index].fail && (
-                                                        <div>
-                                                            <hr/>
-                                                            <Form.Group className="mb-3">
-                                                                <Form.Label>Description</Form.Label>
-                                                                <Form.Control
-                                                                    as="textarea"
-                                                                    rows={3}
-                                                                    value={criteriaPasses[index].info.desc}
-                                                                    onChange={(ev) => {
-                                                                        const tmpCriteriaPasses = criteriaPasses.slice();
-                                                                        tmpCriteriaPasses[index].info.desc = ev.target.value;
-                                                                        setCriteriaPasses(tmpCriteriaPasses);
-                                                                    }}
-                                                                />
-                                                            </Form.Group>
-                                                            <Form.Group className="mb-3">
-                                                                <Form.Label>Category</Form.Label>
-                                                                <div className="d-grid">
-                                                                    <div className="btn-group" role="group">
-                                                                        {["Observation", "Minor NC", "Major NC"].map((value, categoryIndex) => (
-                                                                            <React.Fragment key={categoryIndex}>
-                                                                                <input
-                                                                                    type="radio"
-                                                                                    className="btn-check"
-                                                                                    name={`pass_catergory_${index}`}
-                                                                                    value={categoryIndex}
-                                                                                    checked={criteriaPasses[index].info.category == categoryIndex}
-                                                                                    onChange={(ev) => handleCategoryBtn(ev, index)}
-                                                                                    id={`pass_catergory_${index}_${categoryIndex}`}
-                                                                                    autoComplete="off" />
-                                                                                <label className="btn btn-outline-primary" htmlFor={`pass_catergory_${index}_${categoryIndex}`}>
-                                                                                    {value}
-                                                                                </label>
-                                                                            </React.Fragment>
-                                                                        ))}
-                                                                    </div>
+                                                    <div className="btn-group" role="group">
+                                                        <input
+                                                            type="radio"
+                                                            className="btn-check"
+                                                            name={data.id}
+                                                            value={true}
+                                                            checked={!criteriaPasses[index].fail}
+                                                            onChange={(ev) => handlePassesBtn(ev, index)}
+                                                            id={`${index}_0`}
+                                                            autoComplete="off" />
+                                                        <label className="btn btn-outline-success" htmlFor={`${index}_0`}>Pass</label>
+                                                        <input
+                                                            type="radio"
+                                                            className="btn-check"
+                                                            name={data.id}
+                                                            value={false}
+                                                            checked={criteriaPasses[index].fail}
+                                                            onChange={(ev) => handlePassesBtn(ev, index)}
+                                                            id={`${index}_1`}
+                                                            autoComplete="off"/>
+                                                        <label className="btn btn-outline-danger" htmlFor={`${index}_1`}>Fail</label>
+                                                    </div>
+                                                </div>
+                                                {criteriaPasses[index].fail && (
+                                                    <div>
+                                                        <hr/>
+                                                        <Form.Group className="mb-3">
+                                                            <Form.Label>Description</Form.Label>
+                                                            <Form.Control
+                                                                as="textarea"
+                                                                rows={3}
+                                                                value={criteriaPasses[index].info.desc}
+                                                                onChange={(ev) => {
+                                                                    const tmpCriteriaPasses = criteriaPasses.slice();
+                                                                    tmpCriteriaPasses[index].info.desc = ev.target.value;
+                                                                    setCriteriaPasses(tmpCriteriaPasses);
+                                                                }}
+                                                            />
+                                                        </Form.Group>
+                                                        <Form.Group className="mb-3">
+                                                            <Form.Label>Category</Form.Label>
+                                                            <div className="d-grid">
+                                                                <div className="btn-group" role="group">
+                                                                    {["Observation", "Minor NC", "Major NC"].map((value, categoryIndex) => (
+                                                                        <React.Fragment key={categoryIndex}>
+                                                                            <input
+                                                                                type="radio"
+                                                                                className="btn-check"
+                                                                                name={`pass_catergory_${index}`}
+                                                                                value={categoryIndex}
+                                                                                checked={criteriaPasses[index].info.category == categoryIndex}
+                                                                                onChange={(ev) => handleCategoryBtn(ev, index)}
+                                                                                id={`pass_catergory_${index}_${categoryIndex}`}
+                                                                                autoComplete="off" />
+                                                                            <label className="btn btn-outline-primary" htmlFor={`pass_catergory_${index}_${categoryIndex}`}>
+                                                                                {value}
+                                                                            </label>
+                                                                        </React.Fragment>
+                                                                    ))}
                                                                 </div>
-                                                            </Form.Group>
-                                                            <Form.Group className="mb-3">
-                                                                <Form.Label>Images</Form.Label>
-                                                                <FileInput
-                                                                    accept="image/*"
-                                                                    files={criteriaPasses[index].info.photos}
-                                                                    setFiles={(files) => {
-                                                                        const tmpCriteriaPasses = criteriaPasses.slice();
-                                                                        tmpCriteriaPasses[index].info.photos = files;
-                                                                        setCriteriaPasses(tmpCriteriaPasses);
-                                                                    }}
-                                                                >
-                                                                    <FontAwesomeIcon icon={faImage} /> Add Images
-                                                                </FileInput>
-                                                            </Form.Group>
-                                                        </div>
-                                                    )}
-                                                </ListGroup.Item>
-                                            );
-                                        })
-                                    )
+                                                            </div>
+                                                        </Form.Group>
+                                                        <Form.Group className="mb-3">
+                                                            <Form.Label>Images</Form.Label>
+                                                            <FileInput
+                                                                accept="image/*"
+                                                                files={criteriaPasses[index].info.photos}
+                                                                setFiles={(files) => {
+                                                                    const tmpCriteriaPasses = criteriaPasses.slice();
+                                                                    tmpCriteriaPasses[index].info.photos = files;
+                                                                    setCriteriaPasses(tmpCriteriaPasses);
+                                                                }}
+                                                            >
+                                                                <FontAwesomeIcon icon={faImage} /> Add Images
+                                                            </FileInput>
+                                                        </Form.Group>
+                                                    </div>
+                                                )}
+                                            </ListGroup.Item>
+                                        );
+                                    })
                                 }
                             </ListGroup>
                         </Form.Group>
@@ -385,12 +380,12 @@ export default function AuditProcessLayout() {
                                 </Table>
                             </Form.Group>
                         }
-                    </Modal.Body>
-                    <Modal.Footer>
+                    </Card.Body>
+                    <Card.Footer className="p-3 hstack justify-content-end">
                         <LoadingButton onClick={handleSubmit} icon={faClipboardList}>Submit</LoadingButton>
-                    </Modal.Footer>
-                </Modal>
+                    </Card.Footer>
+                </>
             )}
-        </>
+        </Card>
     );
 }
