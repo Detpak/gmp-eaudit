@@ -12,10 +12,6 @@ import LoadingButton from "../components/LoadingButton";
 import ModalForm from "../components/ModalForm";
 import { rootUrl } from "../utils";
 
-function AuditProcessForm() {
-    return <></>;
-}
-
 export default function AuditProcessLayout() {
     const [user, setUser] = useState({});
     const [isLoading, setLoading] = useState(true);
@@ -179,7 +175,7 @@ export default function AuditProcessLayout() {
     }, []);
 
     return (
-        <Card className="audit-card w-auto mx-sm-auto mx-2 my-2">
+        <Card className="audit-card mx-sm-auto mx-2 my-2 w-auto">
             {isLoading || message != null ? (
                 <div className="p-4">
                     <div className="text-center">

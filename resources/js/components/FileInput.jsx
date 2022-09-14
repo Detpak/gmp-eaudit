@@ -7,7 +7,8 @@ import { Button, Image, ListGroup, Modal } from "react-bootstrap";
 
 export default function FileInput({ files, setFiles, className, children, ...rest }) {
     const [thumbnails, setThumbnails] = useState([]);
-    const [previewImage, setPreviewImage] = useState(false);
+    const [showImage, setShowImage] = useState(false);
+    const [previewImage, setPreviewImage] = useState(null);
 
     useEffect(() => {
         setThumbnails(files.map((file) => file.type.includes('image') ? URL.createObjectURL(file) : null));
@@ -20,18 +21,21 @@ export default function FileInput({ files, setFiles, className, children, ...res
                     {files.map((file, index) => (
                         <ListGroup.Item key={index} className="hstack gap-2">
                             {file &&
-                                <a role="button" href="#" onClick={() => setPreviewImage(true)}>
-                                    <Image
-                                        src={thumbnails[index]}
-                                        style={{
-                                            width: 38,
-                                            height: 38,
-                                            maxWidth: 38,
-                                            maxHeight: 38,
-                                            objectFit: 'contain'
-                                        }}
-                                    />
-                                </a>
+                                <Image
+                                    role="button"
+                                    src={thumbnails[index]}
+                                    style={{
+                                        width: 38,
+                                        height: 38,
+                                        maxWidth: 38,
+                                        maxHeight: 38,
+                                        objectFit: 'contain'
+                                    }}
+                                    onClick={() => {
+                                        setPreviewImage(thumbnails[index]);
+                                        setShowImage(true);
+                                    }}
+                                />
                             }
 
                             <div className="text-truncate me-auto">{file.name}</div>
@@ -71,12 +75,20 @@ export default function FileInput({ files, setFiles, className, children, ...res
                     {...rest}
                 />
             </label>
-            <Modal show={previewImage} onHide={() => setPreviewImage(false)}>
+            <Modal
+                show={showImage}
+                onHide={() => {
+                    setShowImage(false);
+                }}
+                onExited={() => {
+                    setPreviewImage(null);
+                }}
+            >
                 <Modal.Header closeButton>
                     <Modal.Title>Preview</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
-                    Test
+                    {previewImage && <Image src={previewImage} className="w-100" />}
                 </Modal.Body>
             </Modal>
         </div>
