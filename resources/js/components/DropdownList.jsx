@@ -1,4 +1,6 @@
+import axios from "axios";
 import React from "react";
+import { useRef } from "react";
 import { useEffect, useState } from "react";
 import { Dropdown, Form, Spinner } from "react-bootstrap";
 import { useIsMounted } from "../utils";
@@ -10,6 +12,7 @@ export default function DropdownList({ source, selectedItem, setSelectedItem, ca
     const [currentPage, setCurrentPage] = useState(1);
     const [listData, setListData] = useState([]);
     const [search, setSearch] = useState('');
+    const abortController = useRef(null);
 
     const handleShow = (nextShow) => {
         if (nextShow == false) {
@@ -29,7 +32,7 @@ export default function DropdownList({ source, selectedItem, setSelectedItem, ca
             max: 8
         };
 
-        axios.get(source, { params: params })
+        axios.get(source, { params: params, signal: abortController.current.signal })
             .then((response) => {
                 if (append) {
                     if (response.data.total == listData.length) {
@@ -46,6 +49,13 @@ export default function DropdownList({ source, selectedItem, setSelectedItem, ca
 
                 setCurrentPage(page);
                 setLoading(false);
+            })
+            .catch((reason) => {
+                if (axios.isCancel(reason)) {
+                    return;
+                }
+
+                console.error(reason);
             });
     };
 
@@ -63,6 +73,7 @@ export default function DropdownList({ source, selectedItem, setSelectedItem, ca
 
     useEffect(() => {
         if (!show) return;
+        abortController.current = new AbortController();
 
         const timeout = setTimeout(() => {
             setCanFetch(true);
@@ -70,7 +81,13 @@ export default function DropdownList({ source, selectedItem, setSelectedItem, ca
             fetchData(search, 1, false);
         }, 500);
 
-        return () => clearTimeout(timeout);
+        return () => {
+            clearTimeout(timeout);
+            if (abortController.current != null) {
+                abortController.current.abort();
+                abortController.current = null;
+            }
+        };
     }, [show, search]);
 
     return (

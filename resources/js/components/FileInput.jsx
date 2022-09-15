@@ -11,6 +11,7 @@ export default function FileInput({ files, setFiles, className, children, ...res
     const [previewImage, setPreviewImage] = useState(null);
 
     useEffect(() => {
+        // Create a thumbnail if it's an image file
         setThumbnails(files.map((file) => file.type.includes('image') ? URL.createObjectURL(file) : null));
     }, [files])
 
@@ -18,8 +19,10 @@ export default function FileInput({ files, setFiles, className, children, ...res
         <div className={className}>
             {files.length > 0 &&
                 <ListGroup className="mb-2">
+                    {/* Display selected files */}
                     {files.map((file, index) => (
                         <ListGroup.Item key={index} className="hstack gap-2">
+                            {/* View the image thumbnail */}
                             {file &&
                                 <Image
                                     role="button"

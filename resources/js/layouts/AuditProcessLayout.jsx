@@ -1,4 +1,4 @@
-import { faClipboardList, faImage } from "@fortawesome/free-solid-svg-icons";
+import { faClipboardList, faEnvelopesBulk, faImage } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import axios from "axios";
 import _ from "lodash";
@@ -190,7 +190,7 @@ export default function AuditProcessLayout() {
             ) : (
                 <>
                     <Card.Header className="p-3">
-                        <h3 className="fw-bold display-spacing m-0">Submit Finding</h3>
+                        <h3 className="fw-bold display-spacing m-0">Audit Process</h3>
                     </Card.Header>
                     <Card.Body className="card-body">
                         <Table className="align-middle">
@@ -242,7 +242,7 @@ export default function AuditProcessLayout() {
                                     <div className="my-2">Department's PIC:</div>
                                     <ListGroup style={{ maxHeight: 200 }}>
                                         {deptPIC.map((value, index) => (
-                                            <ListGroup.Item key={index}>{value.name} <small>({value.email})</small></ListGroup.Item>
+                                            <ListGroup.Item key={index}>{value.name}</ListGroup.Item>
                                         ))}
                                     </ListGroup>
                                 </>
@@ -378,7 +378,7 @@ export default function AuditProcessLayout() {
                         }
                     </Card.Body>
                     <Card.Footer className="p-3 hstack justify-content-end">
-                        <LoadingButton onClick={handleSubmit} icon={faClipboardList}>Submit</LoadingButton>
+                        <LoadingButton onClick={handleSubmit} icon={faEnvelopesBulk}>Submit</LoadingButton>
                     </Card.Footer>
                 </>
             )}
