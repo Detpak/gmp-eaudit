@@ -7,6 +7,7 @@ use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Response;
+use Illuminate\Support\Facades\Validator;
 
 class AuditCycleController extends Controller
 {
@@ -15,18 +16,37 @@ class AuditCycleController extends Controller
         return view('audit');
     }
 
-    public function apiNewCycle()
+    public function apiNewCycle(Request $request)
     {
-        $activeCycle = AuditCycle::whereNull('close_time')->first();
-        $lastId = 1;
+        // 1. Check overlapping date ranges
+        // 2. If overlaps, check each of
+        // $activeCycle = AuditCycle::whereNull('close_time')->first();
+        // $lastId = 1;
 
-        // Close current cycle
-        if ($activeCycle) {
-            $lastId = $activeCycle->id + 1;
+        $validator = Validator::make(
+            $request->all(),
+            [
+                'start_date' => 'required',
+                'end_date' => 'required',
+            ],
+            [],
+            [
+                'end_date' => 'due date'
+            ]);
+
+        if ($validator->fails()) {
+            return ['formError' => $validator->errors()];
         }
 
-        AuditCycle::create(['label' => "GMP-{$lastId}"]);
-        return ['result' => 'ok'];
+        $date = Carbon::createFromFormat('Y-m-d\TH:i', $request->start_date);
+
+        // // Close current cycle
+        // if ($activeCycle) {
+        //     $lastId = $activeCycle->id + 1;
+        // }
+
+        // AuditCycle::create(['label' => "GMP-{$lastId}"]);
+        return ['result' => 'ok', 'request' => $request->all(), 'date' => $date];
     }
 
     public function apiGetActiveCycle()

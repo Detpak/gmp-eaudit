@@ -165,7 +165,7 @@ export default function ModalForm({ action, fetchUrl, initialValues, title, size
     return (
         <Modal show={show} size={size} backdrop="static" onHide={onClose} onExited={handleExited}>
             <Modal.Header closeButton={closeButton}>
-                <Modal.Title>{title}</Modal.Title>
+                <Modal.Title className="fw-bold display-spacing">{title}</Modal.Title>
             </Modal.Header>
             <Form noValidate onSubmit={handleSubmit} ref={formRef}>
                 <Modal.Body>
