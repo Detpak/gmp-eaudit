@@ -56,6 +56,7 @@ Route::prefix('/v1')->group(function() {
         Route::get('/fetch-criteria-groups', [CriteriaGroupController::class, 'apiFetch']);
         Route::get('/delete-criteria-group/{id}', [CriteriaGroupController::class, 'apiDelete']);
         Route::post('/delete-criteria-groups', [CriteriaGroupController::class, 'apiDeleteSelected']);
+        Route::post('/get-criteria-groups', [CriteriaGroupController::class, 'apiGetSelected']);
 
         // Entity APIs
         Route::post('/add-entity', [EntityController::class, 'apiAdd']);

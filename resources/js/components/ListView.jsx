@@ -15,7 +15,10 @@ export default function ListView({ ids, fetchUrl, onDoneLoading, handleRemoveAll
         if (ids.length == 0) {
             setLoading(false);
             setData([]);
-            onDoneLoading([]);
+
+            if (onDoneLoading) {
+                onDoneLoading([]);
+            }
             return;
         }
 
@@ -26,7 +29,10 @@ export default function ListView({ ids, fetchUrl, onDoneLoading, handleRemoveAll
         if (isMounted.current) {
             setData(response.data);
             setLoading(false);
-            onDoneLoading(response.data);
+
+            if (onDoneLoading) {
+                onDoneLoading(response.data);
+            }
         }
     }
 
@@ -48,7 +54,7 @@ export default function ListView({ ids, fetchUrl, onDoneLoading, handleRemoveAll
                             </ListGroup.Item>
                         ) : (
                             (data.length == 0) ? (
-                                <ListGroup.Item className="text-center">No PIC(s) selected</ListGroup.Item>
+                                <ListGroup.Item className="text-center">No item selected</ListGroup.Item>
                             ) : (
                                 data.map((item, index) => (
                                     <ListGroup.Item key={index} className="hstack gap-3">

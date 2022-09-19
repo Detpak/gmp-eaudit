@@ -28,10 +28,11 @@ class AuditCycleController extends Controller
             [
                 'start_date' => 'required',
                 'end_date' => 'required',
+                'cgroup_ids' => 'required'
             ],
             [],
             [
-                'end_date' => 'due date'
+                'end_date' => 'finish date'
             ]);
 
         if ($validator->fails()) {

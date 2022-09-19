@@ -172,4 +172,9 @@ class CriteriaGroupController extends Controller
         CriteriaGroup::whereIn('id', $request->rowIds)->delete();
         return ['result' => 'ok'];
     }
+
+    public function apiGetSelected(Request $request)
+    {
+        return CriteriaGroup::whereIn('id', $request->ids)->get();
+    }
 }

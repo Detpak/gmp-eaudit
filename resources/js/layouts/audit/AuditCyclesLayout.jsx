@@ -11,16 +11,39 @@ import { Button, Form, InputGroup } from "react-bootstrap";
 import { useState } from "react";
 import ModalForm from "../../components/ModalForm";
 import { useEffect } from "react";
+import SearchList from "../../components/SearchList";
+import ListView from "../../components/ListView";
 
 const formInitialValues = {
     start_date: '',
-    end_date: ''
+    end_date: '',
+    cgroup_ids:[]
 };
 
 function AuditCycleForm({ shown, handleChange, values, setValues, errors }) {
     useEffect(() => {
         console.log(values);
     }, [values])
+
+    const handleSelectCriteriaGroups = async (selectedItems) => {
+        if (selectedItems.length == 0) {
+            return;
+        }
+
+        const newCriteriaIds = new Set([...values.cgroup_ids, ...selectedItems]);
+
+        setValues({ ...values, cgroup_ids: Array.from(newCriteriaIds) });
+    };
+
+    const handleRemoveCriteriaGroup = (id) => {
+        const newCriteriaIds = new Set(values.cgroup_ids);
+        newCriteriaIds.delete(`${id}`);
+        setValues({ ...values, cgroup_ids: Array.from(newCriteriaIds) });
+    };
+
+    const handleRemoveAllCriteriaGroup = () => {
+        setValues({ ...values, cgroup_ids: [] });
+    }
 
     return (
         <>
@@ -37,8 +60,8 @@ function AuditCycleForm({ shown, handleChange, values, setValues, errors }) {
                 />
                 <Form.Control.Feedback type="invalid">{errors.start_date}</Form.Control.Feedback>
             </Form.Group>
-            <Form.Group>
-                <Form.Label>Due Date</Form.Label>
+            <Form.Group className="mb-3">
+                <Form.Label>Finish Date</Form.Label>
                 <Form.Control
                     type="datetime-local"
                     className="mb-1"
@@ -48,6 +71,41 @@ function AuditCycleForm({ shown, handleChange, values, setValues, errors }) {
                     isInvalid={!!errors.end_date}
                 />
                 <Form.Control.Feedback type="invalid">{errors.end_date}</Form.Control.Feedback>
+            </Form.Group>
+            <Form.Group>
+                <Form.Label>Allowed Criteria Groups</Form.Label>
+                <SearchList
+                    height="200px"
+                    placeholder="Select Criteria Groups..."
+                    source={rootUrl('api/v1/fetch-criteria-groups?noparam=true')}
+                    onDone={handleSelectCriteriaGroups}
+                >
+                    {({ data }) => {
+                        return (
+                            <>
+                                <h6 className="mb-1">{data.name}</h6>
+                                <small>{data.code}</small>
+                            </>
+                        )
+                    }}
+                </SearchList>
+                <ListView
+                    ids={values.cgroup_ids}
+                    fetchUrl={rootUrl('api/v1/get-criteria-groups')}
+                    handleRemove={handleRemoveCriteriaGroup}
+                    handleRemoveAll={handleRemoveAllCriteriaGroup}
+                >
+                    {({ item }) => {
+                        return (
+                            <>
+                                <span className="me-auto text-truncate">{item.name}</span>
+                                <small>{item.code}</small>
+                            </>
+                        )
+                    }}
+                </ListView>
+                <input type="hidden" className={!!errors.cgroup_ids ? 'is-invalid' : ''} />
+                <Form.Control.Feedback type="invalid">{errors.cgroup_ids}</Form.Control.Feedback>
             </Form.Group>
         </>
     );
