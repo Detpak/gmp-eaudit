@@ -37,7 +37,7 @@ Route::prefix('/v1')->group(function() {
         Route::post('/new-cycle', [AuditCycleController::class, 'apiNewCycle']);
         Route::get('/get-active-cycle', [AuditCycleController::class, 'apiGetActiveCycle']);
         Route::get('/fetch-cycles', [AuditCycleController::class, 'apiFetchCycles']);
-        Route::get('/close-or-reopen-cycle/{id}', [AuditCycleController::class, 'apiCloseOrReopen']);
+        Route::get('/close-cycle/{id}', [AuditCycleController::class, 'apiCloseCycle']);
 
         // Criteria APIs
         Route::post('/add-criteria', [CriteriaController::class, 'apiAdd']);
@@ -48,7 +48,7 @@ Route::prefix('/v1')->group(function() {
         Route::post('/delete-criterias', [CriteriaController::class, 'apiDeleteSelected']);
         Route::post('/get-criterias', [CriteriaController::class, 'apiGetSelected']);
 
-        // Criteria APIs
+        // Criteria Group APIs
         Route::post('/add-criteria-group', [CriteriaGroupController::class, 'apiAdd']);
         Route::post('/edit-criteria-group', [CriteriaGroupController::class, 'apiEdit']);
         Route::get('/get-criteria-group/{id}', [CriteriaGroupController::class, 'apiGet']);

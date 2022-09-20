@@ -5,16 +5,13 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class AuditCycle extends Model
+class AppState extends Model
 {
     use HasFactory;
 
+    protected $table = 'app_state';
+
     protected $fillable = [
-        'cycle_id',
-        'start_date',
-        'close_date',
-        'finish_date',
-        'cgroup_id',
-        'desc',
+        'current_cycle',
     ];
 }

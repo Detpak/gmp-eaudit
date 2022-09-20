@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\AppStateHelpers;
 use App\Models\AuditCycle;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -18,58 +19,74 @@ class AuditCycleController extends Controller
 
     public function apiNewCycle(Request $request)
     {
-        // 1. Check overlapping date ranges
-        // 2. If overlaps, check each of
-        // $activeCycle = AuditCycle::whereNull('close_time')->first();
-        // $lastId = 1;
-
         $validator = Validator::make(
             $request->all(),
             [
                 'start_date' => 'required',
-                'end_date' => 'required',
-                'cgroup_ids' => 'required'
+                'finish_date' => 'required|date|date_format:Y-m-d|after:start_date',
+                'cgroup_id' => 'required|exists:criteria_groups,id',
+                'desc' => 'nullable|string'
             ],
-            [],
             [
-                'end_date' => 'finish date'
+                'cgroup_id.required' => 'The criteria group must be filled.'
             ]);
 
         if ($validator->fails()) {
             return ['formError' => $validator->errors()];
         }
 
-        $date = Carbon::createFromFormat('Y-m-d\TH:i', $request->start_date);
+        $activeCycle = AuditCycle::whereNull('close_date')->first();
 
-        // // Close current cycle
-        // if ($activeCycle) {
-        //     $lastId = $activeCycle->id + 1;
-        // }
+        if ($activeCycle) {
+            return ['result' => 'error', 'msg' => 'Unable to start new cycle, there is one unfinished cycle.'];
+        }
 
-        // AuditCycle::create(['label' => "GMP-{$lastId}"]);
-        return ['result' => 'ok', 'request' => $request->all(), 'date' => $date];
+        $startDate = Carbon::createFromFormat('Y-m-d', $request->start_date);
+
+        // Reset cycle count when we're in the new year
+        if ($activeCycle && Carbon::createFromTimestamp($activeCycle->created_at)->year < $startDate->year) {
+            AppStateHelpers::resetCycleCount();
+        }
+
+        $state = AppStateHelpers::incrementCycle($startDate);
+
+        $cycleNumber = str_pad($state->current_cycle, 3, '0', STR_PAD_LEFT);
+        $yearNumber = $startDate->year % 100;
+        $newCycle = [
+            'cycle_id' => "GMP/{$yearNumber}/{$cycleNumber}",
+            'start_date' => $startDate,
+            'finish_date' => $request->finish_date,
+            'cgroup_id' => $request->cgroup_id,
+            'desc' => $request->desc,
+        ];
+
+        AuditCycle::create($newCycle);
+
+        return ['result' => 'ok', 'request' => $request->all(), 'cycle' => $newCycle];
     }
 
     public function apiGetActiveCycle()
     {
-        return ['result' => AuditCycle::whereNull('close_time')->first()];
+        return ['result' => AuditCycle::whereNull('close_date')->first()];
     }
 
     public function apiFetchCycles(Request $request)
     {
-        $query = AuditCycle::query()->select('id', 'label', 'open_time', 'close_time');
+        $query = AuditCycle::query()->select('id', 'cycle_id', 'start_date', 'finish_date', 'close_date');
 
         if ($request->search) {
-            $query->where('label', 'LIKE', "%{$request->search}%");
+            $query->where('cycle_id', 'LIKE', "%{$request->search}%");
 
             if ($request->list != '1') {
-                $query->orWhere('open_time', 'LIKE', "%{$request->search}%")
-                      ->orWhere('close_time', 'LIKE', "%{$request->search}%");
+                $query->orWhere('desc', 'LIKE', "%{$request->search}%")
+                      ->orWhere('start_date', 'LIKE', "%{$request->search}%")
+                      ->orWhere('finish_date', 'LIKE', "%{$request->search}%")
+                      ->orWhere('close_date', 'LIKE', "%{$request->search}%");
             }
         }
 
         if ($request->list == '1') {
-            $query->whereNull('close_time');
+            $query->whereNull('close_date');
         }
 
         if ($request->sort && $request->dir) {
@@ -82,7 +99,7 @@ class AuditCycleController extends Controller
         return $query->paginate($request->max);
     }
 
-    public function apiCloseOrReopen(Request $request, $id)
+    public function apiCloseCycle(Request $request, $id)
     {
         $cycle = AuditCycle::find($id);
 
@@ -90,13 +107,7 @@ class AuditCycleController extends Controller
             return Response::json(['result' => 'Data not found.'], 404);
         }
 
-        if ($request->close == '1') {
-            $cycle->close_time = Carbon::now()->toDateTimeString();
-        }
-        else {
-            $cycle->close_time = null;
-        }
-
+        $cycle->close_date = Carbon::now()->toDateTimeString();
         $cycle->save();
 
         return ['result' => 'ok'];

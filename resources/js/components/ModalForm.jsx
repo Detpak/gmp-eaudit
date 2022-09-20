@@ -124,7 +124,7 @@ export default function ModalForm({ action, fetchUrl, initialValues, title, size
         const newValues = _.mapValues({...values}, (value, key) => '');
         setValues(newValues);
         setErrors({});
-    }
+    };
 
     const handleSubmit = async (ev) => {
         ev.preventDefault();
@@ -149,7 +149,7 @@ export default function ModalForm({ action, fetchUrl, initialValues, title, size
         }
 
         if (submitBtn.afterSubmit) {
-            submitBtn.afterSubmit();
+            submitBtn.afterSubmit(response.data);
         }
 
         setSubmitting(false);

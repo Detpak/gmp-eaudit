@@ -13,99 +13,78 @@ import ModalForm from "../../components/ModalForm";
 import { useEffect } from "react";
 import SearchList from "../../components/SearchList";
 import ListView from "../../components/ListView";
+import DropdownList from "../../components/DropdownList";
 
 const formInitialValues = {
     start_date: '',
-    end_date: '',
-    cgroup_ids:[]
+    finish_date: '',
+    desc: '',
+    cgroup_id: ''
 };
 
 function AuditCycleForm({ shown, handleChange, values, setValues, errors }) {
+    const [criteriaGroup, setCriteriaGroup] = useState(null);
+    const [startDate, setStartDate] = useState(null);
+
     useEffect(() => {
         console.log(values);
     }, [values])
 
-    const handleSelectCriteriaGroups = async (selectedItems) => {
-        if (selectedItems.length == 0) {
-            return;
-        }
+    useEffect(() => {
+        const currentDate = new Date(Date.now() + (new Date().getTimezoneOffset() * -60 * 1000)).toISOString();
+        const date = currentDate.slice(0, 10);
+        setValues({ ...values, start_date: date });
+        setStartDate(`${date}`);
+    }, []);
 
-        const newCriteriaIds = new Set([...values.cgroup_ids, ...selectedItems]);
-
-        setValues({ ...values, cgroup_ids: Array.from(newCriteriaIds) });
+    const handleSelectCriteriaGroup = (selected) => {
+        setCriteriaGroup(selected);
+        setValues({ ...values, cgroup_id: `${selected.id}` });
     };
-
-    const handleRemoveCriteriaGroup = (id) => {
-        const newCriteriaIds = new Set(values.cgroup_ids);
-        newCriteriaIds.delete(`${id}`);
-        setValues({ ...values, cgroup_ids: Array.from(newCriteriaIds) });
-    };
-
-    const handleRemoveAllCriteriaGroup = () => {
-        setValues({ ...values, cgroup_ids: [] });
-    }
 
     return (
         <>
             <Form.Group className="mb-3">
                 <Form.Label>Start Date</Form.Label>
                 <Form.Control
-                    type="datetime-local"
+                    type="date"
                     className="mb-1"
                     name="start_date"
-                    disabled={values.use_current_date}
-                    value={values.start_date}
-                    onChange={handleChange}
-                    isInvalid={!!errors.start_date}
+                    defaultValue={startDate}
+                    disabled
                 />
-                <Form.Control.Feedback type="invalid">{errors.start_date}</Form.Control.Feedback>
             </Form.Group>
             <Form.Group className="mb-3">
                 <Form.Label>Finish Date</Form.Label>
                 <Form.Control
-                    type="datetime-local"
+                    type="date"
                     className="mb-1"
-                    name="end_date"
-                    value={values.end_date}
+                    name="finish_date"
+                    value={values.finish_date}
                     onChange={handleChange}
-                    isInvalid={!!errors.end_date}
+                    isInvalid={!!errors.finish_date}
                 />
-                <Form.Control.Feedback type="invalid">{errors.end_date}</Form.Control.Feedback>
+                <Form.Control.Feedback type="invalid">{errors.finish_date}</Form.Control.Feedback>
             </Form.Group>
-            <Form.Group>
-                <Form.Label>Allowed Criteria Groups</Form.Label>
-                <SearchList
-                    height="200px"
-                    placeholder="Select Criteria Groups..."
+            <Form.Group className="mb-3">
+                <Form.Label>Criteria Group</Form.Label>
+                <DropdownList
                     source={rootUrl('api/v1/fetch-criteria-groups?noparam=true')}
-                    onDone={handleSelectCriteriaGroups}
+                    selectedItem={criteriaGroup}
+                    setSelectedItem={handleSelectCriteriaGroup}
+                    caption={(data) => data.name}
+                    title="Please Select Criteria Group"
                 >
-                    {({ data }) => {
-                        return (
-                            <>
-                                <h6 className="mb-1">{data.name}</h6>
-                                <small>{data.code}</small>
-                            </>
-                        )
-                    }}
-                </SearchList>
-                <ListView
-                    ids={values.cgroup_ids}
-                    fetchUrl={rootUrl('api/v1/get-criteria-groups')}
-                    handleRemove={handleRemoveCriteriaGroup}
-                    handleRemoveAll={handleRemoveAllCriteriaGroup}
-                >
-                    {({ item }) => {
-                        return (
-                            <>
-                                <span className="me-auto text-truncate">{item.name}</span>
-                                <small>{item.code}</small>
-                            </>
-                        )
-                    }}
-                </ListView>
-                <input type="hidden" className={!!errors.cgroup_ids ? 'is-invalid' : ''} />
-                <Form.Control.Feedback type="invalid">{errors.cgroup_ids}</Form.Control.Feedback>
+                    {({ data }) => (
+                        <span>{data.name}</span>
+                    )}
+                </DropdownList>
+                <input type="hidden" className={!!errors.cgroup_id ? 'is-invalid' : ''} />
+                <Form.Control.Feedback type="invalid">{errors.cgroup_id}</Form.Control.Feedback>
+            </Form.Group>
+            <Form.Group className="mb-3">
+                <Form.Label>Description</Form.Label>
+                <Form.Control as="textarea" name="desc" rows={3} value={values.desc} onChange={handleChange} isInvalid={!!errors.desc} maxLength={65536} />
             </Form.Group>
         </>
     );
@@ -133,17 +112,10 @@ export default function AuditCyclesLayout() {
         }
     };
 
-    const closeOrReopenCycle = async (id, close) => {
-        const response = await axios.get(rootUrl(`api/v1/close-or-reopen-cycle/${id}?close=${close}`));
+    const closeCycle = async (id) => {
+        const response = await axios.get(rootUrl(`api/v1/close-cycle/${id}`));
 
         if (response.data.result === 'ok') {
-            if (close) {
-                showToastMsg('Cycle has been closed!');
-            }
-            else {
-                showToastMsg('Cycle has been reopened!');
-            }
-
             refreshTable();
         }
     };
@@ -168,16 +140,25 @@ export default function AuditCyclesLayout() {
                     searchKeyword={searchKeyword}
                     columns={[
                         {
-                            id: 'label',
-                            name: 'Label',
+                            id: 'cycle_id',
+                            name: 'Cycle ID',
                         },
                         {
-                            id: 'open_time',
-                            name: 'Open Time'
+                            id: 'start_date',
+                            name: 'Start Date'
                         },
                         {
-                            id: 'close_time',
-                            name: 'Close Time'
+                            id: 'finish_date',
+                            name: 'Finish Date'
+                        },
+                        {
+                            id: 'close_date',
+                            name: 'Close Date'
+                        },
+                        {
+                            sortable: false,
+                            id: 'desc',
+                            name: 'Description'
                         },
                         {
                             sortable: false,
@@ -189,27 +170,22 @@ export default function AuditCyclesLayout() {
                         url: rootUrl('api/v1/fetch-cycles'),
                         method: 'GET',
                         produce: item => [
-                            item.label,
-                            item.open_time,
-                            item.close_time ? item.close_time : '-',
-                            item.close_time ?
-                                <LoadingButton
-                                    type="button"
-                                    variant="primary"
-                                    size="sm"
-                                    onClick={async () => await closeOrReopenCycle(item.id, 0)}
-                                >
-                                    Reopen
-                                </LoadingButton>
-                                :
+                            item.cycle_id,
+                            item.start_date,
+                            item.finish_date ? item.finish_date : '-',
+                            item.close_date ? item.close_date : '-',
+                            item.desc && item.desc.length > 0 ? item.desc : '-',
+                            !item.close_date ?
                                 <LoadingButton
                                     type="button"
                                     variant="danger"
                                     size="sm"
-                                    onClick={async () => await closeOrReopenCycle(item.id, 1)}
+                                    onClick={async () => await closeCycle(item.id)}
                                 >
                                     Close
                                 </LoadingButton>
+                                :
+                                <></>
                         ],
                     }}
                 />
@@ -225,8 +201,14 @@ export default function AuditCyclesLayout() {
                 submitBtn={{
                     name: "Start",
                     icon: faArrowRightToBracket,
-                    afterSubmit: () => {
-                        showToastMsg("New cycle has been started");
+                    afterSubmit: (response) => {
+                        if (response.result == 'error') {
+                            showToastMsg(response.msg);
+                        }
+                        else {
+                            showToastMsg("New cycle has been started");
+                        }
+
                         refreshTable();
                     }
                 }}
