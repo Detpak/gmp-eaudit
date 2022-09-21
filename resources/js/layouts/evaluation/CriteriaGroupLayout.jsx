@@ -186,7 +186,7 @@ export default function CriteriaGroupLayout() {
                                     </Tooltip>
                                 )}
                             >
-                                <span className="fw-bold text-danger">
+                                <span className="fw-bold text-danger user-select-none">
                                     {item.criterias_sum_weight}% <FontAwesomeIcon icon={faWarning} />
                                 </span>
                             </OverlayTrigger>
