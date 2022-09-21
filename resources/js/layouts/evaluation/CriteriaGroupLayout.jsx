@@ -150,6 +150,11 @@ export default function CriteriaGroupLayout() {
                         name: 'Remarks'
                     },
                     {
+                        sortable: false,
+                        id: 'active_cycle.cycle_id',
+                        name: 'Active Cycle'
+                    },
+                    {
                         id: 'criterias_count',
                         name: 'Number of Criterias'
                     },
@@ -170,6 +175,7 @@ export default function CriteriaGroupLayout() {
                         item.code,
                         item.name,
                         item.remarks,
+                        item.active_cycle.length > 0 ? item.active_cycle[0].cycle_id : '-',
                         item.criterias_count,
                         item.criterias_sum_weight != 100 ? (
                             <OverlayTrigger

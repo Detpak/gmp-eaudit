@@ -17,4 +17,9 @@ class AuditCycle extends Model
         'cgroup_id',
         'desc',
     ];
+
+    public function criteriaGroup()
+    {
+        return $this->belongsTo(CriteriaGroup::class, 'cgroup_id');
+    }
 }

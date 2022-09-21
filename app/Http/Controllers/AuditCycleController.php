@@ -72,7 +72,7 @@ class AuditCycleController extends Controller
 
     public function apiFetchCycles(Request $request)
     {
-        $query = AuditCycle::query()->select('id', 'cycle_id', 'start_date', 'finish_date', 'close_date');
+        $query = AuditCycle::query();
 
         if ($request->search) {
             $query->where('cycle_id', 'LIKE', "%{$request->search}%");
@@ -87,6 +87,11 @@ class AuditCycleController extends Controller
 
         if ($request->list == '1') {
             $query->whereNull('close_date');
+        }
+        else {
+            $query->with('criteriaGroup', function ($query) {
+                $query->select('id', 'name');
+            });
         }
 
         if ($request->sort && $request->dir) {

@@ -140,6 +140,11 @@ class CriteriaGroupController extends Controller
         }
 
         if (!$request->noparam) {
+            $query->with(['activeCycle' => function($query) {
+                $query->select('id', 'cycle_id', 'cgroup_id')
+                    ->whereNull('close_date');
+            }]);
+
             $query->with('criterias', function($query) {
                     $query->select('code')
                           ->orderBy('code');
