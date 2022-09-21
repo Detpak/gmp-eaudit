@@ -195,7 +195,22 @@ export default function CriteriaGroupLayout() {
                                     {item.criterias_sum_weight}%
                             </span>
                         ),
-                        item.criterias.map(criteria => criteria.code).join(', '),
+                        <OverlayTrigger
+                            placement="bottom"
+                            overlay={(props) => (
+                                <Tooltip id="total-weight-tooltip" {...props}>
+                                    {item.criterias.slice(0, 20).map((criteria, index) => (
+                                        <div key={index}>{criteria.name} ({criteria.code})</div>
+                                    ))}
+                                    {item.criterias.length >= 20 && <div>...</div>}
+                                </Tooltip>
+                            )}
+                        >
+                            <span className="user-select-none">
+                                {item.criterias.slice(0, 3).map(criteria => criteria.code).join(', ')}
+                                {item.criterias.length >= 3 && " ..."}
+                            </span>
+                        </OverlayTrigger>
                     ]
                 }
             }}

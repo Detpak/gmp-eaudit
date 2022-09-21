@@ -146,7 +146,7 @@ class CriteriaGroupController extends Controller
             }]);
 
             $query->with('criterias', function($query) {
-                    $query->select('code')
+                    $query->select('code', 'name')
                           ->orderBy('code');
                 })
                 ->withSum('criterias', 'weight')
