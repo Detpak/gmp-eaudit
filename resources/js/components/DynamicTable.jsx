@@ -28,6 +28,7 @@ export default function DynamicTable({ refreshTrigger, columns, selectedItems, o
     const [isLoading, setLoading] = useState(false);
     const [entries, setEntries] = useState(20);
     const [numPages, setNumPages] = useState(null);
+    const [error, setError] = useState(false);
     const mounted = useRef(false);
 
     const fetchData = async () => {
@@ -120,13 +121,21 @@ export default function DynamicTable({ refreshTrigger, columns, selectedItems, o
             setSearch(searchKeyword);
 
             const timeout = setTimeout(() => {
-                fetchData();
+                setError(false);
+                fetchData().catch(reason => {
+                    setError(true);
+                    setLoading(false);
+                });
             }, 500);
 
             return () => clearTimeout(timeout);
         }
 
-        fetchData();
+        setError(false);
+        fetchData().catch(reason => {
+            setError(true);
+            setLoading(false);
+        });
     }, [refreshTrigger, searchKeyword, sort, entries, currentPage]);
 
     return (
@@ -160,7 +169,7 @@ export default function DynamicTable({ refreshTrigger, columns, selectedItems, o
                     </thead>
                     <tbody>
                         {
-                            isLoading ? (
+                            isLoading && !error ? (
                                 // Show loading shimmer
                                 _.range(0, 5).map((_, index) => (
                                     <tr key={index}>
@@ -222,6 +231,7 @@ export default function DynamicTable({ refreshTrigger, columns, selectedItems, o
                             No records available.
                         </div>
                 }
+                {error && <div className="text-center p-4">Failed to retrieve data.</div>}
             </div>
             <div className="d-flex align-items-center mb-3">
                 <div className="flex-fill hstack gap-1">
