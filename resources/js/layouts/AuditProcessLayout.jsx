@@ -1,7 +1,7 @@
 import { faClipboardList, faEnvelopesBulk, faImage } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import axios from "axios";
-import _ from "lodash";
+import _, { result } from "lodash";
 import React, { useState } from "react";
 import { useRef } from "react";
 import { useEffect } from "react";
@@ -38,11 +38,8 @@ export default function AuditProcessLayout() {
 
         const activeCycle = await axios.get(rootUrl('api/v1/get-active-cycle'));
 
-        console.log(activeCycle);
-
         if (activeCycle.data.result == null) {
-            setMessage("Unable to continue audit process, there is no active cycle. Please contact QC administrator.");
-            return;
+            throw { result: 'error', msg: "Unable to continue audit process, there is no active cycle. Please contact QC administrator." };
         }
 
         setCycle(activeCycle.data.result);
@@ -50,7 +47,6 @@ export default function AuditProcessLayout() {
         const cycleCriterias = await axios.get(`api/v1/get-criteria-group-params/${activeCycle.data.result.cgroup_id}`);
 
         setCriterias(cycleCriterias.data);
-        setLoading(false);
     };
 
     // Recalculate summary values
@@ -184,7 +180,14 @@ export default function AuditProcessLayout() {
     }, [area]);
 
     useEffect(() => {
-        fetchData();
+        fetchData().then(() => {
+            setLoading(false);
+        })
+        .catch((reason) => {
+            if (reason.result === 'error') {
+                setMessage(reason.msg);
+            }
+        });
     }, []);
 
     return (
@@ -214,7 +217,7 @@ export default function AuditProcessLayout() {
                                 </tr>
                                 <tr>
                                     <th>Cycle:</th>
-                                    <td>{cycle.cycle_id}</td>
+                                    <td>{cycle.cycle_id} ({cycle.start_date.replaceAll('-', '/')} - {cycle.finish_date.replaceAll('-', '/')})</td>
                                 </tr>
                                 <tr>
                                     <th>Date:</th>
