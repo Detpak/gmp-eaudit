@@ -191,7 +191,7 @@ export default function CriteriaGroupLayout() {
                                 </span>
                             </OverlayTrigger>
                         ) : (
-                            <span className="fw-bold text-success">
+                            <span className="fw-bold text-success user-select-none">
                                     {item.criterias_sum_weight}%
                             </span>
                         ),
@@ -200,7 +200,7 @@ export default function CriteriaGroupLayout() {
                             overlay={(props) => (
                                 <Tooltip id="total-weight-tooltip" {...props}>
                                     {item.criterias.slice(0, 20).map((criteria, index) => (
-                                        <div key={index}>{criteria.name} ({criteria.code})</div>
+                                        <div key={index}><span className="fw-bold">{criteria.name}</span> ({criteria.code})</div>
                                     ))}
                                     {item.criterias.length >= 20 && <div>...</div>}
                                 </Tooltip>
