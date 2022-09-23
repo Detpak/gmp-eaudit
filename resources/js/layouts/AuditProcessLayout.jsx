@@ -27,7 +27,7 @@ export default function AuditProcessLayout() {
     const [isLoadingCriteria, setLoadingCriteria] = useState(false);
     const [isLoadingDeptPIC, setLoadingDeptPIC] = useState(false);
     const [criteriaPasses, setCriteriaPasses] = useState([]);
-    const date = useRef(new Date(Date.now() + (new Date().getTimezoneOffset() * -60 * 1000)).toISOString().slice(0, 19));
+    const date = useRef(new Date().toLocaleDateString('en-UK', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }));
 
     const fetchData = async () => {
         const userData = await axios.get(rootUrl('api/v1/get-current-user'));
@@ -42,7 +42,12 @@ export default function AuditProcessLayout() {
             throw { result: 'error', msg: "Unable to continue audit process, there is no active cycle. Please contact QC administrator." };
         }
 
+        activeCycle.data.result.formatted_start_date = new Date(activeCycle.data.result.start_date).toDateString();
+        activeCycle.data.result.formatted_finish_date = new Date(activeCycle.data.result.finish_date).toDateString();
         setCycle(activeCycle.data.result);
+
+        const cycleCriteriaGroup = await axios.get(rootUrl(`api/v1/get-criteria-group/${activeCycle.data.result.cgroup_id}`));
+        setCriteriaGroup(cycleCriteriaGroup.data);
 
         const cycleCriterias = await axios.get(`api/v1/get-criteria-group-params/${activeCycle.data.result.cgroup_id}`);
 
@@ -186,7 +191,10 @@ export default function AuditProcessLayout() {
         .catch((reason) => {
             if (reason.result === 'error') {
                 setMessage(reason.msg);
+                return;
             }
+
+            setMessage("Error occurred when starting audit process.");
         });
     }, []);
 
@@ -217,11 +225,15 @@ export default function AuditProcessLayout() {
                                 </tr>
                                 <tr>
                                     <th>Cycle:</th>
-                                    <td>{cycle.cycle_id} ({cycle.start_date.replaceAll('-', '/')} - {cycle.finish_date.replaceAll('-', '/')})</td>
+                                    <td>{cycle.cycle_id} <small>({cycle.formatted_start_date} - {cycle.formatted_finish_date})</small></td>
+                                </tr>
+                                <tr>
+                                    <th>Criteria Group:</th>
+                                    <td>{criteriaGroup.name} <small>({criteriaGroup.code})</small></td>
                                 </tr>
                                 <tr>
                                     <th>Date:</th>
-                                    <td>{new Date(date.current).toLocaleString()}</td>
+                                    <td>{date.current}</td>
                                 </tr>
                             </tbody>
                         </Table>
