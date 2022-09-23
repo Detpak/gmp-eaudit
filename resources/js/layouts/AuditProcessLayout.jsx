@@ -194,7 +194,7 @@ export default function AuditProcessLayout() {
                 return;
             }
 
-            setMessage("Error occurred when starting audit process.");
+            setMessage("An error occurred when starting audit process.");
         });
     }, []);
 
@@ -220,12 +220,15 @@ export default function AuditProcessLayout() {
                         <Table className="align-middle">
                             <tbody>
                                 <tr>
-                                    <th>Auditor:</th>
-                                    <td>{user.name} ({user.employee_id})</td>
+                                    <th>Cycle:</th>
+                                    <td>
+                                        <div>{cycle.cycle_id}</div>
+                                        <small>{cycle.formatted_start_date} - {cycle.formatted_finish_date}</small>
+                                    </td>
                                 </tr>
                                 <tr>
-                                    <th>Cycle:</th>
-                                    <td>{cycle.cycle_id} <small>({cycle.formatted_start_date} - {cycle.formatted_finish_date})</small></td>
+                                    <th>Auditor:</th>
+                                    <td>{user.name} ({user.employee_id})</td>
                                 </tr>
                                 <tr>
                                     <th>Criteria Group:</th>
