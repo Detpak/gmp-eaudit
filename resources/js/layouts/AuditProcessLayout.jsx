@@ -24,9 +24,10 @@ export default function AuditProcessLayout() {
     const [criteriaGroup, setCriteriaGroup] = useState(null);
     const [criterias, setCriterias] = useState([]);
     const [deptPIC, setDeptPIC] = useState([]);
-    const [isLoadingCriteria, setLoadingCriteria] = useState(false);
+    //const [isLoadingCriteria, setLoadingCriteria] = useState(false);
     const [isLoadingDeptPIC, setLoadingDeptPIC] = useState(false);
     const [criteriaPasses, setCriteriaPasses] = useState([]);
+    const [formError, setFormError] = useState(null);
     const date = useRef(new Date().toLocaleDateString('en-UK', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }));
 
     const fetchData = async () => {
@@ -50,7 +51,6 @@ export default function AuditProcessLayout() {
         setCriteriaGroup(cycleCriteriaGroup.data);
 
         const cycleCriterias = await axios.get(`api/v1/get-criteria-group-params/${activeCycle.data.result.cgroup_id}`);
-
         setCriterias(cycleCriterias.data);
     };
 
@@ -145,8 +145,17 @@ export default function AuditProcessLayout() {
             console.log(ex);
         }
 
-        console.log(criteriaPasses);
+        console.log(formData);
         console.log(JSON.stringify(formData));
+
+        const submitResponse = await axios.post('api/v1/submit-audit', formData);
+
+        if (submitResponse.data.formError) {
+            const errors = _.mapValues(submitResponse.data.formError, (value) => value[0]);
+            setFormError(errors);
+        }
+
+        console.log(submitResponse);
     }
 
     useEffect(() => {
@@ -253,6 +262,8 @@ export default function AuditProcessLayout() {
                                     <span>{data.name} ({data.dept_name})</span>
                                 )}
                             </DropdownList>
+                            <input type="hidden" className={formError && formError.area_id ? 'is-invalid' : ''}/>
+                            <Form.Control.Feedback type="invalid">{formError && formError.area_id ? formError.area_id : ''}</Form.Control.Feedback>
                             {isLoadingDeptPIC && (
                                 <div className="text-center p-4">
                                     <Spinner animation="border" size="sm" /> Loading
@@ -317,7 +328,13 @@ export default function AuditProcessLayout() {
                                                                 tmpCriteriaPasses[index].info.desc = ev.target.value;
                                                                 setCriteriaPasses(tmpCriteriaPasses);
                                                             }}
+                                                            isInvalid={formError && formError[`criteria_passes.${index}.info.desc`]}
                                                         />
+                                                        <Form.Control.Feedback type="invalid">
+                                                            {formError && formError[`criteria_passes.${index}.info.desc`] ?
+                                                                formError[`criteria_passes.${index}.info.desc`] : ''
+                                                            }
+                                                        </Form.Control.Feedback>
                                                     </Form.Group>
                                                     <Form.Group className="mb-3">
                                                         <Form.Label>Category</Form.Label>

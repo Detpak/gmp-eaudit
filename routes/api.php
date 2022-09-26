@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AreaController;
 use App\Http\Controllers\AuditCycleController;
+use App\Http\Controllers\AuditProcessController;
 use App\Http\Controllers\AuditRecordController;
 use App\Http\Controllers\CriteriaController;
 use App\Http\Controllers\CriteriaGroupController;
@@ -33,6 +34,9 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 Route::prefix('/v1')->group(function() {
     Route::middleware('private_api')->group(function() {
         Route::post('/get-chart', [DashboardController::class, 'apiGetChart']);
+
+        // Audit submission
+        Route::post('/submit-audit', [AuditProcessController::class, 'apiSubmitAudit']);
 
         // Audit cycle APIs
         Route::post('/new-cycle', [AuditCycleController::class, 'apiNewCycle']);

@@ -18,7 +18,7 @@ import DivisionLayout from './workplace/DivisionLayout';
 import PlantLayout from './workplace/PlantLayout';
 import CriteriaLayout from './evaluation/CriteriaLayout';
 import CriteriaGroupLayout from './evaluation/CriteriaGroupLayout';
-import AuditFindingLayout from './audit/AuditRecordsLayout';
+import AuditFindingLayout from './audit/AuditFindingLayout';
 
 function Sidebar() {
     return (

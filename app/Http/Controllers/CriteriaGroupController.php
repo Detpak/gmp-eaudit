@@ -99,7 +99,7 @@ class CriteriaGroupController extends Controller
             return Response::json(['result' => 'Data not found']);
         }
 
-        $attr = collect($dept->makeHidden(['id', 'created_at', 'updated_at'])->toArray());
+        $attr = collect($dept->makeHidden(['created_at', 'updated_at'])->toArray());
 
         $criteriaIds = CriteriaGroupParam::select('criteria_id')
             ->where('group_id', $id)

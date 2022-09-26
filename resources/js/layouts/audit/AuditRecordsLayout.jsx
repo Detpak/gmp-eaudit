@@ -87,7 +87,7 @@ export default function AuditRecordsLayout() {
                                 </div>
                             </OverlayTrigger>,
                             item.auditor ? item.auditor.name : '-',
-                            ['Not Started', 'In-Progress', 'Needs Approval', 'Done'][item.status]
+                            ['Not Started', 'In-Progress', 'Waiting for Approval', 'Done'][item.status]
                         ]
                     }}
                 />
