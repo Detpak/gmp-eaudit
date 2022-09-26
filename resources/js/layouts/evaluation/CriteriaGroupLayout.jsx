@@ -198,7 +198,7 @@ export default function CriteriaGroupLayout() {
                         <OverlayTrigger
                             placement="bottom"
                             overlay={(props) => (
-                                <Tooltip id="total-weight-tooltip" {...props}>
+                                <Tooltip id="criterias-tooltip" {...props}>
                                     {item.criterias.slice(0, 20).map((criteria, index) => (
                                         <div key={index}><span className="fw-bold">{criteria.name}</span> ({criteria.code})</div>
                                     ))}

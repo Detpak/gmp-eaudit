@@ -26,9 +26,9 @@ function AuditCycleForm({ shown, handleChange, values, setValues, errors }) {
     const [criteriaGroup, setCriteriaGroup] = useState(null);
     const [startDate, setStartDate] = useState(null);
 
-    useEffect(() => {
-        console.log(values);
-    }, [values])
+    // useEffect(() => {
+    //     console.log(values);
+    // }, [values])
 
     useEffect(() => {
         const currentDate = new Date(Date.now() + (new Date().getTimezoneOffset() * -60 * 1000)).toISOString();

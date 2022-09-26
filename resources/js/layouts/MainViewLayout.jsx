@@ -18,6 +18,7 @@ import DivisionLayout from './workplace/DivisionLayout';
 import PlantLayout from './workplace/PlantLayout';
 import CriteriaLayout from './evaluation/CriteriaLayout';
 import CriteriaGroupLayout from './evaluation/CriteriaGroupLayout';
+import AuditFindingLayout from './audit/AuditRecordsLayout';
 
 function Sidebar() {
     return (
@@ -42,6 +43,7 @@ function AuditOutlet() {
             <PageNavbar>
                 <PageLink to="cycles">Cycles</PageLink>
                 <PageLink to="records">Records</PageLink>
+                <PageLink to="findings">Findings</PageLink>
             </PageNavbar>
 
             <Outlet />
@@ -136,6 +138,7 @@ export function MainViewLayout() {
                                 <Route index element={<Navigate to="/app/audit/cycles" replace />} />
                                 <Route path="cycles" element={<AuditCyclesLayout />} />
                                 <Route path="records" element={<AuditRecordsLayout />} />
+                                <Route path="findings" element={<AuditFindingLayout />} />
                                 <Route path="*" element={<Navigate to="/app/dashboard" replace />} />
                             </Route>
 

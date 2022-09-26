@@ -3,10 +3,13 @@
 namespace App\Http\Controllers;
 
 use App\Helpers\AppStateHelpers;
+use App\Models\Area;
 use App\Models\AuditCycle;
+use App\Models\AuditRecord;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Response;
 use Illuminate\Support\Facades\Validator;
 
@@ -52,17 +55,60 @@ class AuditCycleController extends Controller
 
         $cycleNumber = str_pad($state->current_cycle, 3, '0', STR_PAD_LEFT);
         $yearNumber = $startDate->year % 100;
+        $cycleId = "GMP/{$yearNumber}/{$cycleNumber}";
         $newCycle = [
-            'cycle_id' => "GMP/{$yearNumber}/{$cycleNumber}",
+            'cycle_id' => $cycleId,
             'start_date' => $startDate,
             'finish_date' => $request->finish_date,
             'cgroup_id' => $request->cgroup_id,
             'desc' => $request->desc,
         ];
 
-        AuditCycle::create($newCycle);
+        try {
+            $newAuditCycle = AuditCycle::create($newCycle);
+        } catch (\Throwable $th) {
+            Log::critical($th);
+            return [
+                'result' => 'error',
+                'msg' => 'Internal error occurred, please contact administrator.',
+                'detail' => $th
+            ];
+        }
 
-        return ['result' => 'ok', 'request' => $request->all(), 'cycle' => $newCycle];
+        $areas = Area::get();
+
+        if ($areas->count() == 0) {
+            return [
+                'result' => 'error',
+                'msg' => 'Cannot start new cycle, there is no area registered.'
+            ];
+        }
+
+        $records = $areas->map(function ($item, $key) use($newAuditCycle, $cycleId) {
+            $recordCode = $key + 1;
+            $createdAt = Carbon::now();
+            return [
+                'code' => "{$cycleId}/{$recordCode}",
+                'area_id' => $item->id,
+                'created_at' => $createdAt,
+                'updated_at' => $createdAt,
+                'cycle_id' => $newAuditCycle->id,
+                'status' => 0
+            ];
+        });
+
+        try {
+            AuditRecord::insert($records->toArray());
+        } catch (\Throwable $th) {
+            Log::critical($th);
+            return [
+                'result' => 'error',
+                'msg' => 'Internal error occurred, please contact administrator.',
+                'detail' => $th
+            ];
+        }
+
+        return ['result' => 'ok', 'request' => $request->all(), 'records' => $records];
     }
 
     public function apiGetActiveCycle()

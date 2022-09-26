@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AreaController;
 use App\Http\Controllers\AuditCycleController;
+use App\Http\Controllers\AuditRecordController;
 use App\Http\Controllers\CriteriaController;
 use App\Http\Controllers\CriteriaGroupController;
 use App\Http\Controllers\DashboardController;
@@ -33,11 +34,14 @@ Route::prefix('/v1')->group(function() {
     Route::middleware('private_api')->group(function() {
         Route::post('/get-chart', [DashboardController::class, 'apiGetChart']);
 
-        // Audit APIs
+        // Audit cycle APIs
         Route::post('/new-cycle', [AuditCycleController::class, 'apiNewCycle']);
         Route::get('/get-active-cycle', [AuditCycleController::class, 'apiGetActiveCycle']);
         Route::get('/fetch-cycles', [AuditCycleController::class, 'apiFetchCycles']);
         Route::get('/close-cycle/{id}', [AuditCycleController::class, 'apiCloseCycle']);
+
+        // Audit records APIs
+        Route::get('/fetch-records', [AuditRecordController::class, 'apiFetch']);
 
         // Criteria APIs
         Route::post('/add-criteria', [CriteriaController::class, 'apiAdd']);
