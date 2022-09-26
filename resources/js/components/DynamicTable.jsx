@@ -153,7 +153,7 @@ export default function DynamicTable({ refreshTrigger, columns, selectedItems, o
                                 const sortable = !('sortable' in column) ? true : column.sortable;
                                 return (
                                     <th key={index} className={thClassName} onClick={() => sortable && handleSort(column.id)}>
-                                        <div className="hstack gap-3 px-3 py-2 border border-start-0">
+                                        <div className={`hstack gap-3 px-3 py-2 border ${selectedItems || index != 0 ? 'border-start-0' : ''}`}>
                                             <span className="user-select-none flex-fill">{column.name}</span>
                                             {sortable && <FontAwesomeIcon icon={sort && sort.column == column.id ? (sort.dir == 1 ? faSortUp : faSortDown) : faSort} />}
                                         </div>
