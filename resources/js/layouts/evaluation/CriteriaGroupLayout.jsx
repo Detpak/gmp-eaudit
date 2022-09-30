@@ -128,11 +128,15 @@ export default function CriteriaGroupLayout() {
                 name: "Edit Group",
                 form: CriteriaGroupForm,
                 size: 'lg',
+                allowEditIf: item => item.cycles_count > 0,
                 action: rootUrl('api/v1/edit-criteria-group'),
                 fetchUrl: rootUrl('api/v1/get-criteria-group'),
                 initialValues: { ...initialValues }
             }}
-            deleteItemAction={rootUrl('api/v1/delete-criteria-group')}
+            deleteItem={{
+                allowDeleteIf: item => item.cycles_count > 0,
+                action: rootUrl('api/v1/delete-criteria-group')
+            }}
             deleteSelectedItemAction={rootUrl('api/v1/delete-criteria-groups')}
             table={{
                 canSelect: true,

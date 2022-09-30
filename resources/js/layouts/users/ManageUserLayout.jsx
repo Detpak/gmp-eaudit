@@ -81,7 +81,9 @@ export default function ManageUserLayout() {
                 fetchUrl: rootUrl('api/v1/get-user'),
                 initialValues: { ...initialValues }
             }}
-            deleteItemAction={rootUrl('api/v1/delete-user')}
+            deleteItem={{
+                action: rootUrl('api/v1/delete-user')
+            }}
             deleteSelectedItemAction={rootUrl('api/v1/delete-users')}
             table={{
                 columns: [

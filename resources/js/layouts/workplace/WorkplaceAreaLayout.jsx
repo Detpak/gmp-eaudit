@@ -88,7 +88,9 @@ export default function WorkplaceAreaLayout() {
                 fetchUrl: rootUrl('api/v1/get-area'),
                 initialValues: { ...initialValues }
             }}
-            deleteItemAction={rootUrl('api/v1/delete-area')}
+            deleteItem={{
+                action: rootUrl('api/v1/delete-area')
+            }}
             deleteSelectedItemAction={rootUrl('api/v1/delete-areas')}
             table={{
                 canSelect: true,

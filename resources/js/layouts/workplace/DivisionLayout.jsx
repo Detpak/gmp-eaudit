@@ -62,7 +62,9 @@ export default function DivisionLayout() {
                 fetchUrl: rootUrl('api/v1/get-division'),
                 initialValues: { ...initialValues }
             }}
-            deleteItemAction={rootUrl('api/v1/delete-division')}
+            deleteItem={{
+                action: rootUrl('api/v1/delete-division')
+            }}
             deleteSelectedItemAction={rootUrl('api/v1/delete-divisions')}
             table={{
                 canSelect: true,

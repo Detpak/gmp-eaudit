@@ -209,13 +209,21 @@ export default function DynamicTable({ refreshTrigger, columns, selectedItems, o
                                         ))}
                                         {actionColumn &&
                                             <td className={tdFixedRightClassName}>
-                                                <Button size="sm" className="me-1" onClick={() => actionColumn.onEditClick(item.id)}><FontAwesomeIcon icon={faPenToSquare}/></Button>
+                                                <Button
+                                                    size="sm"
+                                                    className="me-1"
+                                                    onClick={() => actionColumn.onEditClick(item.id)}
+                                                    disabled={actionColumn.allowEditIf && actionColumn.allowEditIf(item)}
+                                                >
+                                                    <FontAwesomeIcon icon={faPenToSquare}/>
+                                                </Button>
                                                 <LoadingButton
                                                     variant="danger"
                                                     size="sm"
                                                     icon={faTrash}
                                                     onClick={() => handleDeleteClick(item.id)}
                                                     afterLoading={() => fetchData()}
+                                                    disabled={actionColumn.allowDeleteIf && actionColumn.allowDeleteIf(item)}
                                                 />
                                             </td>
                                         }

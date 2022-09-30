@@ -53,7 +53,7 @@ export default class LoadingButton extends React.Component {
                 type={this.props.type}
                 variant={this.props.variant}
                 size={this.props.size}
-                disabled={this.handledManually ? this.props.isLoading : this.state.isLoading}
+                disabled={this.props.disabled ? true : (this.handledManually ? this.props.isLoading : this.state.isLoading)}
                 onClick={(this.handledManually ? this.props.isLoading : this.state.isLoading) ? null : ((this.props.onClick) ? this.handleClick : null)}
                 className={this.props.className}
             >

@@ -92,12 +92,12 @@ class CriteriaController extends Controller
     public function apiDelete($id)
     {
         $criteria = Criteria::find($id);
-        // $criteria = Criteria::withCount('groups')->find($id);
+        $criteria = Criteria::withCount('groups')->find($id);
 
-        // if ($criteria->groups_count > 0) {
-        //     $subject = CommonHelpers::getSubjectWord($criteria->groups_count);
-        //     return ['error' => "Cannot delete criteria. There {$subject} {$criteria->groups_count} registered group(s) under the criteria."];
-        // }
+        if ($criteria->groups_count > 0) {
+            $subject = CommonHelpers::getSubjectWord($criteria->groups_count);
+            return ['error' => "Cannot delete criteria. There {$subject} {$criteria->groups_count} registered group(s) under the criteria."];
+        }
 
         $criteria->delete();
         return ['result' => 'ok'];
@@ -110,19 +110,19 @@ class CriteriaController extends Controller
         }
 
         $criterias = Criteria::whereIn('id', $request->rowIds);
-        // $criterias = Criteria::withCount('groups')->whereIn('id', $request->rowIds);
-        // $errorCount = 0;
+        $criterias = Criteria::withCount('groups')->whereIn('id', $request->rowIds);
+        $errorCount = 0;
 
-        // foreach ($criterias->get() as $criteria) {
-        //     if ($criteria->groups_count > 0) {
-        //         $errorCount += $criteria->groups_count;
-        //     }
-        // }
+        foreach ($criterias->get() as $criteria) {
+            if ($criteria->groups_count > 0) {
+                $errorCount += $criteria->groups_count;
+            }
+        }
 
-        // if ($errorCount > 0) {
-        //     $subject = CommonHelpers::getSubjectWord($errorCount);
-        //     return ['error' => "Cannot delete criterias. There {$subject} {$errorCount} registered group(s) under some criterias."];
-        // }
+        if ($errorCount > 0) {
+            $subject = CommonHelpers::getSubjectWord($errorCount);
+            return ['error' => "Cannot delete criterias. There {$subject} {$errorCount} registered group(s) under some criterias."];
+        }
 
         $criterias->delete();
 

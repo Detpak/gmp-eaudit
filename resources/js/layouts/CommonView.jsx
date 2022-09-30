@@ -89,8 +89,10 @@ export default class CommonView extends React.Component {
                         onSelect={(state) => this.setState({ selectedItems: state })}
                         searchKeyword={this.state.searchKeyword}
                         actionColumn={{
-                            deleteAction: this.props.deleteItemAction,
+                            allowEditIf: this.props.editItem.allowEditIf,
                             onEditClick: (id) => this.setState({ editItemModalShown: true, editId: id }),
+                            allowDeleteIf: this.props.deleteItem.allowDeleteIf,
+                            deleteAction: this.props.deleteItem.action,
                             onDeleted: () => {
                                 showToastMsg(this.props.messages.onItemDeleted);
                                 this.refreshTable();

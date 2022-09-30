@@ -161,6 +161,10 @@ export default function AuditCyclesLayout() {
                             name: 'Criteria Group'
                         },
                         {
+                            id: 'total_audit',
+                            name: 'Total Case Found'
+                        },
+                        {
                             sortable: false,
                             id: 'desc',
                             name: 'Description'
@@ -180,6 +184,7 @@ export default function AuditCyclesLayout() {
                             item.finish_date ? item.finish_date : '-',
                             item.close_date ? item.close_date : '-',
                             item.criteria_group.name,
+                            item.total_findings,
                             item.desc && item.desc.length > 0 ? item.desc : '-',
                             !item.close_date ?
                                 <LoadingButton

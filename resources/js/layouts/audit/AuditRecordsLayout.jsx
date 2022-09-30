@@ -37,18 +37,20 @@ export default function AuditRecordsLayout() {
                     searchKeyword={searchKeyword}
                     columns={[
                         {
+                            id: 'cycle_id',
+                            name: 'Cycle ID'
+                        },
+                        {
                             id: 'code',
                             name: 'Code'
                         },
                         {
-                            sortable: false,
-                            id: 'area.name',
-                            name: 'Area',
+                            id: 'dept_name',
+                            name: 'Department'
                         },
                         {
-                            sortable: false,
-                            id: 'area.department.name',
-                            name: 'Department'
+                            id: 'area_name',
+                            name: 'Area',
                         },
                         {
                             sortable: false,
@@ -69,9 +71,10 @@ export default function AuditRecordsLayout() {
                         url: rootUrl('api/v1/fetch-records'),
                         method: 'GET',
                         produce: item => [
+                            item.cycle_id,
                             item.code,
-                            item.area.name,
-                            item.area.department.name,
+                            item.dept_name,
+                            item.area_name,
                             <OverlayTrigger
                                 placement="bottom"
                                 overlay={(props) => (
@@ -86,8 +89,8 @@ export default function AuditRecordsLayout() {
                                     {item.area.department.pics.map(data => data.name).join(", ")}
                                 </div>
                             </OverlayTrigger>,
-                            item.auditor ? item.auditor.name : '-',
-                            ['Not Started', 'In-Progress', 'Waiting for Approval', 'Done'][item.status]
+                            item.auditor_name ? item.auditor_name : '-',
+                            ['Not Started', 'In-Progress', 'Done'][item.status]
                         ]
                     }}
                 />

@@ -47,11 +47,14 @@ export default function CriteriaLayout() {
             editItem={{
                 name: "Edit Criteria",
                 form: CriteriaForm,
+                allowEditIf: item => item.groups_count == 0,
                 action: rootUrl('api/v1/edit-criteria'),
                 fetchUrl: rootUrl('api/v1/get-criteria'),
                 initialValues: { ...initialValues }
             }}
-            deleteItemAction={rootUrl('api/v1/delete-criteria')}
+            deleteItem={{
+                action: rootUrl('api/v1/delete-criteria')
+            }}
             deleteSelectedItemAction={rootUrl('api/v1/delete-criterias')}
             table={{
                 canSelect: true,

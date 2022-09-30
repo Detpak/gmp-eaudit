@@ -27,6 +27,11 @@ class CriteriaGroup extends Model
 
     public function activeCycle()
     {
+        return $this->hasMany(AuditCycle::class, 'cgroup_id')->select('id', 'cycle_id', 'cgroup_id')->whereNull('close_date');
+    }
+
+    public function cycles()
+    {
         return $this->hasMany(AuditCycle::class, 'cgroup_id');
     }
 }

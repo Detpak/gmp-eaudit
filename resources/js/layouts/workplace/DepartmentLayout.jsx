@@ -133,7 +133,9 @@ export default function DepartmentLayout() {
                 fetchUrl: rootUrl('api/v1/get-dept'),
                 initialValues: { ...initialValues }
             }}
-            deleteItemAction={rootUrl('api/v1/delete-dept')}
+            deleteItem={{
+                action: rootUrl('api/v1/delete-dept')
+            }}
             deleteSelectedItemAction={rootUrl('api/v1/delete-depts')}
             table={{
                 canSelect: true,

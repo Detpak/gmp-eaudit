@@ -79,7 +79,9 @@ export default function EntityLayout() {
                 fetchUrl: rootUrl('api/v1/get-entity'),
                 initialValues: { ...initialValues }
             }}
-            deleteItemAction={rootUrl('api/v1/delete-entity')}
+            deleteItem={{
+                action: rootUrl('api/v1/delete-entity')
+            }}
             deleteSelectedItemAction={rootUrl('api/v1/delete-entities')}
             table={{
                 canSelect: true,

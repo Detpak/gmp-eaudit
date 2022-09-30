@@ -15,6 +15,7 @@ class AuditRecord extends Model
         'area_id',
         'cycle_id',
         'status',
+        'total_findings',
     ];
 
     public function area()

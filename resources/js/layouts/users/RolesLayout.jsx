@@ -60,7 +60,9 @@ export default function RolesUserLayout() {
                 fetchUrl: rootUrl('api/v1/get-role'),
                 initialValues: { ...initialValues }
             }}
-            deleteItemAction={rootUrl('api/v1/delete-role')}
+            deleteItem={{
+                action: rootUrl('api/v1/delete-role')
+            }}
             deleteSelectedItemAction={rootUrl('api/v1/delete-roles')}
             table={{
                 canSelect: true,

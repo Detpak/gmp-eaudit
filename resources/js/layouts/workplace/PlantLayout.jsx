@@ -93,7 +93,9 @@ export default function PlantLayout() {
                 fetchUrl: rootUrl('api/v1/get-plant'),
                 initialValues: { ...initialValues }
             }}
-            deleteItemAction={rootUrl('api/v1/delete-plant')}
+            deleteItem={{
+                action: rootUrl('api/v1/delete-plant')
+            }}
             deleteSelectedItemAction={rootUrl('api/v1/delete-plants')}
             table={{
                 canSelect: true,

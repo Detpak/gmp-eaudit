@@ -43,7 +43,7 @@ function AuditOutlet() {
             <PageNavbar>
                 <PageLink to="cycles">Cycles</PageLink>
                 <PageLink to="records">Records</PageLink>
-                <PageLink to="findings">Findings</PageLink>
+                <PageLink to="findings">Case Findings</PageLink>
             </PageNavbar>
 
             <Outlet />

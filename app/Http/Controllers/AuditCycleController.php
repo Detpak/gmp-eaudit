@@ -47,17 +47,18 @@ class AuditCycleController extends Controller
         $startDate = Carbon::createFromFormat('Y-m-d', $request->start_date);
 
         // Reset cycle count when we're in the new year
-        if ($activeCycle && Carbon::createFromTimestamp($activeCycle->created_at)->year < $startDate->year) {
+        if ($activeCycle && Carbon::createFromTimestamp($activeCycle->created_at)->month < $startDate->month) {
             AppStateHelpers::resetCycleCount();
         }
 
         $state = AppStateHelpers::incrementCycle($startDate);
 
-        $cycleNumber = str_pad($state->current_cycle, 3, '0', STR_PAD_LEFT);
+        $cycleNumber = str_pad($state->current_cycle, 2, '0', STR_PAD_LEFT);
+        $monthNumber = str_pad($startDate->month, 2, '0', STR_PAD_LEFT);
         $yearNumber = $startDate->year % 100;
-        $cycleId = "GMP/{$yearNumber}/{$cycleNumber}";
+        $code = "GMP/{$yearNumber}{$monthNumber}";
         $newCycle = [
-            'cycle_id' => $cycleId,
+            'cycle_id' => "{$code}/{$cycleNumber}",
             'start_date' => $startDate,
             'finish_date' => $request->finish_date,
             'cgroup_id' => $request->cgroup_id,
@@ -84,11 +85,11 @@ class AuditCycleController extends Controller
             ];
         }
 
-        $records = $areas->map(function ($item, $key) use($newAuditCycle, $cycleId) {
-            $recordCode = $key + 1;
+        $records = $areas->map(function ($item, $key) use($newAuditCycle, $code) {
+            $recordCode = str_pad($key + 1, 3, '0', STR_PAD_LEFT);
             $createdAt = Carbon::now();
             return [
-                'code' => "{$cycleId}/{$recordCode}",
+                'code' => "{$code}/{$recordCode}",
                 'area_id' => $item->id,
                 'created_at' => $createdAt,
                 'updated_at' => $createdAt,
@@ -135,9 +136,7 @@ class AuditCycleController extends Controller
             $query->whereNull('close_date');
         }
         else {
-            $query->with('criteriaGroup', function ($query) {
-                $query->select('id', 'name');
-            });
+            $query->with('criteriaGroup');
         }
 
         if ($request->sort && $request->dir) {

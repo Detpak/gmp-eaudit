@@ -13,6 +13,7 @@ use App\Http\Controllers\DivisionController;
 use App\Http\Controllers\PlantController;
 use App\Http\Controllers\TestbedController;
 use App\Http\Controllers\UsersController;
+use App\Models\AuditFinding;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -46,6 +47,9 @@ Route::prefix('/v1')->group(function() {
 
         // Audit records APIs
         Route::get('/fetch-records', [AuditRecordController::class, 'apiFetch']);
+
+        // Audit findings APIs
+        Route::get('/fetch-findings', [AuditProcessController::class, 'apiFetch']);
 
         // Criteria APIs
         Route::post('/add-criteria', [CriteriaController::class, 'apiAdd']);

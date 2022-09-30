@@ -140,17 +140,24 @@ class CriteriaGroupController extends Controller
         }
 
         if (!$request->noparam) {
-            $query->with(['activeCycle' => function($query) {
-                $query->select('id', 'cycle_id', 'cgroup_id')
-                    ->whereNull('close_date');
-            }]);
+            // $query->with(['activeCycle' => function($query) {
+            //     $query->select('id', 'cycle_id', 'cgroup_id')
+            //         ->whereNull('close_date');
+            // }]);
 
+            $query->with('activeCycle');
             $query->with('criterias', function($query) {
                     $query->select('code', 'name')
                           ->orderBy('code');
                 })
                 ->withSum('criterias', 'weight')
-                ->withCount('criterias');
+                ->withCount('criterias')
+                ->withCount('cycles');
+        }
+        else {
+            $query->with('criterias', function ($query) {
+                $query->sum('weight');
+            });
         }
 
         if ($request->sort && $request->dir) {

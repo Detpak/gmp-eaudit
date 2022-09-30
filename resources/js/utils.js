@@ -62,3 +62,7 @@ export function useIsMounted() {
 
     return isMounted;
 }
+
+export async function waitForMs(time) {
+    await new Promise((resolve) => setTimeout(resolve, time));
+}
