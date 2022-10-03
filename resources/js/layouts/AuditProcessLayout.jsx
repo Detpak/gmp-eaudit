@@ -174,7 +174,6 @@ export default function AuditProcessLayout() {
         if (submitResponse.data.formError) {
             const errors = _.mapValues(submitResponse.data.formError, (value) => value[0]);
             setFormError(errors);
-            scrollToElementById(Object.keys(errors)[0]); // Scroll to the first error.
             setSubmitting(false);
             return;
         }
@@ -448,6 +447,7 @@ export default function AuditProcessLayout() {
                 onExited={() => {
                     setSubmitMsg('');
                     setSubmitProgress(0);
+                    scrollToElementById(Object.keys(formError)[0]); // Scroll to the first error.
                 }}
                 centered
             >
