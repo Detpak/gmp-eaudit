@@ -252,7 +252,7 @@ export default function AuditProcessLayout() {
                             <h3 className="fw-bold display-spacing m-0">Audit Process</h3>
                         </Card.Header>
                         <Card.Body className="card-body">
-                            {auditResult &&
+                            {!auditResult &&
                                 <>
                                     <Table className="align-middle">
                                         <tbody>
