@@ -29,7 +29,7 @@
         "@fortawesome/react-fontawesome": "^0.2.0",
         "bootstrap": "^5.2.0",
         "bootstrap-table": "^1.20.2",
-        "chart.js": "^3.8.0",
+        "chart.js": "^3.9.1",
         "chartjs-plugin-datalabels": "^2.0.0",
         "chroma-js": "^2.4.2",
         "counterup2": "^2.0.2",
@@ -40,6 +40,7 @@
         "inter-ui": "^3.19.3",
         "jquery": "^3.6.0",
         "react-bootstrap": "^2.5.0",
+        "react-chartjs-2": "^4.3.1",
         "react-router-dom": "^6.3.0",
         "state-pool": "^0.7.1",
         "uuid": "^8.3.2"
