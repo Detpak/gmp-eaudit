@@ -9,7 +9,7 @@ import { Button, Card, Form, Image, ListGroup, Modal, ProgressBar, Spinner, Tabl
 import DropdownList from "../components/DropdownList";
 import FileInput from "../components/FileInput";
 import LoadingButton from "../components/LoadingButton";
-import { rootUrl, waitForMs } from "../utils";
+import { rootUrl, scrollToElementById, waitForMs } from "../utils";
 
 function AuditProcessResult({ auditResult }) {
     return (
@@ -174,6 +174,7 @@ export default function AuditProcessLayout() {
         if (submitResponse.data.formError) {
             const errors = _.mapValues(submitResponse.data.formError, (value) => value[0]);
             setFormError(errors);
+            scrollToElementById(Object.keys(errors)[0]); // Scroll to the first error.
             setSubmitting(false);
             return;
         }
@@ -277,7 +278,7 @@ export default function AuditProcessLayout() {
                                             </tr>
                                         </tbody>
                                     </Table>
-                                    <Form.Group className="mb-3">
+                                    <Form.Group id="record_id" className="mb-3">
                                         <Form.Label>Area</Form.Label>
                                         <DropdownList
                                             source={rootUrl(`api/v1/fetch-records?list=1&cycle=${cycle.id}`)}
@@ -345,7 +346,7 @@ export default function AuditProcessLayout() {
                                                         {criteriaPasses[index].fail && (
                                                             <div>
                                                                 <hr/>
-                                                                <Form.Group className="mb-3">
+                                                                <Form.Group id={`criteria_passes.${index}.info.desc`} className="mb-3">
                                                                     <Form.Label>Description</Form.Label>
                                                                     <Form.Control
                                                                         as="textarea"
@@ -427,7 +428,6 @@ export default function AuditProcessLayout() {
                                     }
                                 </>
                             }
-
                         </Card.Body>
                         <Card.Footer className="p-3 hstack justify-content-end">
                             <Button

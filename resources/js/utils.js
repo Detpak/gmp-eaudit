@@ -66,3 +66,13 @@ export function useIsMounted() {
 export async function waitForMs(time) {
     await new Promise((resolve) => setTimeout(resolve, time));
 }
+
+export function scrollToElementById(id) {
+    const target = document.getElementById(id);
+    if (target) {
+        window.scrollTo({
+            top: target.offsetTop,
+            behavior: "smooth"
+        });
+    }
+}
