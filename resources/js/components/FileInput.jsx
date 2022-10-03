@@ -9,6 +9,7 @@ export default function FileInput({ files, setFiles, className, children, ...res
     const [thumbnails, setThumbnails] = useState([]);
     const [showImage, setShowImage] = useState(false);
     const [previewImage, setPreviewImage] = useState(null);
+    const [rerender, triggerRerender] = useState(_.uniqueId());
 
     useEffect(() => {
         // Create a thumbnail if it's an image file
@@ -61,6 +62,7 @@ export default function FileInput({ files, setFiles, className, children, ...res
                 {children}
                 <input
                     multiple
+                    key={rerender}
                     type="file"
                     onChange={(ev) => {
                         const fileset = new Set(files.map((data) => data.name));
@@ -73,6 +75,7 @@ export default function FileInput({ files, setFiles, className, children, ...res
                         }
 
                         setFiles([...newFiles, ...files]);
+                        triggerRerender(_.uniqueId());
                     }}
                     style={{ display: "none" }}
                     {...rest}

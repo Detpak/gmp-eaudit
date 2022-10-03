@@ -95,9 +95,9 @@ class AuditProcessController extends Controller
         $record->auditor_id = $tokenSplit[0];
 
         try {
-            AuditFinding::insert($auditFindings->toArray());
-            $record->save();
-            $cycle->save();
+            //AuditFinding::insert($auditFindings->toArray());
+            //$record->save();
+            //$cycle->save();
         } catch (\Throwable $th) {
             return ['result' => 'error', 'msg' => 'An error occurred when submitting reports.', 'details' => $th->getMessage()];
         }
