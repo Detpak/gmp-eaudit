@@ -1,5 +1,6 @@
 import { faChartLine, faFlaskVial, faIndustry, faListCheck, faPercent, faPowerOff, faUsers } from '@fortawesome/free-solid-svg-icons';
 import React from 'react';
+import $ from 'jquery';
 
 export const menus = [
     {
@@ -69,9 +70,10 @@ export async function waitForMs(time) {
 
 export function scrollToElementById(id) {
     const target = document.getElementById(id);
+
     if (target) {
         window.scrollTo({
-            top: target.offsetTop,
+            top: $(target).offset().top,
             behavior: "smooth"
         });
     }

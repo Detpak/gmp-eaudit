@@ -447,6 +447,7 @@ export default function AuditProcessLayout() {
                 onExited={() => {
                     setSubmitMsg('');
                     setSubmitProgress(0);
+                    console.log(Object.keys(formError));
                     scrollToElementById(Object.keys(formError)[0]); // Scroll to the first error.
                 }}
                 centered
