@@ -127,7 +127,6 @@ function AuditProcessForm({ auditResult, setAuditResult }) {
     const handleSubmit = async () => {
         const formData = {};
 
-        setFormError(null);
         setMaxProgress(1);
         setSubmitMsg('Saving Information...');
 
@@ -424,7 +423,8 @@ function AuditProcessForm({ auditResult, setAuditResult }) {
                     </Card.Body>
                     <Card.Footer className="p-3 hstack justify-content-end">
                         <Button
-                            onClick={() => {
+                            onClick={(ev) => {
+                                ev.target.blur();
                                 setSubmitting(true);
                                 handleSubmit();
                             }}
