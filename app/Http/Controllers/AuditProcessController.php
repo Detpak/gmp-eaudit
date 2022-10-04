@@ -39,7 +39,7 @@ class AuditProcessController extends Controller
         }
 
         // Check if the audit is not started
-        $record = AuditRecord::select('id', 'status')->find($request->record_id);
+        $record = AuditRecord::select('id', 'code', 'status', 'area_id')->find($request->record_id);
         if ($record->status > 0) {
             return [
                 'formError' => [
@@ -63,7 +63,7 @@ class AuditProcessController extends Controller
         }
 
         $criteriaGroup = CriteriaGroup::find($request->cgroup_id);
-        $cycle = AuditCycle::select('id', 'total_findings')->find($request->cycle_id);
+        $cycle = AuditCycle::select('id', 'cycle_id', 'total_findings')->find($request->cycle_id);
         $totalFindings = $cycle->total_findings;
 
         // Create audit findings data
@@ -102,7 +102,17 @@ class AuditProcessController extends Controller
             return ['result' => 'error', 'msg' => 'An error occurred when submitting reports.', 'details' => $th->getMessage()];
         }
 
-        return ['result' => 'ok', 'request' => $request->all(), 'total_findings' => $totalFindings, 'findings' => $auditFindings, 'cycle' => $cycle];
+        return [
+            'result' => 'ok',
+            'result_data' => [
+                'cycle_id' => $cycle->cycle_id,
+                'record_code' => $record->code,
+                'area_name' => $record->area->name,
+                'dept_name' => $record->area->department->name,
+                'num_criterias' => $criteriaGroup->criterias->count(),
+                'findings' => $auditFindings,
+            ]
+        ];
     }
 
     public function apiFetch(Request $request)

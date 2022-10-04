@@ -1,3 +1,4 @@
+import 'chart.js/auto';
 import { faEnvelopesBulk, faImage } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import axios from "axios";
@@ -5,19 +6,113 @@ import _, { result } from "lodash";
 import React, { useState } from "react";
 import { useRef } from "react";
 import { useEffect } from "react";
-import { Button, Card, Form, Image, ListGroup, Modal, ProgressBar, Spinner, Table } from "react-bootstrap";
+import { Accordion, Button, Card, Form, Image, ListGroup, Modal, ProgressBar, Spinner, Table } from "react-bootstrap";
+import { Doughnut } from "react-chartjs-2";
 import DropdownList from "../components/DropdownList";
 import FileInput from "../components/FileInput";
-import LoadingButton from "../components/LoadingButton";
+import CountUp from 'react-countup';
 import { rootUrl, scrollToElementById, waitForMs } from "../utils";
 
 function AuditProcessResult({ auditResult }) {
+    const [score, setScore] = useState(0);
+
+    useEffect(() => {
+        let failScore = 0;
+
+        for (const finding of auditResult.findings) {
+            failScore += finding.ca_weight;
+        }
+
+        setScore(100 - failScore);
+    }, []);
+
     return (
-        <>Audit Result</>
+        <>
+            <Card.Header className="p-3">
+                <h3 className="fw-bold display-spacing m-0">Audit Process Result</h3>
+            </Card.Header>
+            <Card.Body className="card-body">
+                <h5 className="text-center">Total Score (%)</h5>
+                <div className="mx-auto mb-3" style={{ width: 150 }}>
+                    <div className="position-relative">
+                        <div className="position-absolute" style={{ width: 150, height: 150 }}>
+                            <div className="position-relative top-50 translate-middle-y text-center">
+                                <h3 className="fw-bold display-spacing m-0"><CountUp end={score} duration={1} />/100</h3>
+                            </div>
+                        </div>
+                    </div>
+                    <Doughnut
+                        data={{
+                            labels: ['Passed', 'Fail'],
+                            datasets: [
+                                {
+                                    label: 'test',
+                                    data: [score, 100 - score],
+                                    cutout: '90%',
+                                    backgroundColor: [
+                                        getComputedStyle(document.body).getPropertyValue('--bs-success'),
+                                        getComputedStyle(document.body).getPropertyValue('--bs-danger'),
+                                    ]
+                                }
+                            ],
+                        }}
+                        options={{
+                            plugins: {
+                                legend: { display: false }
+                            }
+                        }}
+                    />
+                </div>
+                <Table className="align-middle">
+                    <tbody>
+                        <tr>
+                            <th>Cycle ID:</th>
+                            <td>{auditResult.cycle_id}</td>
+                        </tr>
+                        <tr>
+                            <th>Record ID:</th>
+                            <td>{auditResult.record_code}</td>
+                        </tr>
+                        <tr>
+                            <th>Area:</th>
+                            <td>{auditResult.area_name} ({auditResult.dept_name})</td>
+                        </tr>
+                        <tr>
+                            <th>Criteria Passed:</th>
+                            <td>{auditResult.num_criterias - auditResult.findings.length}</td>
+                        </tr>
+                        <tr>
+                            <th>Criteria Failed:</th>
+                            <td>{auditResult.findings.length}</td>
+                        </tr>
+                    </tbody>
+                </Table>
+                <div className="mb-3">Failed Criteria:</div>
+                {auditResult.findings.length > 0 ? (
+                    <Accordion alwaysOpen>
+                        {auditResult.findings.map((finding, key) => (
+                            <Accordion.Item key={key} eventKey={key}>
+                                <Accordion.Header>
+                                    <div className="vstack gap-2">
+                                        <div className="fw-bold text-truncate">{finding.ca_name}</div>
+                                        <small>{finding.ca_code} (Weight: {finding.ca_weight}%)</small>
+                                    </div>
+                                </Accordion.Header>
+                                <Accordion.Body>{finding.desc}</Accordion.Body>
+                            </Accordion.Item>
+                        ))}
+                    </Accordion>
+                ) : (
+                    <Card>
+                        <Card.Body className="text-center">No failed criteria.</Card.Body>
+                    </Card>
+                )}
+            </Card.Body>
+        </>
     );
 }
 
-function AuditProcessForm({ auditResult, setAuditResult }) {
+function AuditProcessForm({ setAuditResult }) {
     const [user, setUser] = useState(null);
     const [isLoading, setLoading] = useState(true);
     const [message, setMessage] = useState(null);
@@ -176,9 +271,9 @@ function AuditProcessForm({ auditResult, setAuditResult }) {
             return;
         }
 
-        setAuditResult(submitResponse.data);
-        setSubmitting(false);
         console.log(submitResponse);
+        setSubmitting(false);
+        setAuditResult(submitResponse.data.result_data);
     };
 
     useEffect(() => {
@@ -468,9 +563,9 @@ export default function AuditProcessLayout() {
     return (
         <Card className="audit-card mx-sm-auto mx-2 my-2 w-auto">
             {!auditResult ? (
-                <AuditProcessForm auditResult={auditResult} setAuditResult={setAuditResult} />
+                <AuditProcessForm setAuditResult={setAuditResult} />
             ) : (
-                <AuditProcessResult />
+                <AuditProcessResult auditResult={auditResult} />
             )}
         </Card>
     );
