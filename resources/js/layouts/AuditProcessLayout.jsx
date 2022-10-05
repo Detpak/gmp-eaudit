@@ -1,5 +1,5 @@
 import 'chart.js/auto';
-import { faEnvelopesBulk, faImage } from "@fortawesome/free-solid-svg-icons";
+import { faArrowLeft, faEnvelopesBulk, faImage } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import axios from "axios";
 import _, { result } from "lodash";
@@ -13,7 +13,7 @@ import FileInput from "../components/FileInput";
 import CountUp from 'react-countup';
 import { rootUrl, scrollToElementById, waitForMs } from "../utils";
 
-function AuditProcessResult({ auditResult }) {
+function AuditProcessResult({ auditResult, setAuditResult }) {
     const [score, setScore] = useState(0);
 
     useEffect(() => {
@@ -98,7 +98,35 @@ function AuditProcessResult({ auditResult }) {
                                         <small>{finding.ca_code} (Weight: {finding.ca_weight}%)</small>
                                     </div>
                                 </Accordion.Header>
-                                <Accordion.Body>{finding.desc}</Accordion.Body>
+                                <Accordion.Body>
+                                    <Form.Group className="mb-3">
+                                        <Form.Label>Description</Form.Label>
+                                        <Form.Control as="textarea" rows={3} value={finding.desc} disabled />
+                                    </Form.Group>
+                                    <Form.Group className="mb-3">
+                                        <Form.Label>Category</Form.Label>
+                                        <div className="d-grid">
+                                            <div className="btn-group" role="group">
+                                                {["Observation", "Minor NC", "Major NC"].map((value, categoryIndex) => (
+                                                    <React.Fragment key={categoryIndex}>
+                                                        <input
+                                                            type="radio"
+                                                            className="btn-check"
+                                                            name={`pass_catergory_${key}`}
+                                                            value={categoryIndex}
+                                                            checked={finding.category == categoryIndex}
+                                                            id={`pass_catergory_${key}_${categoryIndex}`}
+                                                            autoComplete="off"
+                                                            disabled />
+                                                        <label className="btn btn-outline-primary btn-disabled" htmlFor={`pass_catergory_${key}_${categoryIndex}`}>
+                                                            {value}
+                                                        </label>
+                                                    </React.Fragment>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    </Form.Group>
+                                </Accordion.Body>
                             </Accordion.Item>
                         ))}
                     </Accordion>
@@ -108,6 +136,11 @@ function AuditProcessResult({ auditResult }) {
                     </Card>
                 )}
             </Card.Body>
+            <Card.Footer className="p-3 hstack justify-content-end">
+                <Button onClick={() => setAuditResult(null)}>
+                    <FontAwesomeIcon icon={faArrowLeft} /> Back
+                </Button>
+            </Card.Footer>
         </>
     );
 }
@@ -565,7 +598,7 @@ export default function AuditProcessLayout() {
             {!auditResult ? (
                 <AuditProcessForm setAuditResult={setAuditResult} />
             ) : (
-                <AuditProcessResult auditResult={auditResult} />
+                <AuditProcessResult auditResult={auditResult} setAuditResult={setAuditResult} />
             )}
         </Card>
     );
