@@ -4,7 +4,6 @@ import { useState } from "react";
 import { Button, Form, InputGroup } from "react-bootstrap";
 import { PageContent, PageContentTopbar, PageContentView } from "../../components/PageNav";
 import DynamicTable from "../../components/DynamicTable";
-import { rootUrl } from "../../utils";
 
 export default function AuditFindingLayout() {
     const [refreshTrigger, setRefreshTrigger] = useState(false);
@@ -36,7 +35,7 @@ export default function AuditFindingLayout() {
                     refreshTrigger={refreshTrigger}
                     searchKeyword={searchKeyword}
                     source={{
-                        url: rootUrl('api/v1/fetch-findings'),
+                        url: 'api/v1/fetch-findings',
                         method: 'GET',
                         produce: item => [
                             item.record_code,

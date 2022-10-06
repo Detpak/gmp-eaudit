@@ -3,6 +3,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import _ from "lodash";
 import React, { useEffect, useState } from "react";
 import { Button, Card, CloseButton, Collapse, Form, ListGroup, Spinner } from "react-bootstrap";
+import httpRequest from "../api";
 
 export default function SearchList({ source, height, placeholder, onDone, children }) {
     const [search, setSearch] = useState('');
@@ -51,7 +52,7 @@ export default function SearchList({ source, height, placeholder, onDone, childr
             max: 8
         };
 
-        axios.get(source, { params: params })
+        httpRequest.get(source, { params: params })
             .then((response) => {
                 if (append) {
                     if (response.data.total == listData.length) {

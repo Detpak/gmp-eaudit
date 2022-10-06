@@ -1,13 +1,10 @@
-import { faTrash } from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import axios from "axios";
 import _ from "lodash";
 import { useEffect, useState } from "react";
 import { Button, Form, ListGroup, Spinner } from "react-bootstrap";
+import httpRequest from "../../api";
 import { RequiredSpan } from "../../components/LabelSpan";
 import ListView from "../../components/ListView";
 import SearchList from "../../components/SearchList";
-import { rootUrl } from "../../utils";
 import CommonView from "../CommonView";
 
 function DepartmentForm({ shown, handleChange, values, setValues, errors }) {
@@ -17,7 +14,7 @@ function DepartmentForm({ shown, handleChange, values, setValues, errors }) {
     useEffect(() => {
         if (shown) {
             setLoadingOptions(true);
-            axios.get(rootUrl('api/v1/fetch-division-options'))
+            httpRequest.get('api/v1/fetch-division-options')
                 .then((response) => {
                     setDivisions(response.data);
                     setLoadingOptions(false);
@@ -76,7 +73,7 @@ function DepartmentForm({ shown, handleChange, values, setValues, errors }) {
                 <SearchList
                     height="200px"
                     placeholder="Add PIC(s)..."
-                    source={rootUrl('api/v1/fetch-users?only_auditee=true')}
+                    source={'api/v1/fetch-users?only_auditee=true'}
                     onDone={handleDone}
                 >
                     {({ data }) => {
@@ -93,7 +90,7 @@ function DepartmentForm({ shown, handleChange, values, setValues, errors }) {
                 </SearchList>
                 <ListView
                     ids={values.pic_ids}
-                    fetchUrl={rootUrl('api/v1/get-users')}
+                    fetchUrl={'api/v1/get-users'}
                     handleRemove={handleRemove}
                     handleRemoveAll={handleRemoveAll}
                 >
@@ -123,20 +120,20 @@ export default function DepartmentLayout() {
             addNewItem={{
                 name: "Add Department",
                 form: DepartmentForm,
-                action: rootUrl('api/v1/add-dept'),
+                action: 'api/v1/add-dept',
                 initialValues: initialValues
             }}
             editItem={{
                 name: "Edit Department",
                 form: DepartmentForm,
-                action: rootUrl('api/v1/edit-dept'),
-                fetchUrl: rootUrl('api/v1/get-dept'),
+                action: 'api/v1/edit-dept',
+                fetchUrl: 'api/v1/get-dept',
                 initialValues: { ...initialValues }
             }}
             deleteItem={{
-                action: rootUrl('api/v1/delete-dept')
+                action: 'api/v1/delete-dept'
             }}
-            deleteSelectedItemAction={rootUrl('api/v1/delete-depts')}
+            deleteSelectedItemAction={'api/v1/delete-depts'}
             table={{
                 canSelect: true,
                 columns: [
@@ -164,7 +161,7 @@ export default function DepartmentLayout() {
                     },
                 ],
                 source: {
-                    url: rootUrl('api/v1/fetch-depts'),
+                    url: 'api/v1/fetch-depts',
                     method: 'GET',
                     produce: item => [
                         item.name,

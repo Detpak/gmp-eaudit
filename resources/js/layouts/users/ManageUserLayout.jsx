@@ -1,8 +1,8 @@
 import _ from "lodash";
 import { useEffect, useState } from "react";
 import { Form } from "react-bootstrap";
+import httpRequest from "../../api";
 import { OptionalSpan, RequiredSpan } from "../../components/LabelSpan";
-import { rootUrl } from "../../utils";
 import CommonView from "../CommonView";
 
 function UserForm({ shown, handleChange, values, errors }) {
@@ -13,7 +13,7 @@ function UserForm({ shown, handleChange, values, errors }) {
         if (shown) {
             // Fetch the roles to be shown later
             setLoadingRole(true);
-            axios.get(rootUrl('api/v1/fetch-role-options'))
+            httpRequest.get('api/v1/fetch-role-options')
                 .then((response) => {
                     setRoles(response.data);
                     setLoadingRole(false);
@@ -71,20 +71,20 @@ export default function ManageUserLayout() {
             addNewItem={{
                 name: "Add User",
                 form: UserForm,
-                action: rootUrl('api/v1/add-user'),
+                action: 'api/v1/add-user',
                 initialValues: initialValues
             }}
             editItem={{
                 name: "Edit User",
                 form: UserForm,
-                action: rootUrl('api/v1/edit-user'),
-                fetchUrl: rootUrl('api/v1/get-user'),
+                action: 'api/v1/edit-user',
+                fetchUrl: 'api/v1/get-user',
                 initialValues: { ...initialValues }
             }}
             deleteItem={{
-                action: rootUrl('api/v1/delete-user')
+                action: 'api/v1/delete-user'
             }}
-            deleteSelectedItemAction={rootUrl('api/v1/delete-users')}
+            deleteSelectedItemAction={'api/v1/delete-users'}
             table={{
                 columns: [
                     {
@@ -109,7 +109,7 @@ export default function ManageUserLayout() {
                     }
                 ],
                 source: {
-                    url: rootUrl('api/v1/fetch-users'),
+                    url: 'api/v1/fetch-users',
                     method: 'GET',
                     produce: item => [
                         item.name,

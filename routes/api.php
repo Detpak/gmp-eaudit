@@ -38,6 +38,7 @@ Route::prefix('/v1')->group(function() {
 
         // Audit submission
         Route::post('/submit-audit', [AuditProcessController::class, 'apiSubmitAudit']);
+        Route::put('/submit-audit-images', [AuditProcessController::class, 'apiSubmitImages']);
 
         // Audit cycle APIs
         Route::post('/new-cycle', [AuditCycleController::class, 'apiNewCycle']);

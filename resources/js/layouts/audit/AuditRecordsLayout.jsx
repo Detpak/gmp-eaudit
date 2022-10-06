@@ -4,7 +4,6 @@ import { useState } from "react";
 import { Button, Form, InputGroup, OverlayTrigger, Tooltip } from "react-bootstrap";
 import DynamicTable from "../../components/DynamicTable";
 import { PageContent, PageContentTopbar, PageContentView } from "../../components/PageNav";
-import { rootUrl } from "../../utils";
 
 export default function AuditRecordsLayout() {
     const [refreshTrigger, setRefreshTrigger] = useState(false);
@@ -68,7 +67,7 @@ export default function AuditRecordsLayout() {
                         }
                     ]}
                     source={{
-                        url: rootUrl('api/v1/fetch-records'),
+                        url: 'api/v1/fetch-records',
                         method: 'GET',
                         produce: item => [
                             item.cycle_id,

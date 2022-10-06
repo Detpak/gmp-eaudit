@@ -9,6 +9,7 @@ import LoadingButton from "./LoadingButton";
 import { useInRouterContext } from "react-router-dom";
 import { useRef } from "react";
 import { showToastMsg } from "../utils";
+import httpRequest from "../api";
 
 const MAX_PAGES = 3;
 
@@ -56,7 +57,7 @@ export default function DynamicTable({ refreshTrigger, columns, selectedItems, o
             }
         }
 
-        const response = await axios.get(source.url, { params: params });
+        const response = await httpRequest.get(source.url, { params: params });
 
         if (response.data.data && mounted.current) {
             if (response.data.last_page < currentPage) {
@@ -133,6 +134,7 @@ export default function DynamicTable({ refreshTrigger, columns, selectedItems, o
 
         setError(false);
         fetchData().catch(reason => {
+            console.log(reason);
             setError(true);
             setLoading(false);
         });

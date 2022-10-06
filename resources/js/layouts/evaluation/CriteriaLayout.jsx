@@ -1,7 +1,5 @@
-import { Input } from "postcss";
 import { Form, InputGroup } from "react-bootstrap";
 import { RequiredSpan } from "../../components/LabelSpan";
-import { rootUrl } from "../../utils";
 import CommonView from "../CommonView";
 
 function CriteriaForm({ shown, handleChange, values, errors }) {
@@ -41,21 +39,21 @@ export default function CriteriaLayout() {
             addNewItem={{
                 name: "Add Criteria",
                 form: CriteriaForm,
-                action: rootUrl('api/v1/add-criteria'),
+                action: 'api/v1/add-criteria',
                 initialValues: initialValues
             }}
             editItem={{
                 name: "Edit Criteria",
                 form: CriteriaForm,
                 allowEditIf: item => item.groups_count == 0,
-                action: rootUrl('api/v1/edit-criteria'),
-                fetchUrl: rootUrl('api/v1/get-criteria'),
+                action: 'api/v1/edit-criteria',
+                fetchUrl: 'api/v1/get-criteria',
                 initialValues: { ...initialValues }
             }}
             deleteItem={{
-                action: rootUrl('api/v1/delete-criteria')
+                action: 'api/v1/delete-criteria'
             }}
-            deleteSelectedItemAction={rootUrl('api/v1/delete-criterias')}
+            deleteSelectedItemAction={'api/v1/delete-criterias'}
             table={{
                 canSelect: true,
                 columns: [
@@ -77,7 +75,7 @@ export default function CriteriaLayout() {
                     }
                 ],
                 source: {
-                    url: rootUrl('api/v1/fetch-criterias'),
+                    url: 'api/v1/fetch-criterias',
                     method: 'GET',
                     produce: item => [
                         item.code,

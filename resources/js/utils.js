@@ -1,6 +1,7 @@
 import { faChartLine, faFlaskVial, faIndustry, faListCheck, faPercent, faPowerOff, faUsers } from '@fortawesome/free-solid-svg-icons';
 import React from 'react';
 import $ from 'jquery';
+import httpRequest from './api';
 
 export const menus = [
     {
@@ -45,7 +46,7 @@ if (document.querySelector("meta[name='development']")) {
 }
 
 export function rootUrl(url) {
-    return window.rootUrl + url;
+    return httpRequest.rootUrl + url;
 }
 
 export function showToastMsg(msg) {

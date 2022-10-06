@@ -1,12 +1,9 @@
 import { faWarning } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { useState } from "react";
-import { useRef } from "react";
 import { Col, Form, OverlayTrigger, Row, Table, Tooltip } from "react-bootstrap";
 import { OptionalSpan, RequiredSpan } from "../../components/LabelSpan";
 import ListView from "../../components/ListView";
 import SearchList from "../../components/SearchList";
-import { rootUrl } from "../../utils";
 import CommonView from "../CommonView";
 
 function CriteriaGroupForm({ shown, handleChange, values, setValues, errors }) {
@@ -70,7 +67,7 @@ function CriteriaGroupForm({ shown, handleChange, values, setValues, errors }) {
                         <SearchList
                             height="200px"
                             placeholder="Add Criteria(s)..."
-                            source={rootUrl('api/v1/fetch-criterias')}
+                            source={'api/v1/fetch-criterias'}
                             onDone={handleDone}
                         >
                             {({ data }) => (
@@ -82,7 +79,7 @@ function CriteriaGroupForm({ shown, handleChange, values, setValues, errors }) {
                         </SearchList>
                         <ListView
                             ids={values.criteria_ids}
-                            fetchUrl={rootUrl('api/v1/get-criterias')}
+                            fetchUrl={'api/v1/get-criterias'}
                             onDoneLoading={calculateTotalWeight}
                             handleRemove={handleRemove}
                             handleRemoveAll={handleRemoveAll}
@@ -121,7 +118,7 @@ export default function CriteriaGroupLayout() {
                 name: "Add Group",
                 form: CriteriaGroupForm,
                 size: 'lg',
-                action: rootUrl('api/v1/add-criteria-group'),
+                action: 'api/v1/add-criteria-group',
                 initialValues: initialValues
             }}
             editItem={{
@@ -129,15 +126,15 @@ export default function CriteriaGroupLayout() {
                 form: CriteriaGroupForm,
                 size: 'lg',
                 allowEditIf: item => item.cycles_count > 0,
-                action: rootUrl('api/v1/edit-criteria-group'),
-                fetchUrl: rootUrl('api/v1/get-criteria-group'),
+                action: 'api/v1/edit-criteria-group',
+                fetchUrl: 'api/v1/get-criteria-group',
                 initialValues: { ...initialValues }
             }}
             deleteItem={{
                 allowDeleteIf: item => item.cycles_count > 0,
-                action: rootUrl('api/v1/delete-criteria-group')
+                action: 'api/v1/delete-criteria-group'
             }}
-            deleteSelectedItemAction={rootUrl('api/v1/delete-criteria-groups')}
+            deleteSelectedItemAction={'api/v1/delete-criteria-groups'}
             table={{
                 canSelect: true,
                 columns: [
@@ -173,7 +170,7 @@ export default function CriteriaGroupLayout() {
                     }
                 ],
                 source: {
-                    url: rootUrl('api/v1/fetch-criteria-groups'),
+                    url: 'api/v1/fetch-criteria-groups',
                     method: 'GET',
                     produce: item => [
                         item.code,

@@ -2,16 +2,17 @@ import 'chart.js/auto';
 import { faArrowLeft, faEnvelopesBulk, faImage } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import axios from "axios";
-import _, { result } from "lodash";
+import _ from "lodash";
 import React, { useState } from "react";
 import { useRef } from "react";
 import { useEffect } from "react";
-import { Accordion, Button, Card, Form, Image, ListGroup, Modal, ProgressBar, Spinner, Table } from "react-bootstrap";
+import { Accordion, Button, Card, Form, ListGroup, Modal, ProgressBar, Spinner, Table } from "react-bootstrap";
 import { Doughnut } from "react-chartjs-2";
 import DropdownList from "../components/DropdownList";
 import FileInput from "../components/FileInput";
 import CountUp from 'react-countup';
-import { rootUrl, scrollToElementById, waitForMs } from "../utils";
+import { scrollToElementById, waitForMs } from "../utils";
+import httpRequest from '../api';
 
 function AuditProcessResult({ auditResult, setAuditResult }) {
     const [score, setScore] = useState(0);
@@ -118,7 +119,7 @@ function AuditProcessResult({ auditResult, setAuditResult }) {
                                                             id={`pass_catergory_${key}_${categoryIndex}`}
                                                             autoComplete="off"
                                                             disabled />
-                                                        <label className="btn btn-outline-primary btn-disabled" htmlFor={`pass_catergory_${key}_${categoryIndex}`}>
+                                                        <label className="btn btn-outline-primary" htmlFor={`pass_catergory_${key}_${categoryIndex}`}>
                                                             {value}
                                                         </label>
                                                     </React.Fragment>
@@ -168,13 +169,13 @@ function AuditProcessForm({ setAuditResult }) {
     const date = useRef(new Date().toLocaleDateString('en-UK', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }));
 
     const fetchData = async () => {
-        const userData = await axios.get(rootUrl('api/v1/get-current-user'));
+        const userData = await httpRequest.get('api/v1/get-current-user');
 
         if (userData.data) {
             setUser(userData.data.result);
         }
 
-        const activeCycle = await axios.get(rootUrl('api/v1/get-active-cycle'));
+        const activeCycle = await httpRequest.get('api/v1/get-active-cycle');
 
         if (activeCycle.data.result == null) {
             throw { result: 'error', msg: "Unable to continue audit process, there is no active cycle. Please contact QC administrator." };
@@ -184,10 +185,10 @@ function AuditProcessForm({ setAuditResult }) {
         activeCycle.data.result.formatted_finish_date = new Date(activeCycle.data.result.finish_date).toDateString();
         setCycle(activeCycle.data.result);
 
-        const cycleCriteriaGroup = await axios.get(rootUrl(`api/v1/get-criteria-group/${activeCycle.data.result.cgroup_id}`));
+        const cycleCriteriaGroup = await httpRequest.get(`api/v1/get-criteria-group/${activeCycle.data.result.cgroup_id}`);
         setCriteriaGroup(cycleCriteriaGroup.data);
 
-        const cycleCriterias = await axios.get(`api/v1/get-criteria-group-params/${activeCycle.data.result.cgroup_id}`);
+        const cycleCriterias = await httpRequest.get(`api/v1/get-criteria-group-params/${activeCycle.data.result.cgroup_id}`);
         setCriterias(cycleCriterias.data);
     };
 
@@ -255,7 +256,7 @@ function AuditProcessForm({ setAuditResult }) {
     const handleSubmit = async () => {
         const formData = {};
 
-        setMaxProgress(1);
+        setMaxProgress(100);
         setSubmitMsg('Saving Information...');
 
         try {
@@ -289,21 +290,65 @@ function AuditProcessForm({ setAuditResult }) {
             console.log(ex);
         }
 
-        console.log(formData);
-        console.log(JSON.stringify(formData));
+        //console.log(formData);
+        //console.log(JSON.stringify(formData));
 
         const submitResponse = await axios.post('api/v1/submit-audit', formData);
 
-        setSubmitProgress(1);
-        await waitForMs(500);
-
         if (submitResponse.data.formError) {
+            await waitForMs(500);
             const errors = _.mapValues(submitResponse.data.formError, (value) => value[0]);
             setFormError(errors);
             setSubmitting(false);
             return;
         }
 
+        await waitForMs(250);
+        setSubmitProgress(10);
+        setSubmitMsg('Uploading Images...');
+
+        let imageFindingCodes = [];
+        let imageUploads = [];
+
+        try {
+            const failedCriteriaImages = criteriaPasses
+                .map((data) => data.info)
+                .filter((data) => data != null && data.photos.length > 0)
+                .map((data) => data.photos);
+
+            imageFindingCodes = _.zip(failedCriteriaImages, submitResponse.data.result_data.findings)
+                .map((findingInfo) => findingInfo[0].map(() => findingInfo[1].code)) // Replicate the code for each images
+                .flat();
+
+            imageUploads = failedCriteriaImages.flat();
+        }
+        catch (ex) {
+            console.debug(ex);
+        }
+
+        const imageUploadFormData = new FormData();
+
+        imageUploadFormData.append('record_id', formData.record_id);
+
+        for (const imageFindingCode of imageFindingCodes) {
+            imageUploadFormData.append('codes', imageFindingCode);
+        }
+
+        for (const image of imageUploads) {
+            imageUploadFormData.append('images', image);
+        }
+
+        const config = {
+            onUploadProgress: progressEvent => {
+                setSubmitProgress(10 + Math.round(progressEvent.loaded) / progressEvent.total * 90);
+            }
+        };
+
+        const submitImagesResponse = await axios.put('api/v1/submit-audit-images', imageUploadFormData, config);
+
+        await waitForMs(500);
+
+        console.log(submitImageResponse);
         console.log(submitResponse);
         setSubmitting(false);
         setAuditResult(submitResponse.data.result_data);
@@ -325,11 +370,11 @@ function AuditProcessForm({ setAuditResult }) {
             setLoadingDeptPIC(true);
 
             // Update PIC list
-            axios.get(rootUrl(`api/v1/get-dept-pics/${record.dept_id}`))
+            httpRequest.get(`api/v1/get-dept-pics/${record.dept_id}`)
                 .then((response) => {
-                    axios.post(rootUrl(`api/v1/get-users`),
-                               { ids: response.data },
-                               { headers: { 'Content-Type': 'application/json' } })
+                    httpRequest.post(`api/v1/get-users`,
+                                     { ids: response.data },
+                                     { headers: { 'Content-Type': 'application/json' } })
                         .then((response) => {
                             if (response.data) {
                                 setDeptPIC(response.data);
@@ -403,7 +448,7 @@ function AuditProcessForm({ setAuditResult }) {
                         <Form.Group id="record_id" className="mb-3">
                             <Form.Label>Area</Form.Label>
                             <DropdownList
-                                source={rootUrl(`api/v1/fetch-records?list=1&cycle=${cycle.id}`)}
+                                source={`api/v1/fetch-records?list=1&cycle=${cycle.id}`}
                                 selectedItem={record}
                                 setSelectedItem={setRecord}
                                 caption={(data) => <>{data.area_name} ({data.dept_name})</>}

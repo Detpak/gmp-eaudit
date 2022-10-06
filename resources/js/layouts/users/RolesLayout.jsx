@@ -1,5 +1,5 @@
 import CommonView from "../CommonView";
-import { menus, rootUrl } from "../../utils";
+import { menus } from "../../utils";
 import { Accordion, Button, Form, Modal } from "react-bootstrap";
 import _ from "lodash";
 import { OptionalSpan, RequiredSpan } from "../../components/LabelSpan";
@@ -50,20 +50,20 @@ export default function RolesUserLayout() {
             addNewItem={{
                 name: "Add Role",
                 form: RolesForm,
-                action: rootUrl('api/v1/add-role'),
+                action: 'api/v1/add-role',
                 initialValues: initialValues
             }}
             editItem={{
                 name: "Edit Role",
                 form: RolesForm,
-                action: rootUrl('api/v1/edit-role'),
-                fetchUrl: rootUrl('api/v1/get-role'),
+                action: 'api/v1/edit-role',
+                fetchUrl: 'api/v1/get-role',
                 initialValues: { ...initialValues }
             }}
             deleteItem={{
-                action: rootUrl('api/v1/delete-role')
+                action: 'api/v1/delete-role'
             }}
-            deleteSelectedItemAction={rootUrl('api/v1/delete-roles')}
+            deleteSelectedItemAction={'api/v1/delete-roles'}
             table={{
                 canSelect: true,
                 columns: [
@@ -81,7 +81,7 @@ export default function RolesUserLayout() {
                     }
                 ],
                 source: {
-                    url: rootUrl('api/v1/fetch-roles'),
+                    url: 'api/v1/fetch-roles',
                     method: 'GET',
                     produce: item => [
                         item.name,

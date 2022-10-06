@@ -14,6 +14,7 @@ import { useEffect } from "react";
 import SearchList from "../../components/SearchList";
 import ListView from "../../components/ListView";
 import DropdownList from "../../components/DropdownList";
+import httpRequest from "../../api";
 
 const formInitialValues = {
     start_date: '',
@@ -69,7 +70,7 @@ function AuditCycleForm({ shown, handleChange, values, setValues, errors }) {
             <Form.Group className="mb-3">
                 <Form.Label>Criteria Group</Form.Label>
                 <DropdownList
-                    source={rootUrl('api/v1/fetch-criteria-groups?noparam=true')}
+                    source={'api/v1/fetch-criteria-groups?noparam=true'}
                     selectedItem={criteriaGroup}
                     setSelectedItem={handleSelectCriteriaGroup}
                     caption={(data) => data.name}
@@ -104,7 +105,7 @@ export default function AuditCyclesLayout() {
     };
 
     const startNewCycle = async () => {
-        const newCycle = await axios.post(rootUrl('api/v1/new-cycle'));
+        const newCycle = await httpRequest.post('api/v1/new-cycle');
 
         if (newCycle.data.result == 'ok') {
             showToastMsg("New cycle has been started.");
@@ -113,7 +114,7 @@ export default function AuditCyclesLayout() {
     };
 
     const closeCycle = async (id) => {
-        const response = await axios.get(rootUrl(`api/v1/close-cycle/${id}`));
+        const response = await httpRequest.get(`api/v1/close-cycle/${id}`);
 
         if (response.data.result === 'ok') {
             refreshTable();
@@ -176,7 +177,7 @@ export default function AuditCyclesLayout() {
                         }
                     ]}
                     source={{
-                        url: rootUrl('api/v1/fetch-cycles'),
+                        url: 'api/v1/fetch-cycles',
                         method: 'GET',
                         produce: item => [
                             item.cycle_id,
@@ -204,7 +205,7 @@ export default function AuditCyclesLayout() {
 
             <ModalForm
                 title="Start New Cycle"
-                action={rootUrl('api/v1/new-cycle')}
+                action={'api/v1/new-cycle'}
                 initialValues={formInitialValues}
                 closeButton={true}
                 show={startNewCycleModalShown}

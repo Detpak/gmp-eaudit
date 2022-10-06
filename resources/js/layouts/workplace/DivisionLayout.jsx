@@ -1,7 +1,7 @@
 import { useState, useEffect} from "react";
 import { Form } from "react-bootstrap";
+import httpRequest from "../../api";
 import { RequiredSpan } from "../../components/LabelSpan";
-import { rootUrl } from "../../utils";
 import CommonView from "../CommonView";
 
 function DivisionForm({ shown, handleChange, values, errors }) {
@@ -11,7 +11,7 @@ function DivisionForm({ shown, handleChange, values, errors }) {
     useEffect(() => {
         if (shown) {
             setLoading(true);
-            axios.get(rootUrl('api/v1/fetch-entity-options'))
+            httpRequest.get('api/v1/fetch-entity-options')
                 .then((response) => {
                     setEntities(response.data);
                     setLoading(false);
@@ -52,20 +52,20 @@ export default function DivisionLayout() {
             addNewItem={{
                 name: "Add Division",
                 form: DivisionForm,
-                action: rootUrl('api/v1/add-division'),
+                action: 'api/v1/add-division',
                 initialValues: initialValues
             }}
             editItem={{
                 name: "Edit Division",
                 form: DivisionForm,
-                action: rootUrl('api/v1/edit-division'),
-                fetchUrl: rootUrl('api/v1/get-division'),
+                action: 'api/v1/edit-division',
+                fetchUrl: 'api/v1/get-division',
                 initialValues: { ...initialValues }
             }}
             deleteItem={{
-                action: rootUrl('api/v1/delete-division')
+                action: 'api/v1/delete-division'
             }}
-            deleteSelectedItemAction={rootUrl('api/v1/delete-divisions')}
+            deleteSelectedItemAction={'api/v1/delete-divisions'}
             table={{
                 canSelect: true,
                 columns: [
@@ -83,7 +83,7 @@ export default function DivisionLayout() {
                     },
                 ],
                 source: {
-                    url: rootUrl('api/v1/fetch-divisions'),
+                    url: 'api/v1/fetch-divisions',
                     method: 'GET',
                     produce: item => [
                         item.name,

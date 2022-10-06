@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Col, Form, Row } from "react-bootstrap";
+import httpRequest from "../../api";
 import { RequiredSpan } from "../../components/LabelSpan";
-import { rootUrl } from "../../utils";
 import CommonView from "../CommonView";
 
 function PlantForm({ shown, handleChange, values, errors }) {
@@ -11,7 +11,7 @@ function PlantForm({ shown, handleChange, values, errors }) {
     useEffect(() => {
         if (shown) {
             setLoading(true);
-            axios.get(rootUrl('api/v1/fetch-entity-options'))
+            httpRequest.get('api/v1/fetch-entity-options')
                 .then((response) => {
                     setEntities(response.data);
                     setLoading(false);
@@ -82,21 +82,21 @@ export default function PlantLayout() {
                 name: "Add Plant",
                 form: PlantForm,
                 size: 'lg',
-                action: rootUrl('api/v1/add-plant'),
+                action: 'api/v1/add-plant',
                 initialValues: initialValues
             }}
             editItem={{
                 name: "Edit Plant",
                 form: PlantForm,
                 size: 'lg',
-                action: rootUrl('api/v1/edit-plant'),
-                fetchUrl: rootUrl('api/v1/get-plant'),
+                action: 'api/v1/edit-plant',
+                fetchUrl: 'api/v1/get-plant',
                 initialValues: { ...initialValues }
             }}
             deleteItem={{
-                action: rootUrl('api/v1/delete-plant')
+                action: 'api/v1/delete-plant'
             }}
-            deleteSelectedItemAction={rootUrl('api/v1/delete-plants')}
+            deleteSelectedItemAction={'api/v1/delete-plants'}
             table={{
                 canSelect: true,
                 columns: [
@@ -131,7 +131,7 @@ export default function PlantLayout() {
                     },
                 ],
                 source: {
-                    url: rootUrl('api/v1/fetch-plants'),
+                    url: 'api/v1/fetch-plants',
                     method: 'GET',
                     produce: item => [
                         item.code,

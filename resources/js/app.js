@@ -7,6 +7,7 @@ import $ from 'jquery';
 import { BrowserRouter } from 'react-router-dom';
 import { createStore } from 'state-pool';
 import AuditProcessLayout from './layouts/AuditProcessLayout';
+import httpRequest from './api';
 
 $(function() {
     axios.defaults.headers.common["X-Requested-With"] ="XMLHttpRequest";
@@ -17,7 +18,7 @@ $(function() {
         axios.defaults.headers.common["Authorization"] = `Bearer ${window.appToken.content}`;
     }
 
-    window.rootUrl = document.querySelector("meta[name='root-url']").content;
+    httpRequest.rootUrl = document.querySelector("meta[name='root-url']").content;
 
     window.globalStateStore = createStore();
     window.globalStateStore.setState("toastMsg", { toastShown: false, msg: "" });

@@ -1,6 +1,5 @@
 import { Col, Container, Form, Row } from "react-bootstrap";
 import { OptionalSpan, RequiredSpan } from "../../components/LabelSpan";
-import { rootUrl } from "../../utils";
 import CommonView from "../CommonView";
 
 function EntityForm({ shown, handleChange, values, errors }) {
@@ -68,21 +67,21 @@ export default function EntityLayout() {
                 name: "Add Entity",
                 form: EntityForm,
                 size: "lg",
-                action: rootUrl('api/v1/add-entity'),
+                action: 'api/v1/add-entity',
                 initialValues: initialValues
             }}
             editItem={{
                 name: "Edit Entity",
                 form: EntityForm,
                 size: "lg",
-                action: rootUrl('api/v1/edit-entity'),
-                fetchUrl: rootUrl('api/v1/get-entity'),
+                action: 'api/v1/edit-entity',
+                fetchUrl: 'api/v1/get-entity',
                 initialValues: { ...initialValues }
             }}
             deleteItem={{
-                action: rootUrl('api/v1/delete-entity')
+                action: 'api/v1/delete-entity'
             }}
-            deleteSelectedItemAction={rootUrl('api/v1/delete-entities')}
+            deleteSelectedItemAction={'api/v1/delete-entities'}
             table={{
                 canSelect: true,
                 columns: [
@@ -121,7 +120,7 @@ export default function EntityLayout() {
                     },
                 ],
                 source: {
-                    url: rootUrl('api/v1/fetch-entities'),
+                    url: 'api/v1/fetch-entities',
                     method: 'GET',
                     produce: item => [
                         item.name,

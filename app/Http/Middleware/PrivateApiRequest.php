@@ -38,7 +38,7 @@ class PrivateApiRequest
         }
 
         if (!$result) {
-            return Response::json(['result' => 'error'], 404);
+            return Response::json(['result' => 'invalid_token']);
         }
 
         return $next($request);

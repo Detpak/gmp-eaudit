@@ -94,11 +94,11 @@ class LoginController extends Controller
     public function deauth()
     {
         $currentToken = UserHelpers::getUserToken();
-        $tokens = ApiAccessToken::where('user_id', $currentToken->id)->get();
+        $accessTokens = ApiAccessToken::where('user_id', $currentToken->id)->get();
 
-        foreach ($tokens as $tokenData) {
-            if (Hash::check($currentToken->token, $tokenData->token)) {
-                $tokenData->delete();
+        foreach ($accessTokens as $accessToken) {
+            if (Hash::check($currentToken->token, $accessToken->token)) {
+                $accessToken->delete();
                 break;
             }
         }

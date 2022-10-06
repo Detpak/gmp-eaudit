@@ -104,6 +104,8 @@ class AuditProcessController extends Controller
 
         return [
             'result' => 'ok',
+            'failedIds' => $failedCriteriaIds,
+            'failedParams' => $failedCriteriaParams,
             'result_data' => [
                 'cycle_id' => $cycle->cycle_id,
                 'record_code' => $record->code,
@@ -113,6 +115,11 @@ class AuditProcessController extends Controller
                 'findings' => $auditFindings,
             ]
         ];
+    }
+
+    public function apiSubmitImages(Request $request)
+    {
+        return ['result' => 'ok'];
     }
 
     public function apiFetch(Request $request)

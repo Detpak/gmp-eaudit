@@ -1,10 +1,10 @@
 import axios from "axios";
 import CommonView from "./../CommonView";
 import { Form } from "react-bootstrap";
-import { rootUrl } from "../../utils";
 import { useState } from "react";
 import { useEffect } from "react";
 import { OptionalSpan, RequiredSpan } from "../../components/LabelSpan";
+import httpRequest from "../../api";
 
 function WorkplaceAreaForm({ shown, handleChange, values, setValues, errors }) {
     const [isLoading, setLoading] = useState(false);
@@ -13,8 +13,8 @@ function WorkplaceAreaForm({ shown, handleChange, values, setValues, errors }) {
 
     const fetchData = async () => {
         return {
-            departments: (await axios.get(rootUrl('api/v1/fetch-dept-options'))).data,
-            plants: (await axios.get(rootUrl('api/v1/fetch-plant-options'))).data
+            departments: (await httpRequest.get('api/v1/fetch-dept-options')).data,
+            plants: (await httpRequest.get('api/v1/fetch-plant-options')).data
         };
     };
 
@@ -78,20 +78,20 @@ export default function WorkplaceAreaLayout() {
             addNewItem={{
                 name: "Add Area",
                 form: WorkplaceAreaForm,
-                action: rootUrl('api/v1/add-area'),
+                action: 'api/v1/add-area',
                 initialValues: initialValues
             }}
             editItem={{
                 name: "Edit Area",
                 form: WorkplaceAreaForm,
-                action: rootUrl('api/v1/edit-area'),
-                fetchUrl: rootUrl('api/v1/get-area'),
+                action: 'api/v1/edit-area',
+                fetchUrl: 'api/v1/get-area',
                 initialValues: { ...initialValues }
             }}
             deleteItem={{
-                action: rootUrl('api/v1/delete-area')
+                action: 'api/v1/delete-area'
             }}
-            deleteSelectedItemAction={rootUrl('api/v1/delete-areas')}
+            deleteSelectedItemAction={'api/v1/delete-areas'}
             table={{
                 canSelect: true,
                 columns: [
@@ -113,7 +113,7 @@ export default function WorkplaceAreaLayout() {
                     }
                 ],
                 source: {
-                    url: rootUrl('api/v1/fetch-areas'),
+                    url: 'api/v1/fetch-areas',
                     method: 'GET',
                     produce: item => [
                         item.name,
