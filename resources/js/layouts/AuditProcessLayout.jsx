@@ -348,7 +348,7 @@ function AuditProcessForm({ setAuditResult }) {
 
         await waitForMs(500);
 
-        console.log(submitImageResponse);
+        console.log(submitImagesResponse);
         console.log(submitResponse);
         setSubmitting(false);
         setAuditResult(submitResponse.data.result_data);

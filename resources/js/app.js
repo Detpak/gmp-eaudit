@@ -19,6 +19,7 @@ $(function() {
     }
 
     httpRequest.rootUrl = document.querySelector("meta[name='root-url']").content;
+    document.querySelector("meta[name='root-url']").remove();
 
     window.globalStateStore = createStore();
     window.globalStateStore.setState("toastMsg", { toastShown: false, msg: "" });
