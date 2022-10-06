@@ -45,7 +45,7 @@ export default function CriteriaLayout() {
             editItem={{
                 name: "Edit Criteria",
                 form: CriteriaForm,
-                allowEditIf: item => item.groups_count == 0,
+                allowEditIf: item => item.groups_count > 0,
                 action: 'api/v1/edit-criteria',
                 fetchUrl: 'api/v1/get-criteria',
                 initialValues: { ...initialValues }
