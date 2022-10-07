@@ -446,7 +446,7 @@ function AuditProcessForm({ setAuditResult }) {
                             </tbody>
                         </Table>
                         <Form.Group id="record_id" className="mb-3">
-                            <Form.Label>Area</Form.Label>
+                            <Form.Label className="fw-bold">Area</Form.Label>
                             <DropdownList
                                 source={`api/v1/fetch-records?list=1&cycle=${cycle.id}`}
                                 selectedItem={record}
@@ -467,7 +467,7 @@ function AuditProcessForm({ setAuditResult }) {
                             )}
                             {deptPIC.length > 0 && (
                                 <>
-                                    <div className="my-2">Department's PIC:</div>
+                                    <div className="my-1"><small>Department's PIC:</small></div>
                                     <ListGroup style={{ maxHeight: 200 }}>
                                         {deptPIC.map((value, index) => (
                                             <ListGroup.Item key={index}>{value.name}</ListGroup.Item>
@@ -477,7 +477,7 @@ function AuditProcessForm({ setAuditResult }) {
                             )}
                         </Form.Group>
                         <Form.Group>
-                            <Form.Label>Criteria Finding</Form.Label>
+                            <Form.Label className="fw-bold">Criteria Finding</Form.Label>
                             <ListGroup>
                                 {criterias.map((data, index) => {
                                     return (
@@ -498,6 +498,7 @@ function AuditProcessForm({ setAuditResult }) {
                                                         id={`${index}_0`}
                                                         autoComplete="off" />
                                                     <label className="btn btn-outline-success" htmlFor={`${index}_0`}>Pass</label>
+                                                    {/* TODO(native-m): Replace "fail" */}
                                                     <input
                                                         type="radio"
                                                         className="btn-check"
@@ -578,7 +579,7 @@ function AuditProcessForm({ setAuditResult }) {
                         </Form.Group>
                         {criterias.length > 0 &&
                             <Form.Group className="mt-3">
-                                <Form.Label>Summary</Form.Label>
+                                <Form.Label className="fw-bold">Summary</Form.Label>
                                 <Table className="align-middle">
                                     <tbody>
                                         <tr>
