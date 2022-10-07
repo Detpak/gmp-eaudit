@@ -477,7 +477,7 @@ function AuditProcessForm({ setAuditResult }) {
                             )}
                         </Form.Group>
                         <Form.Group>
-                            <Form.Label className="fw-bold">Criteria Finding</Form.Label>
+                            <Form.Label className="fw-bold">Case Found</Form.Label>
                             <ListGroup>
                                 {criterias.map((data, index) => {
                                     return (
