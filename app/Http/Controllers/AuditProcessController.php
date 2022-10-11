@@ -17,18 +17,26 @@ class AuditProcessController extends Controller
 {
     public function apiSubmitAudit(Request $request)
     {
+        $wrap = [
+            'cycle_id' => $request->cycle_id,
+            'auditor_id' => $request->auditor_id,
+            'record_id' => $request->record_id,
+            'cgroup_id' => $request->cgroup_id,
+            'findings' => json_decode($request->findings, true)
+        ];
+
         $validator = Validator::make(
-            $request->all(),
+            $wrap,
             [
-                'cycle_id'                          => 'required|exists:audit_cycles,id',
-                'record_id'                         => 'required|exists:audit_records,id',
-                'cgroup_id'                         => 'required|exists:criteria_groups,id',
-                'criteria_passes.*.info'            => 'required_if:criteria_passes.*.fail,true',
-                'criteria_passes.*.info.category'   => ['required_if:criteria_passes.*.fail,true', Rule::in([0, 1, 2])],
-                'criteria_passes.*.info.desc'       => 'required_if:criteria_passes.*.fail,true|max:65536'
+                'cycle_id'                      => 'required|exists:audit_cycles,id',
+                'auditor_id'                    => 'required|exists:users,id',
+                'record_id'                     => 'required|exists:audit_records,id',
+                'cgroup_id'                     => 'required|exists:criteria_groups,id',
+                'findings.*.category'           => ['required_if:findings.*.need_action,true', Rule::in([0, 1, 2])],
+                'findings.*.desc'               => 'required_if:findings.*.need_action,true|max:65536'
             ],
             [
-                'criteria_passes.*.info.desc.required_if' => 'Description must be filled'
+                'findings.*.desc.required_if'   => 'Description must be filled'
             ],
             [
                 'record_id' => 'area'
@@ -38,21 +46,24 @@ class AuditProcessController extends Controller
             return ['formError' => $validator->errors()];
         }
 
+        //return ['result' => 'ok', 'wrap' => $wrap];
+
         // Check if the audit is not started
         $record = AuditRecord::select('id', 'code', 'status', 'area_id')->find($request->record_id);
         if ($record->status > 0) {
             return [
                 'formError' => [
-                    'record_id' => ['Cannot submit audit. The area has been submitted previously.']
+                    'record_id' => ['Cannot submit audit. The area has been auditted previously.']
                 ],
             ];
         }
 
         // Filter passed criterias
-        $failedCriteria = collect($request->criteria_passes)
-            ->filter(function ($value) {
-                return $value['fail'];
-            });
+        $failedCriteria = collect($wrap['findings'])
+            ->filter(function ($value) { return $value['need_action']; })
+            ->map(function ($value, $key) { return [...$value, 'case_id' => $key]; } );
+
+        //dd($failedCriteria);
 
         // Get failed criteria parameters
         $failedCriteriaIds = $failedCriteria->map(function ($value) { return $value['id']; });
@@ -78,10 +89,11 @@ class AuditProcessController extends Controller
                     'ca_weight' => $value[1]->weight,
                     'cg_name' => $criteriaGroup->name,
                     'cg_code' => $criteriaGroup->code,
-                    'category' => $value[0]['info']['category'],
-                    'desc' => $value[0]['info']['desc'],
+                    'category' => $value[0]['category'],
+                    'desc' => $value[0]['desc'],
                     'created_at' => Carbon::now(),
                     'updated_at' => Carbon::now(),
+                    'case_id' => $value[0]['case_id']
                 ];
             });
 
@@ -104,8 +116,9 @@ class AuditProcessController extends Controller
 
         return [
             'result' => 'ok',
-            'failedIds' => $failedCriteriaIds,
-            'failedParams' => $failedCriteriaParams,
+            'failed_ids' => $failedCriteriaIds,
+            'failed_params' => $failedCriteriaParams,
+            'failed_case' => $failedCriteria,
             'result_data' => [
                 'cycle_id' => $cycle->cycle_id,
                 'record_code' => $record->code,

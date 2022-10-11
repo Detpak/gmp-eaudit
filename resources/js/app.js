@@ -8,6 +8,7 @@ import { BrowserRouter } from 'react-router-dom';
 import { createStore } from 'state-pool';
 import AuditProcessLayout from './layouts/AuditProcessLayout';
 import httpRequest from './api';
+import 'chart.js/auto';
 
 $(function() {
     axios.defaults.headers.common["X-Requested-With"] ="XMLHttpRequest";

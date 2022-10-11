@@ -3,6 +3,7 @@ import React from "react";
 import { useRef } from "react";
 import { useEffect, useState } from "react";
 import { Dropdown, Form, Spinner } from "react-bootstrap";
+import httpRequest from "../api";
 import { useIsMounted } from "../utils";
 
 export default function DropdownList({ source, selectedItem, setSelectedItem, caption, title, children }) {
@@ -32,7 +33,7 @@ export default function DropdownList({ source, selectedItem, setSelectedItem, ca
             max: 8
         };
 
-        axios.get(source, { params: params, signal: abortController.current.signal })
+        httpRequest.get(source, { params: params, signal: abortController.current.signal })
             .then((response) => {
                 if (append) {
                     if (response.data.total == listData.length) {

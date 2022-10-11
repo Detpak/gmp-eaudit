@@ -3,7 +3,6 @@ import axios from "axios";
 const httpRequest = {
     rootUrl: '',
     checkToken: function (response) {
-        console.log(response);
         if (response.data.result === 'invalid_token') {
             window.location.replace(this.rootUrl + 'deauth');
         }

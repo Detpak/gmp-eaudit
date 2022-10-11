@@ -1,5 +1,4 @@
-import 'chart.js/auto';
-import { faArrowLeft, faEnvelopesBulk, faImage } from "@fortawesome/free-solid-svg-icons";
+import { faArrowLeft, faCheck, faCircleExclamation, faEnvelopesBulk, faImage } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import axios from "axios";
 import _ from "lodash";
@@ -13,6 +12,7 @@ import FileInput from "../components/FileInput";
 import CountUp from 'react-countup';
 import { scrollToElementById, waitForMs } from "../utils";
 import httpRequest from '../api';
+import { data } from "jquery";
 
 function AuditProcessResult({ auditResult, setAuditResult }) {
     const [score, setScore] = useState(0);
@@ -79,16 +79,16 @@ function AuditProcessResult({ auditResult, setAuditResult }) {
                             <td>{auditResult.area_name} ({auditResult.dept_name})</td>
                         </tr>
                         <tr>
-                            <th>Criteria Passed:</th>
+                            <th>Case Passed:</th>
                             <td>{auditResult.num_criterias - auditResult.findings.length}</td>
                         </tr>
                         <tr>
-                            <th>Criteria Failed:</th>
+                            <th>Case Failed:</th>
                             <td>{auditResult.findings.length}</td>
                         </tr>
                     </tbody>
                 </Table>
-                <div className="mb-3">Failed Criteria:</div>
+                <div className="mb-3">Failed Case:</div>
                 {auditResult.findings.length > 0 ? (
                     <Accordion alwaysOpen>
                         {auditResult.findings.map((finding, key) => (
@@ -133,7 +133,7 @@ function AuditProcessResult({ auditResult, setAuditResult }) {
                     </Accordion>
                 ) : (
                     <Card>
-                        <Card.Body className="text-center">No failed criteria.</Card.Body>
+                        <Card.Body className="text-center">No failed case.</Card.Body>
                     </Card>
                 )}
             </Card.Body>
@@ -160,7 +160,7 @@ function AuditProcessForm({ setAuditResult }) {
     const [deptPIC, setDeptPIC] = useState([]);
     //const [isLoadingCriteria, setLoadingCriteria] = useState(false);
     const [isLoadingDeptPIC, setLoadingDeptPIC] = useState(false);
-    const [criteriaPasses, setCriteriaPasses] = useState([]);
+    const [cases, setCases] = useState([]);
     const [formError, setFormError] = useState(null);
     const [isSubmitting, setSubmitting] = useState(false);
     const [submitMsg, setSubmitMsg] = useState('');
@@ -200,7 +200,7 @@ function AuditProcessForm({ setAuditResult }) {
         let index = 0;
 
         for (const criteria of criterias) {
-            if (!passes[index].fail) {
+            if (!passes[index].need_action) {
                 tmpTotalWeight += criteria.weight;
                 tmpCriteriaPassed += 1;
             }
@@ -230,138 +230,124 @@ function AuditProcessForm({ setAuditResult }) {
     // };
 
     const handlePassesBtn = (ev, index) => {
-        const tmpCriteriaPasses = criteriaPasses.slice();
-        tmpCriteriaPasses[index].fail = ev.target.value !== 'true';
+        const tmpCases = cases.slice();
+        tmpCases[index].need_action = ev.target.value !== 'true';
 
-        if (tmpCriteriaPasses[index].fail) {
-            tmpCriteriaPasses[index].info = {
+        if (tmpCases[index].need_action) {
+            tmpCases[index].info = {
                 desc: '',
                 category: 0,
                 photos: []
             };
         }
 
-        setCriteriaPasses(tmpCriteriaPasses);
-        recalculateSummary(tmpCriteriaPasses);
+        setCases(tmpCases);
+        recalculateSummary(tmpCases);
     };
 
     const handleCategoryBtn = (ev, index) => {
-        const tmpCriteriaPasses = criteriaPasses.slice();
+        const tmpCriteriaPasses = cases.slice();
         tmpCriteriaPasses[index].info.category = ev.target.value;
 
-        setCriteriaPasses(tmpCriteriaPasses);
+        setCases(tmpCriteriaPasses);
         recalculateSummary(tmpCriteriaPasses);
     };
 
     const handleSubmit = async () => {
-        const formData = {};
+        const formData = new FormData();
 
         setMaxProgress(100);
-        setSubmitMsg('Saving Information...');
+        setSubmitMsg('Submitting...');
 
         try {
             if (cycle) {
-                formData.cycle_id = cycle.id;
-            }
-
-            if (user) {
-                formData.auditor_id = user.id;
+                formData.append('cycle_id', cycle.id);
             }
 
             if (record) {
-                formData.record_id = record.id;
+                formData.append('record_id', record.id);
+            }
+
+            if (user) {
+                formData.append('auditor_id', user.id);
             }
 
             if (criteriaGroup) {
-                formData.cgroup_id = criteriaGroup.id;
+                formData.append('cgroup_id', criteriaGroup.id);
             }
 
-            if (criteriaPasses.length > 0) {
-                formData.criteria_passes = criteriaPasses.map((data) => {
-                    const tmpData = _.cloneDeep(data);
-                    if (tmpData.info) {
-                        delete tmpData.info.photos;
-                    }
-                    return tmpData;
-                });
+            if (cases.length > 0) {
+                const findings = cases
+                    .map(finding => {
+                        const data = { id: finding.id, need_action: finding.need_action };
+
+                        if (finding.need_action) {
+                            data.category = finding.info.category;
+                            data.desc = finding.info.desc;
+                        }
+
+                        return data;
+                    });
+
+                console.log(findings);
+                formData.append('findings', JSON.stringify(findings));
+
+                const findingImages = cases.map((data) => data.info ? data.info.photos : null);
+
+                findingImages
+                    .filter(data => data != null && data.length > 0)
+                    .flat()
+                    .forEach(image => formData.append('images', image));
+
+                // Make case index references for the image
+                _.zip(findingImages, cases)
+                    .map((finding, index) => finding[0] ? finding[0].map(() => index) : null)
+                    .filter(data => data != null)
+                    .flat()
+                    .forEach(index => formData.append('imageIndexes', index));
             }
         }
         catch (ex) {
             console.log(ex);
         }
 
-        //console.log(formData);
-        //console.log(JSON.stringify(formData));
+        console.log(Object.fromEntries(formData));
 
-        const submitResponse = await axios.post('api/v1/submit-audit', formData);
+        const config = {
+            onUploadProgress: progressEvent => {
+                setSubmitProgress(Math.round(progressEvent.loaded) / progressEvent.total * 90);
+            }
+        };
 
-        if (submitResponse.data.formError) {
-            await waitForMs(500);
-            const errors = _.mapValues(submitResponse.data.formError, (value) => value[0]);
+        const response = await httpRequest.post('api/v1/submit-audit', formData, config);
+
+        setSubmitProgress(100);
+
+        await waitForMs(500);
+
+        if (response.data.formError) {
+            const errors = _.mapValues(response.data.formError, (value) => value[0]);
+            console.log(errors);
             setFormError(errors);
             setSubmitting(false);
             return;
         }
 
-        await waitForMs(250);
-        setSubmitProgress(10);
-        setSubmitMsg('Uploading Images...');
-
-        let imageFindingCodes = [];
-        let imageUploads = [];
-
-        try {
-            const failedCriteriaImages = criteriaPasses
-                .map((data) => data.info)
-                .filter((data) => data != null && data.photos.length > 0)
-                .map((data) => data.photos);
-
-            imageFindingCodes = _.zip(failedCriteriaImages, submitResponse.data.result_data.findings)
-                .map((findingInfo) => findingInfo[0].map(() => findingInfo[1].code)) // Replicate the code for each images
-                .flat();
-
-            imageUploads = failedCriteriaImages.flat();
-        }
-        catch (ex) {
-            console.debug(ex);
-        }
-
-        const imageUploadFormData = new FormData();
-
-        imageUploadFormData.append('record_id', formData.record_id);
-
-        for (const imageFindingCode of imageFindingCodes) {
-            imageUploadFormData.append('codes', imageFindingCode);
-        }
-
-        for (const image of imageUploads) {
-            imageUploadFormData.append('images', image);
-        }
-
-        const config = {
-            onUploadProgress: progressEvent => {
-                setSubmitProgress(10 + Math.round(progressEvent.loaded) / progressEvent.total * 90);
-            }
-        };
-
-        const submitImagesResponse = await axios.put('api/v1/submit-audit-images', imageUploadFormData, config);
-
-        await waitForMs(500);
-
-        console.log(submitImagesResponse);
-        console.log(submitResponse);
+        setFormError(null);
         setSubmitting(false);
         setAuditResult(submitResponse.data.result_data);
+
+        return;
     };
 
     useEffect(() => {
         const passes = criterias.map((data) => ({
             id: data.id,
-            fail: false,
+            need_action: false,
             info: null
         }));
 
-        setCriteriaPasses(passes);
+        setCases(passes);
         recalculateSummary(passes);
     }, [criterias]);
 
@@ -493,43 +479,43 @@ function AuditProcessForm({ setAuditResult }) {
                                                         className="btn-check"
                                                         name={data.id}
                                                         value={true}
-                                                        checked={!criteriaPasses[index].fail}
+                                                        checked={!cases[index].need_action}
                                                         onChange={(ev) => handlePassesBtn(ev, index)}
                                                         id={`${index}_0`}
                                                         autoComplete="off" />
-                                                    <label className="btn btn-outline-success" htmlFor={`${index}_0`}>Pass</label>
+                                                    <label className="btn btn-outline-success" htmlFor={`${index}_0`}><FontAwesomeIcon icon={faCheck} /></label>
                                                     {/* TODO(native-m): Replace "fail" */}
                                                     <input
                                                         type="radio"
                                                         className="btn-check"
                                                         name={data.id}
                                                         value={false}
-                                                        checked={criteriaPasses[index].fail}
+                                                        checked={cases[index].need_action}
                                                         onChange={(ev) => handlePassesBtn(ev, index)}
                                                         id={`${index}_1`}
                                                         autoComplete="off"/>
-                                                    <label className="btn btn-outline-danger" htmlFor={`${index}_1`}>Fail</label>
+                                                    <label className="btn btn-outline-danger" htmlFor={`${index}_1`}><FontAwesomeIcon icon={faCircleExclamation} /></label>
                                                 </div>
                                             </div>
-                                            {criteriaPasses[index].fail && (
+                                            {cases[index].need_action && (
                                                 <div>
                                                     <hr/>
-                                                    <Form.Group id={`criteria_passes.${index}.info.desc`} className="mb-3">
+                                                    <Form.Group id={`findings.${index}.desc`} className="mb-3">
                                                         <Form.Label>Description</Form.Label>
                                                         <Form.Control
                                                             as="textarea"
                                                             rows={3}
-                                                            value={criteriaPasses[index].info.desc}
+                                                            value={cases[index].info.desc}
                                                             onChange={(ev) => {
-                                                                const tmpCriteriaPasses = criteriaPasses.slice();
-                                                                tmpCriteriaPasses[index].info.desc = ev.target.value;
-                                                                setCriteriaPasses(tmpCriteriaPasses);
+                                                                const tmpCases = cases.slice();
+                                                                tmpCases[index].info.desc = ev.target.value;
+                                                                setCases(tmpCases);
                                                             }}
-                                                            isInvalid={formError && formError[`criteria_passes.${index}.info.desc`]}
+                                                            isInvalid={formError && formError[`findings.${index}.desc`]}
                                                         />
                                                         <Form.Control.Feedback type="invalid">
-                                                            {formError && formError[`criteria_passes.${index}.info.desc`] ?
-                                                                formError[`criteria_passes.${index}.info.desc`] : ''
+                                                            {formError && formError[`findings.${index}.desc`] ?
+                                                                formError[`findings.${index}.desc`] : ''
                                                             }
                                                         </Form.Control.Feedback>
                                                     </Form.Group>
@@ -544,7 +530,7 @@ function AuditProcessForm({ setAuditResult }) {
                                                                             className="btn-check"
                                                                             name={`pass_catergory_${index}`}
                                                                             value={categoryIndex}
-                                                                            checked={criteriaPasses[index].info.category == categoryIndex}
+                                                                            checked={cases[index].info.category == categoryIndex}
                                                                             onChange={(ev) => handleCategoryBtn(ev, index)}
                                                                             id={`pass_catergory_${index}_${categoryIndex}`}
                                                                             autoComplete="off" />
@@ -560,11 +546,11 @@ function AuditProcessForm({ setAuditResult }) {
                                                         <Form.Label>Images</Form.Label>
                                                         <FileInput
                                                             accept="image/*"
-                                                            files={criteriaPasses[index].info.photos}
+                                                            files={cases[index].info.photos}
                                                             setFiles={(files) => {
-                                                                const tmpCriteriaPasses = criteriaPasses.slice();
-                                                                tmpCriteriaPasses[index].info.photos = files;
-                                                                setCriteriaPasses(tmpCriteriaPasses);
+                                                                const tmpCases = cases.slice();
+                                                                tmpCases[index].info.photos = files;
+                                                                setCases(tmpCases);
                                                             }}
                                                         >
                                                             <FontAwesomeIcon icon={faImage} /> Add Images

@@ -77,7 +77,7 @@ function AuditCycleForm({ shown, handleChange, values, setValues, errors }) {
                     title="Please Select Criteria Group"
                 >
                     {({ data }) => (
-                        <span>{data.name}</span>
+                        <span>{data.name} ({data.code})</span>
                     )}
                 </DropdownList>
                 <input type="hidden" className={!!errors.cgroup_id ? 'is-invalid' : ''} />

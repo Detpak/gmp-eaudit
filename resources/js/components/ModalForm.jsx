@@ -5,6 +5,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { Modal, Button, Form } from "react-bootstrap";
 import LoadingButton from "./LoadingButton";
 import $ from 'jquery';
+import httpRequest from "../api";
 
 // export default class ModalForm extends React.Component {
 //     constructor(props) {
@@ -130,7 +131,7 @@ export default function ModalForm({ action, fetchUrl, initialValues, title, size
         ev.preventDefault();
 
         setSubmitting(true);
-        const response = await axios.post(action, values, { headers: { 'Content-Type': 'application/json' } });
+        const response = await httpRequest.post(action, values, { headers: { 'Content-Type': 'application/json' } });
 
         if (response.data.formError) {
             const newErrors = {};
