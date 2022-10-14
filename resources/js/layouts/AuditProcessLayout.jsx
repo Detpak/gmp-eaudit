@@ -1,18 +1,57 @@
-import { faArrowLeft, faCheck, faCircleExclamation, faEnvelopesBulk, faImage } from "@fortawesome/free-solid-svg-icons";
+import { faArrowLeft, faCheck, faChevronLeft, faChevronRight, faCircleExclamation, faEnvelopesBulk, faImage } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import axios from "axios";
 import _ from "lodash";
 import React, { useState } from "react";
 import { useRef } from "react";
 import { useEffect } from "react";
-import { Accordion, Button, Card, Form, ListGroup, Modal, ProgressBar, Spinner, Table } from "react-bootstrap";
+import { Accordion, Button, Card, Carousel, Form, ListGroup, Modal, ProgressBar, Spinner, Table } from "react-bootstrap";
 import { Doughnut } from "react-chartjs-2";
 import DropdownList from "../components/DropdownList";
 import FileInput from "../components/FileInput";
 import CountUp from 'react-countup';
 import { scrollToElementById, waitForMs } from "../utils";
 import httpRequest from '../api';
-import { data } from "jquery";
+
+function ShowImageModal({ imageDescriptors }) {
+    const [shown, setShown] = useState(false);
+    const [currentImage, setCurrentImage] = useState(0);
+
+    return (
+        <>
+            <Button className="d-block w-100" onClick={() => setShown(true)}>
+                Show Images
+            </Button>
+            <Modal
+                show={shown}
+                onHide={() => setShown(false)}
+            >
+                <Modal.Header closeButton>
+                    <Modal.Title>Images</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    <div className="hstack gap-2 mb-3">
+                        <Button
+                            className="px-3"
+                            onClick={() => setCurrentImage(Math.max(currentImage - 1, 0))}
+                        >
+                            <FontAwesomeIcon icon={faChevronLeft} />
+                        </Button>
+                        <div className="flex-fill text-center">{currentImage + 1}/{imageDescriptors.length}</div>
+                        <Button
+                            className="px-3"
+                            onClick={() => setCurrentImage(Math.min(currentImage + 1, imageDescriptors.length - 1))}
+                        >
+                            <FontAwesomeIcon icon={faChevronRight} />
+                        </Button>
+                    </div>
+                    {imageDescriptors.map((image, key) => (
+                        <img key={key} src={image.file} className={`w-100 ${currentImage == key ? '' : 'd-none'}`} />
+                    ))}
+                </Modal.Body>
+            </Modal>
+        </>
+    )
+}
 
 function AuditProcessResult({ auditResult, setAuditResult }) {
     const [score, setScore] = useState(0);
@@ -127,6 +166,13 @@ function AuditProcessResult({ auditResult, setAuditResult }) {
                                             </div>
                                         </div>
                                     </Form.Group>
+                                    {/* Check whether the case has the image */}
+                                    {auditResult.images[finding.case_id] != null &&
+                                        <Form.Group className="mb-3">
+                                            <Form.Label>Images</Form.Label>
+                                            <ShowImageModal imageDescriptors={auditResult.images[finding.case_id]} />
+                                        </Form.Group>
+                                    }
                                 </Accordion.Body>
                             </Accordion.Item>
                         ))}
@@ -297,14 +343,14 @@ function AuditProcessForm({ setAuditResult }) {
                 findingImages
                     .filter(data => data != null && data.length > 0)
                     .flat()
-                    .forEach(image => formData.append('images', image));
+                    .forEach(image => formData.append('images[]', image));
 
                 // Make case index references for the image
                 _.zip(findingImages, cases)
                     .map((finding, index) => finding[0] ? finding[0].map(() => index) : null)
                     .filter(data => data != null)
                     .flat()
-                    .forEach(index => formData.append('imageIndexes', index));
+                    .forEach(index => formData.append('imageIndexes[]', index));
             }
         }
         catch (ex) {
@@ -314,6 +360,7 @@ function AuditProcessForm({ setAuditResult }) {
         console.log(Object.fromEntries(formData));
 
         const config = {
+            headers: { 'Content-Type': 'multipart/form-data' },
             onUploadProgress: progressEvent => {
                 setSubmitProgress(Math.round(progressEvent.loaded) / progressEvent.total * 90);
             }
@@ -322,7 +369,6 @@ function AuditProcessForm({ setAuditResult }) {
         const response = await httpRequest.post('api/v1/submit-audit', formData, config);
 
         setSubmitProgress(100);
-
         await waitForMs(500);
 
         if (response.data.formError) {
@@ -335,8 +381,7 @@ function AuditProcessForm({ setAuditResult }) {
 
         setFormError(null);
         setSubmitting(false);
-        setAuditResult(submitResponse.data.result_data);
-
+        setAuditResult(response.data.result_data);
         return;
     };
 

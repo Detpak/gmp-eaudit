@@ -7,9 +7,11 @@ use App\Models\AuditFinding;
 use App\Models\AuditRecord;
 use App\Models\Criteria;
 use App\Models\CriteriaGroup;
+use App\Models\FailedPhoto;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 use stdClass;
 
@@ -46,7 +48,17 @@ class AuditProcessController extends Controller
             return ['formError' => $validator->errors()];
         }
 
-        //return ['result' => 'ok', 'wrap' => $wrap];
+        $publicPath = public_path('case_images');
+        $files = [];
+
+        if ($request->hasFile(('images'))) {
+            foreach ($request->file('images') as $file) {
+                $date = Carbon::now();
+                $filename = $date->valueOf() . '_' . Str::random(8) . '.' . $file->getClientOriginalExtension();
+                $file->move($publicPath, $filename);
+                $files[] = ['filename' => $filename, 'date' => $date];
+            }
+        }
 
         // Check if the audit is not started
         $record = AuditRecord::select('id', 'code', 'status', 'area_id')->find($request->record_id);
@@ -78,7 +90,8 @@ class AuditProcessController extends Controller
         $totalFindings = $cycle->total_findings;
 
         // Create audit findings data
-        $auditFindings = $failedCriteria->zip($failedCriteriaParams)
+        $auditFindings = $failedCriteria
+            ->zip($failedCriteriaParams)
             ->map(function ($value, $key) use($criteriaGroup, $request, $totalFindings) {
                 $code = str_pad($totalFindings + $key + 1, 4, "0", STR_PAD_LEFT);
                 return [
@@ -97,6 +110,18 @@ class AuditProcessController extends Controller
                 ];
             });
 
+        $casePhotos = collect($files)
+            ->zip($request->imageIndexes)
+            ->map(function ($value) use($request) {
+                return [
+                    'filename' => $value[0]['filename'],
+                    'record_id' => $request->record_id,
+                    'case_id' => $value[1],
+                    'created_at' => $value[0]['date'],
+                    'updated_at' => $value[0]['date']
+                ];
+            });
+
         // Update the number of total findings
         $totalFindings += $failedCriteriaParams->count();
         $cycle->total_findings = $totalFindings;
@@ -107,6 +132,7 @@ class AuditProcessController extends Controller
         $record->auditor_id = $tokenSplit[0];
 
         try {
+            //FailedPhoto::insert($casePhotos->toArray());
             //AuditFinding::insert($auditFindings->toArray());
             //$record->save();
             //$cycle->save();
@@ -126,6 +152,14 @@ class AuditProcessController extends Controller
                 'dept_name' => $record->area->department->name,
                 'num_criterias' => $criteriaGroup->criterias->count(),
                 'findings' => $auditFindings,
+                'images' => $casePhotos
+                    ->map(function ($value) {
+                        return [
+                            'case_id' => $value['case_id'],
+                            'file' => asset('case_images/' . $value['filename'])
+                        ];
+                    })
+                    ->groupBy('case_id'),
             ]
         ];
     }
