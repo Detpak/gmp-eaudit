@@ -10,6 +10,7 @@ use App\Models\CriteriaGroup;
 use App\Models\FailedPhoto;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
@@ -56,7 +57,7 @@ class AuditProcessController extends Controller
                 $date = Carbon::now();
                 $filename = $date->valueOf() . '_' . Str::random(8) . '.' . $file->getClientOriginalExtension();
                 $file->move($publicPath, $filename);
-                $files[] = ['filename' => $filename, 'date' => $date];
+                $files[] = ['filename' => $filename, 'date' => $date->toDateString()];
             }
         }
 
@@ -94,6 +95,7 @@ class AuditProcessController extends Controller
             ->zip($failedCriteriaParams)
             ->map(function ($value, $key) use($criteriaGroup, $request, $totalFindings) {
                 $code = str_pad($totalFindings + $key + 1, 4, "0", STR_PAD_LEFT);
+                $category = $value[0]['category'];
                 return [
                     'code' => "GMP/2201/{$code}",
                     'record_id' => $request->record_id,
@@ -102,20 +104,21 @@ class AuditProcessController extends Controller
                     'ca_weight' => $value[1]->weight,
                     'cg_name' => $criteriaGroup->name,
                     'cg_code' => $criteriaGroup->code,
-                    'category' => $value[0]['category'],
+                    'category' => $category,
+                    'weight_deduct' => [0, 50, 100][$category],
                     'desc' => $value[0]['desc'],
-                    'created_at' => Carbon::now(),
-                    'updated_at' => Carbon::now(),
+                    'created_at' => Carbon::now()->toDateTimeString(),
+                    'updated_at' => Carbon::now()->toDateTimeString(),
                     'case_id' => $value[0]['case_id']
                 ];
             });
 
+        // Create image data
         $casePhotos = collect($files)
             ->zip($request->imageIndexes)
             ->map(function ($value) use($request) {
                 return [
                     'filename' => $value[0]['filename'],
-                    'record_id' => $request->record_id,
                     'case_id' => $value[1],
                     'created_at' => $value[0]['date'],
                     'updated_at' => $value[0]['date']
@@ -131,20 +134,41 @@ class AuditProcessController extends Controller
         $record->status = $totalFindings > 0 ? 1 : 2;
         $record->auditor_id = $tokenSplit[0];
 
+        //dd($auditFindings->toArray());
+
+        $findingIds = [];
         try {
-            //FailedPhoto::insert($casePhotos->toArray());
-            //AuditFinding::insert($auditFindings->toArray());
-            //$record->save();
-            //$cycle->save();
-        } catch (\Throwable $th) {
-            return ['result' => 'error', 'msg' => 'An error occurred when submitting reports.', 'details' => $th->getMessage()];
+            foreach ($auditFindings as $value) {
+                $findingIds[$value['case_id']] = AuditFinding::insertGetId($value);
+            }
+
+            // Set where the image belongs to the finding
+            $images = $casePhotos
+                ->map(function ($value) use ($findingIds) {
+                    return [
+                        'filename' => $value['filename'],
+                        'finding_id' => $findingIds[$value['case_id']],
+                        'created_at' => $value['created_at'],
+                        'updated_at' => $value['updated_at'],
+                    ];
+                })
+                ->toArray();
+
+            FailedPhoto::insert($images);
+            $record->save();
+            $cycle->save();
+        }
+        catch (\Throwable $th) {
+            AuditFinding::where('record_id', $request->record_id)->delete();
+            return [
+                'result' => 'error',
+                'msg' => 'An error occurred when submitting reports.',
+                'details' => $th->getMessage()
+            ];
         }
 
         return [
             'result' => 'ok',
-            'failed_ids' => $failedCriteriaIds,
-            'failed_params' => $failedCriteriaParams,
-            'failed_case' => $failedCriteria,
             'result_data' => [
                 'cycle_id' => $cycle->cycle_id,
                 'record_code' => $record->code,
@@ -153,13 +177,10 @@ class AuditProcessController extends Controller
                 'num_criterias' => $criteriaGroup->criterias->count(),
                 'findings' => $auditFindings,
                 'images' => $casePhotos
-                    ->map(function ($value) {
-                        return [
-                            'case_id' => $value['case_id'],
-                            'file' => asset('case_images/' . $value['filename'])
-                        ];
+                    ->groupBy('case_id')
+                    ->map(function ($case) {
+                        return $case->map(function ($image) { return asset('case_images/' . $image['filename']); });
                     })
-                    ->groupBy('case_id'),
             ]
         ];
     }
@@ -173,25 +194,49 @@ class AuditProcessController extends Controller
     {
         $query = AuditFinding::query();
 
+        $query->withCount('images');
+
         $query->join('audit_records', 'audit_records.id', '=', 'audit_findings.record_id')
               ->join('areas', 'areas.id', '=', 'audit_records.area_id')
-              ->select('audit_records.code as record_code',
+              ->select('audit_findings.id',
+                       'audit_findings.record_id',
                        'audit_findings.code',
+                       'audit_records.code as record_code',
                        'areas.name as area_name',
                        'audit_findings.desc',
+                       'audit_findings.category',
                        'audit_findings.ca_name',
                        'audit_findings.ca_code',
                        'audit_findings.ca_weight',
                        'audit_findings.cg_name',
-                       'audit_findings.cg_code');
+                       'audit_findings.cg_code',
+                       DB::raw('audit_findings.ca_weight * (audit_findings.weight_deduct / 100) as deducted_weight'),
+                       'audit_findings.case_id');
+
+        if ($request->search) {
+            $query->where('audit_records.code', 'LIKE', "%{$request->search}%")
+                ->orWhere('areas.name', 'LIKE', "%{$request->search}%")
+                ->orWhere('audit_findings.code', 'LIKE', "{$request->search}")
+                ->orWhere('audit_findings.ca_name', 'LIKE', "%{$request->search}%")
+                ->orWhere('audit_findings.ca_weight', 'LIKE', "%{$request->search}%")
+                ->orWhere('audit_findings.cg_name', 'LIKE', "%{$request->search}%");
+        }
 
         if ($request->sort && $request->dir) {
             $query->orderBy($request->sort, $request->dir);
         }
         else {
-            $query->orderBy('audit_records.id', 'desc');
+            $query->orderBy('audit_records.id', 'asc');
         }
 
         return $query->paginate($request->max);
+    }
+
+    public function apiFetchImages($findingId)
+    {
+        return FailedPhoto::where('finding_id', $findingId)
+            ->select('filename')
+            ->get()
+            ->map(function ($image) { return asset('case_images/' . $image['filename']); });
     }
 }

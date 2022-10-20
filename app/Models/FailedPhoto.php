@@ -10,8 +10,7 @@ class FailedPhoto extends Model
     use HasFactory;
 
     protected $fillable = [
-        'record_id',
         'filename',
-        'case_id'
+        'finding_id',
     ];
 }

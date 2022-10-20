@@ -11,47 +11,8 @@ import FileInput from "../components/FileInput";
 import CountUp from 'react-countup';
 import { scrollToElementById, waitForMs } from "../utils";
 import httpRequest from '../api';
+import { ImageModal } from "../components/ImageModal";
 
-function ShowImageModal({ imageDescriptors }) {
-    const [shown, setShown] = useState(false);
-    const [currentImage, setCurrentImage] = useState(0);
-
-    return (
-        <>
-            <Button className="d-block w-100" onClick={() => setShown(true)}>
-                Show Images
-            </Button>
-            <Modal
-                show={shown}
-                onHide={() => setShown(false)}
-            >
-                <Modal.Header closeButton>
-                    <Modal.Title>Images</Modal.Title>
-                </Modal.Header>
-                <Modal.Body>
-                    <div className="hstack gap-2 mb-3">
-                        <Button
-                            className="px-3"
-                            onClick={() => setCurrentImage(Math.max(currentImage - 1, 0))}
-                        >
-                            <FontAwesomeIcon icon={faChevronLeft} />
-                        </Button>
-                        <div className="flex-fill text-center">{currentImage + 1}/{imageDescriptors.length}</div>
-                        <Button
-                            className="px-3"
-                            onClick={() => setCurrentImage(Math.min(currentImage + 1, imageDescriptors.length - 1))}
-                        >
-                            <FontAwesomeIcon icon={faChevronRight} />
-                        </Button>
-                    </div>
-                    {imageDescriptors.map((image, key) => (
-                        <img key={key} src={image.file} className={`w-100 ${currentImage == key ? '' : 'd-none'}`} />
-                    ))}
-                </Modal.Body>
-            </Modal>
-        </>
-    )
-}
 
 function AuditProcessResult({ auditResult, setAuditResult }) {
     const [score, setScore] = useState(0);
@@ -170,7 +131,7 @@ function AuditProcessResult({ auditResult, setAuditResult }) {
                                     {auditResult.images[finding.case_id] != null &&
                                         <Form.Group className="mb-3">
                                             <Form.Label>Images</Form.Label>
-                                            <ShowImageModal imageDescriptors={auditResult.images[finding.case_id]} />
+                                            <ImageModal imageDescriptors={auditResult.images[finding.case_id]} />
                                         </Form.Group>
                                     }
                                 </Accordion.Body>

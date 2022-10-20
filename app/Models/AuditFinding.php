@@ -18,7 +18,14 @@ class AuditFinding extends Model
         'cg_name',
         'cg_code',
         'category',
+        'weight_deduct',
         'desc',
         'approved',
+        'case_id',
     ];
+
+    public function images()
+    {
+        return $this->hasMany(FailedPhoto::class, 'finding_id', 'finding_id');
+    }
 }

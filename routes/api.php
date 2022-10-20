@@ -51,6 +51,7 @@ Route::prefix('/v1')->group(function() {
 
         // Audit findings APIs
         Route::get('/fetch-findings', [AuditProcessController::class, 'apiFetch']);
+        Route::get('/fetch-finding-images/{findingId}', [AuditProcessController::class, 'apiFetchImages']);
 
         // Criteria APIs
         Route::post('/add-criteria', [CriteriaController::class, 'apiAdd']);

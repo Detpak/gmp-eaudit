@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Button, Form, InputGroup } from "react-bootstrap";
 import { PageContent, PageContentTopbar, PageContentView } from "../../components/PageNav";
 import DynamicTable from "../../components/DynamicTable";
+import { ImageModal } from "../../components/ImageModal";
 
 export default function AuditFindingLayout() {
     const [refreshTrigger, setRefreshTrigger] = useState(false);
@@ -42,17 +43,17 @@ export default function AuditFindingLayout() {
                             item.code,
                             item.area_name,
                             item.desc,
-                            //item.approved != 0 ? <FontAwesomeIcon icon={faCheck} className="text-success" /> : <FontAwesomeIcon icon={faX} className="text-danger"/>,
-                            item.ca_name,
-                            item.ca_code,
+                            ['Observation', 'Minor NC', 'Major NC'][item.category],
+                            `${item.cg_name} (${item.cg_code})`,
+                            `${item.ca_name} (${item.ca_code})`,
                             `${item.ca_weight}%`,
-                            item.cg_name,
-                            item.cg_code,
+                            `${item.deducted_weight}%`,
+                            <ImageModal buttonSize="sm" src={`api/v1/fetch-finding-images/${item.id}`} />
                         ]
                     }}
                     columns={[
                         {
-                            id: 'code',
+                            id: 'record_code',
                             name: 'Record Code',
                         },
                         {
@@ -67,30 +68,34 @@ export default function AuditFindingLayout() {
                             id: 'desc',
                             name: 'Description',
                         },
+                        {
+                            id: 'category',
+                            name: 'Category'
+                        },
                         // {
                         //     id: 'approved',
                         //     name: 'Approved'
                         // },
                         {
-                            id: 'ca_name',
-                            name: 'Criteria Name'
+                            id: 'cg_name',
+                            name: 'Criteria Group'
                         },
                         {
-                            id: 'ca_code',
-                            name: 'Criteria Code'
+                            id: 'ca_name',
+                            name: 'Criteria'
                         },
                         {
                             id: 'ca_weight',
-                            name: 'Weight'
+                            name: 'Criteria Weight (%)'
                         },
                         {
-                            id: 'cg_name',
-                            name: 'Criteria Group Name'
+                            id: 'deducted_weight',
+                            name: 'Weight (%)'
                         },
                         {
-                            id: 'cg_code',
-                            name: 'Criteria Group Code'
-                        },
+                            sortable: false,
+                            name: 'Images'
+                        }
                     ]}
                 />
             </PageContentView>
