@@ -1,7 +1,7 @@
 import { faArrowRotateRight, faCheck, faX, faXmark } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useState } from "react";
-import { Button, Form, InputGroup } from "react-bootstrap";
+import { Button, Form, InputGroup, OverlayTrigger, Tooltip } from "react-bootstrap";
 import { PageContent, PageContentTopbar, PageContentView } from "../../components/PageNav";
 import DynamicTable from "../../components/DynamicTable";
 import { ImageModal } from "../../components/ImageModal";
@@ -42,7 +42,19 @@ export default function AuditFindingLayout() {
                             item.record_code,
                             item.code,
                             item.area_name,
-                            item.desc,
+                            item.desc.length >
+                            <OverlayTrigger
+                                placement="bottom"
+                                overlay={(props) => (
+                                    <Tooltip id="auditee-tooltip" {...props}>
+                                        {item.desc}
+                                    </Tooltip>
+                                )}
+                            >
+                                <div className="user-select-none text-truncate" style={{ maxWidth: 500 }}>
+                                    {item.desc}
+                                </div>
+                            </OverlayTrigger>,
                             ['Observation', 'Minor NC', 'Major NC'][item.category],
                             `${item.cg_name} (${item.cg_code})`,
                             `${item.ca_name} (${item.ca_code})`,
