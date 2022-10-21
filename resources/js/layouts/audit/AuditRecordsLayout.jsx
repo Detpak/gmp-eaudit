@@ -117,10 +117,10 @@ export default function AuditRecordsLayout() {
                                 </div>
                             </OverlayTrigger>,
                             item.auditor_name ? item.auditor_name : '-',
+                            item.total_case_found,
                             item.observation,
                             item.minor_nc,
                             item.major_nc,
-                            item.total_case_found,
                             item.total_weight ? `${item.total_weight}%` : '-',
                             item.total_net_weight ? `${item.total_net_weight}%` : '-',
                             item.total_score ? `${item.total_score}%` : '-',
