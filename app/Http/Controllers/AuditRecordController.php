@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\AuditFinding;
 use App\Models\AuditRecord;
 use App\Models\DepartmentPIC;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class AuditRecordController extends Controller
 {
@@ -22,6 +24,7 @@ class AuditRecordController extends Controller
               ->join('departments', 'departments.id', '=', 'areas.department_id')
               ->join('audit_cycles', 'audit_cycles.id', '=', 'audit_records.cycle_id')
               ->leftJoin('users', 'users.id', '=', 'audit_records.auditor_id')
+              ->leftJoin('audit_findings', 'audit_findings.record_id', '=', 'audit_records.id')
               //->join('departments_pics', 'department_pics.dept_id', '=', '');
               ->select('audit_records.id',
                        'audit_records.area_id',
@@ -31,7 +34,12 @@ class AuditRecordController extends Controller
                        'users.name as auditor_name',
                        'audit_cycles.cycle_id as cycle_id',
                        'departments.name as dept_name',
-                       'departments.id as dept_id');
+                       'departments.id as dept_id',
+                       DB::raw('COUNT(audit_findings.id) as total_case_found'),
+                       DB::raw('SUM(audit_findings.ca_weight) as total_weight'),
+                       DB::raw('SUM(audit_findings.ca_weight * (audit_findings.weight_deduct / 100)) as total_net_weight'),
+                       DB::raw('100 - SUM(audit_findings.ca_weight * (audit_findings.weight_deduct / 100)) as total_score'))
+              ->groupBy('audit_records.id');
 
         if (!$request->list) {
             $query->with('area', function ($query) {

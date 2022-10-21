@@ -21,7 +21,7 @@ function AuditProcessResult({ auditResult, setAuditResult }) {
         let failScore = 0;
 
         for (const finding of auditResult.findings) {
-            failScore += finding.ca_weight;
+            failScore += finding.ca_weight * (finding.weight_deduction / 100.0);
         }
 
         setScore(100 - failScore);

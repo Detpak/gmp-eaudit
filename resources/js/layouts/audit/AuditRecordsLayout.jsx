@@ -62,6 +62,26 @@ export default function AuditRecordsLayout() {
                             name: 'Auditor'
                         },
                         {
+                            sortable: false,
+                            id: 'total_case_found',
+                            name: '# Case Found'
+                        },
+                        {
+                            sortable: false,
+                            id: 'total_weight',
+                            name: 'Total Case Weight'
+                        },
+                        {
+                            sortable: false,
+                            id: 'total_weight',
+                            name: 'Score Deduction'
+                        },
+                        {
+                            sortable: false,
+                            id: 'total_deducted_weight',
+                            name: 'Score'
+                        },
+                        {
                             id: 'status',
                             name: 'Status'
                         }
@@ -89,6 +109,10 @@ export default function AuditRecordsLayout() {
                                 </div>
                             </OverlayTrigger>,
                             item.auditor_name ? item.auditor_name : '-',
+                            item.total_case_found,
+                            item.total_weight ? `${item.total_weight}%` : '-',
+                            item.total_net_weight ? `${item.total_net_weight}%` : '-',
+                            item.total_score ? `${item.total_score}%` : '-',
                             ['Not Started', 'In-Progress', 'Done'][item.status]
                         ]
                     }}
