@@ -62,22 +62,18 @@ export default function AuditRecordsLayout() {
                             name: 'Auditor'
                         },
                         {
-                            sortable: false,
                             id: 'total_case_found',
                             name: '# Case Found'
                         },
                         {
-                            sortable: false,
                             id: 'total_weight',
                             name: 'Total Case Weight'
                         },
                         {
-                            sortable: false,
                             id: 'total_weight',
                             name: 'Score Deduction'
                         },
                         {
-                            sortable: false,
                             id: 'total_deducted_weight',
                             name: 'Score'
                         },
