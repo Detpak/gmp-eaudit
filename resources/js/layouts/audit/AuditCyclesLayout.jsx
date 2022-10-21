@@ -187,17 +187,15 @@ export default function AuditCyclesLayout() {
                             item.criteria_group.name,
                             item.total_findings,
                             item.desc && item.desc.length > 0 ? item.desc : '-',
-                            !item.close_date ?
-                                <LoadingButton
-                                    type="button"
-                                    variant="danger"
-                                    size="sm"
-                                    onClick={async () => await closeCycle(item.id)}
-                                >
-                                    Close
-                                </LoadingButton>
-                                :
-                                <></>
+                            <LoadingButton
+                                type="button"
+                                variant="danger"
+                                size="sm"
+                                onClick={async () => await closeCycle(item.id)}
+                                disabled={!!item.close_date}
+                            >
+                                Close
+                            </LoadingButton>
                         ],
                     }}
                 />
