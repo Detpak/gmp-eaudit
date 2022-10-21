@@ -36,6 +36,9 @@ class AuditRecordController extends Controller
                        'departments.name as dept_name',
                        'departments.id as dept_id',
                        DB::raw('COUNT(audit_findings.id) as total_case_found'),
+                       DB::raw('SUM(CASE WHEN audit_findings.category = 0 THEN 1 ELSE 0 END) as observation'),
+                       DB::raw('SUM(CASE WHEN audit_findings.category = 1 THEN 1 ELSE 0 END) as minor_nc'),
+                       DB::raw('SUM(CASE WHEN audit_findings.category = 2 THEN 1 ELSE 0 END) as major_nc'),
                        DB::raw('SUM(audit_findings.ca_weight) as total_weight'),
                        DB::raw('SUM(audit_findings.ca_weight * (audit_findings.weight_deduct / 100)) as total_net_weight'),
                        DB::raw('100 - SUM(audit_findings.ca_weight * (audit_findings.weight_deduct / 100)) as total_score'))

@@ -66,6 +66,18 @@ export default function AuditRecordsLayout() {
                             name: '# Case Found'
                         },
                         {
+                            id: 'observation',
+                            name: '# Observation'
+                        },
+                        {
+                            id: 'minor_nc',
+                            name: '# Minor NC'
+                        },
+                        {
+                            id: 'major_nc',
+                            name: '# Major NC'
+                        },
+                        {
                             id: 'total_weight',
                             name: 'Total Case Weight'
                         },
@@ -105,6 +117,9 @@ export default function AuditRecordsLayout() {
                                 </div>
                             </OverlayTrigger>,
                             item.auditor_name ? item.auditor_name : '-',
+                            item.observation,
+                            item.minor_nc,
+                            item.major_nc,
                             item.total_case_found,
                             item.total_weight ? `${item.total_weight}%` : '-',
                             item.total_net_weight ? `${item.total_net_weight}%` : '-',
