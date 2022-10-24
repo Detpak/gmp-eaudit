@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Button, Toast } from 'react-bootstrap';
 import { faCheck, faPowerOff } from '@fortawesome/free-solid-svg-icons';
-import { menus, rootUrl } from '../utils';
+import { menus, rootUrl, waitForMs } from '../utils';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { PageLink, PageNavbar } from "../components/PageNav";
 import { Routes, Route, Navigate, Outlet, NavLink } from "react-router-dom";
@@ -19,6 +19,7 @@ import PlantLayout from './workplace/PlantLayout';
 import CriteriaLayout from './evaluation/CriteriaLayout';
 import CriteriaGroupLayout from './evaluation/CriteriaGroupLayout';
 import AuditFindingLayout from './audit/AuditFindingLayout';
+import httpRequest from '../api';
 
 function Sidebar() {
     return (
@@ -93,7 +94,7 @@ function UsersOutlet() {
     );
 }
 
-function TestbedLayout() {
+function DevMenuLayout() {
     const [isLoading, setLoading] = useState(false);
     const handleClick = () => {
         setLoading(true);
@@ -104,9 +105,15 @@ function TestbedLayout() {
             })
     };
 
+    const resetCurrentCycle = async () => {
+        const response = await httpRequest.get('api/v1/reset-current-cycle');
+        console.log(response.data);
+    };
+
     return (
         <div className="p-4">
             <LoadingButton isLoading={isLoading} onClick={handleClick}>Test Loading Button</LoadingButton>
+            <LoadingButton onClick={resetCurrentCycle}>Reset Current Cycle</LoadingButton>
         </div>
     )
 }
@@ -165,7 +172,7 @@ export function MainViewLayout() {
                                 <Route path="*" element={<Navigate to="/app/dashboard" replace />} />
                             </Route>
 
-                            {document.querySelector("meta[name='development']") && <Route path="/app/testbed" element={<TestbedLayout />} />}
+                            {document.querySelector("meta[name='development']") && <Route path="/app/testbed" element={<DevMenuLayout />} />}
 
                             <Route path="/app/*" element={<Navigate to="/app/dashboard" replace />} />
                         </Routes>

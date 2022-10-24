@@ -2,6 +2,7 @@ import { faTrash } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import React, { useEffect, useState } from "react";
 import { Button, ListGroup, Spinner } from "react-bootstrap";
+import httpRequest from "../api";
 import { useIsMounted } from "../utils";
 
 export default function ListView({ ids, fetchUrl, onDoneLoading, handleRemoveAll, handleRemove, children }) {
@@ -24,7 +25,7 @@ export default function ListView({ ids, fetchUrl, onDoneLoading, handleRemoveAll
 
         setLoading(true);
         const data = { ids: ids };
-        const response = await axios.post(fetchUrl, data, { headers: { 'Content-Type': 'application/json' } });
+        const response = await httpRequest.post(fetchUrl, data, { headers: { 'Content-Type': 'application/json' } });
 
         if (isMounted.current) {
             setData(response.data);

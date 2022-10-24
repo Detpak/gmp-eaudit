@@ -56,7 +56,7 @@ class AuditProcessController extends Controller
             foreach ($request->file('images') as $file) {
                 $date = Carbon::now();
                 $filename = $date->valueOf() . '_' . Str::random(8) . '.' . $file->getClientOriginalExtension();
-                $file->move($publicPath, $filename);
+                //$file->move($publicPath, $filename);
                 $files[] = ['filename' => $filename, 'date' => $date->toDateString()];
             }
         }
@@ -138,6 +138,7 @@ class AuditProcessController extends Controller
 
         $findingIds = [];
         try {
+            /*
             foreach ($auditFindings as $value) {
                 $findingIds[$value['case_id']] = AuditFinding::insertGetId($value);
             }
@@ -157,9 +158,10 @@ class AuditProcessController extends Controller
             FailedPhoto::insert($images);
             $record->save();
             $cycle->save();
+            */
         }
         catch (\Throwable $th) {
-            AuditFinding::where('record_id', $request->record_id)->delete();
+            //AuditFinding::where('record_id', $request->record_id)->delete();
             return [
                 'result' => 'error',
                 'msg' => 'An error occurred when submitting reports.',

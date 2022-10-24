@@ -103,7 +103,7 @@ export default function ModalForm({ action, fetchUrl, initialValues, title, size
     useEffect(() => {
         if (fetchUrl && show && editId) {
             setSubmitting(true);
-            axios.get(`${fetchUrl}/${editId}`)
+            httpRequest.get(`${fetchUrl}/${editId}`)
                 .then((response) => {
                     const newValues = {};
 

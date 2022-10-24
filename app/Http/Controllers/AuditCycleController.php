@@ -5,7 +5,9 @@ namespace App\Http\Controllers;
 use App\Helpers\AppStateHelpers;
 use App\Models\Area;
 use App\Models\AuditCycle;
+use App\Models\AuditFinding;
 use App\Models\AuditRecord;
+use App\Models\FailedPhoto;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -159,6 +161,28 @@ class AuditCycleController extends Controller
 
         $cycle->close_date = Carbon::now()->toDateTimeString();
         $cycle->save();
+
+        return ['result' => 'ok'];
+    }
+
+    public function apiResetCurrent()
+    {
+        $currentCycle = AuditCycle::whereNull('close_date')->first();
+        $currentCycle->total_findings = 0;
+        $currentCycle->save();
+
+        $records = AuditRecord::where('cycle_id', $currentCycle->id);
+        $records->update(['status' => 0]);
+
+        foreach ($records->get() as $record) {
+            $findings = AuditFinding::where('record_id', $record->id);
+
+            foreach ($findings->get() as $finding) {
+                FailedPhoto::where('finding_id', $finding->id)->delete();
+            }
+
+            $findings->delete();
+        }
 
         return ['result' => 'ok'];
     }

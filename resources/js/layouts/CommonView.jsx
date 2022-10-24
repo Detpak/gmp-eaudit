@@ -10,6 +10,7 @@ import DynamicTable from "../components/DynamicTable";
 import { rootUrl, showToastMsg } from "../utils";
 import { _ } from "gridjs-react";
 import lodash from "lodash";
+import httpRequest from "../api";
 
 export default class CommonView extends React.Component {
     constructor(props) {
@@ -40,9 +41,9 @@ export default class CommonView extends React.Component {
 
         if (!confirm(this.props.messages.onDeleteSelectedItemConfirmMsg)) return;
 
-        const response = await axios.post(this.props.deleteSelectedItemAction,
-                                          { rowIds: ids },
-                                          { headers: { 'Content-Type': 'application/json' } });
+        const response = await httpRequest.post(this.props.deleteSelectedItemAction,
+                                                { rowIds: ids },
+                                                { headers: { 'Content-Type': 'application/json' } });
 
         if (response.data.result == 'ok') {
             showToastMsg(this.props.messages.onSelectedItemDeletedMsg);

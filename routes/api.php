@@ -46,6 +46,10 @@ Route::prefix('/v1')->group(function() {
         Route::get('/fetch-cycles', [AuditCycleController::class, 'apiFetchCycles']);
         Route::get('/close-cycle/{id}', [AuditCycleController::class, 'apiCloseCycle']);
 
+        if (env('APP_DEBUG')) {
+            Route::get('/reset-current-cycle', [AuditCycleController::class, 'apiResetCurrent']);
+        }
+
         // Audit records APIs
         Route::get('/fetch-records', [AuditRecordController::class, 'apiFetch']);
 
