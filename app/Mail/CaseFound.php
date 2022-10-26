@@ -2,6 +2,7 @@
 
 namespace App\Mail;
 
+use App\Models\Area;
 use App\Models\User;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -14,6 +15,7 @@ class CaseFound extends Mailable implements ShouldQueue
 
     protected $auditee;
     protected $auditor;
+    protected $area;
     protected $finding;
 
     /**
@@ -21,10 +23,11 @@ class CaseFound extends Mailable implements ShouldQueue
      *
      * @return void
      */
-    public function __construct(User $auditee, User $auditor, $finding)
+    public function __construct(User $auditee, User $auditor, Area $area, $finding)
     {
         $this->auditee = $auditee;
         $this->auditor = $auditor;
+        $this->area = $area;
         $this->finding = $finding;
     }
 
@@ -37,12 +40,13 @@ class CaseFound extends Mailable implements ShouldQueue
     {
         $code = $this->finding['code'];
         $name = $this->finding['ca_name'];
-        $date = $this->finding['ca_name'];
+        $date = $this->finding['created_at'];
         return $this->markdown('emails.case_found')
                     ->subject("{$code} - {$name} ({$date})")
                     ->with([
                         'auditee' => $this->auditee,
                         'auditor' => $this->auditor,
+                        'area' => $this->area,
                         'finding' => $this->finding
                     ]);
     }

@@ -28,4 +28,9 @@ class AuditFinding extends Model
     {
         return $this->hasMany(FailedPhoto::class, 'finding_id');
     }
+
+    public function record()
+    {
+        return $this->belongsTo(AuditRecord::class, 'record_id');
+    }
 }

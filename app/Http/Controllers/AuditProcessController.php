@@ -155,26 +155,26 @@ class AuditProcessController extends Controller
 
         $findingIds = [];
         try {
-            foreach ($auditFindings as $value) {
-                $findingIds[$value['case_id']] = AuditFinding::insertGetId($value);
-            }
+            // foreach ($auditFindings as $value) {
+            //     $findingIds[$value['case_id']] = AuditFinding::insertGetId($value);
+            // }
 
-            // Set where the image belongs to the finding
-            $images = $casePhotos
-                ->map(function ($value) use ($findingIds) {
-                    return [
-                        'filename' => $value['filename'],
-                        'finding_id' => $findingIds[$value['case_id']],
-                        'created_at' => $value['created_at'],
-                        'updated_at' => $value['updated_at'],
-                    ];
-                })
-                ->toArray();
+            // // Set where the image belongs to the finding
+            // $images = $casePhotos
+            //     ->map(function ($value) use ($findingIds) {
+            //         return [
+            //             'filename' => $value['filename'],
+            //             'finding_id' => $findingIds[$value['case_id']],
+            //             'created_at' => $value['created_at'],
+            //             'updated_at' => $value['updated_at'],
+            //         ];
+            //     })
+            //     ->toArray();
 
-            FailedPhoto::insert($images);
-            $record->save();
-            $cycle->save();
-            AppStateHelpers::advanceFindingsCounter($failedCriteriaParams->count());
+            // FailedPhoto::insert($images);
+            // $record->save();
+            // $cycle->save();
+            // AppStateHelpers::advanceFindingsCounter($failedCriteriaParams->count());
         }
         catch (\Throwable $th) {
             //AuditFinding::where('record_id', $request->record_id)->delete();
@@ -189,8 +189,9 @@ class AuditProcessController extends Controller
             $auditees = $record->area->department->pics;
             $auditor = User::find($request->auditor_id);
             foreach ($auditFindings as $finding) {
+                $area = AuditRecord::find($finding['record_id'])->area;
                 foreach ($auditees as $auditee) {
-                    Mail::to($auditee)->send(new CaseFound($auditee, $auditor, $finding));
+                    Mail::to($auditee)->send(new CaseFound($auditee, $auditor, $area, $finding));
                 }
             }
         }
