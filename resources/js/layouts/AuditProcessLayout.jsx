@@ -88,7 +88,7 @@ function AuditProcessResult({ auditResult, setAuditResult }) {
                         </tr>
                     </tbody>
                 </Table>
-                <div className="mb-3">Failed Case:</div>
+                <div className="mb-3">Case Found:</div>
                 {auditResult.findings.length > 0 ? (
                     <Accordion alwaysOpen>
                         {auditResult.findings.map((finding, key) => (

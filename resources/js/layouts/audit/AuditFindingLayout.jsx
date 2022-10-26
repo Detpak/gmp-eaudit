@@ -1,10 +1,28 @@
 import { faArrowRotateRight, faCheck, faX, faXmark } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useState } from "react";
-import { Button, Form, InputGroup, OverlayTrigger, Tooltip } from "react-bootstrap";
+import { Button, Form, InputGroup, Modal, OverlayTrigger, Tooltip } from "react-bootstrap";
 import { PageContent, PageContentTopbar, PageContentView } from "../../components/PageNav";
 import DynamicTable from "../../components/DynamicTable";
 import { ImageModal } from "../../components/ImageModal";
+
+function DescriptionModal({ msg }) {
+    const [shown, setShown] = useState(false);
+
+    return (
+        <>
+            <a href="#" onClick={() => setShown(true)}>
+                <div className="text-truncate" style={{ maxWidth: 500 }}>{msg}</div>
+            </a>
+            <Modal show={shown} onHide={() => setShown(false)}>
+                <Modal.Header closeButton>Description</Modal.Header>
+                <Modal.Body>
+                    {msg}
+                </Modal.Body>
+            </Modal>
+        </>
+    )
+}
 
 export default function AuditFindingLayout() {
     const [refreshTrigger, setRefreshTrigger] = useState(false);
@@ -42,25 +60,13 @@ export default function AuditFindingLayout() {
                             item.record_code,
                             item.code,
                             item.area_name,
-                            item.desc.length >
-                            <OverlayTrigger
-                                placement="bottom"
-                                overlay={(props) => (
-                                    <Tooltip id="auditee-tooltip" {...props}>
-                                        {item.desc}
-                                    </Tooltip>
-                                )}
-                            >
-                                <div className="user-select-none text-truncate" style={{ maxWidth: 500 }}>
-                                    {item.desc}
-                                </div>
-                            </OverlayTrigger>,
+                            <DescriptionModal msg={item.desc} />,
                             ['Observation', 'Minor NC', 'Major NC'][item.category],
                             `${item.cg_name} (${item.cg_code})`,
                             `${item.ca_name} (${item.ca_code})`,
                             `${item.ca_weight}%`,
                             `${item.deducted_weight}%`,
-                            <ImageModal buttonSize="sm" src={`api/v1/fetch-finding-images/${item.id}`} />
+                            <ImageModal buttonSize="sm" src={`api/v1/fetch-finding-images/${item.id}`} disabled={item.images_count == 0} />
                         ]
                     }}
                     columns={[

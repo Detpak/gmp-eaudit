@@ -6,7 +6,7 @@ import { useEffect } from "react";
 import LoadingButton from "../components/LoadingButton";
 import httpRequest from "../api";
 
-export function ImageModal({ buttonSize, src, imageDescriptors }) {
+export function ImageModal({ buttonSize, src, imageDescriptors, disabled }) {
     const [shown, setShown] = useState(false);
     const [currentImage, setCurrentImage] = useState(0);
     const [images, setImages] = useState(imageDescriptors ? imageDescriptors : []);
@@ -20,9 +20,9 @@ export function ImageModal({ buttonSize, src, imageDescriptors }) {
     return (
         <>
             {src ?
-                <LoadingButton variant="danger" onClick={fetchData} size={buttonSize ? buttonSize : 'md'} className="me-2">Show</LoadingButton>
+                <LoadingButton variant="danger" onClick={fetchData} size={buttonSize ? buttonSize : 'md'} className="me-2" disabled={disabled ? disabled : false}>Show</LoadingButton>
                 :
-                <Button className="d-block w-100" size={buttonSize ? buttonSize : 'md'} onClick={() => setShown(true)}>Show</Button>
+                <Button className="d-block w-100" size={buttonSize ? buttonSize : 'md'} onClick={() => setShown(true)} disabled={disabled ? disabled : false}>Show</Button>
             }
 
             <Modal

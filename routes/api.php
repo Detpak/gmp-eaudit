@@ -8,6 +8,7 @@ use App\Http\Controllers\CriteriaController;
 use App\Http\Controllers\CriteriaGroupController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DepartmentController;
+use App\Http\Controllers\DevMenuController;
 use App\Http\Controllers\EntityController;
 use App\Http\Controllers\DivisionController;
 use App\Http\Controllers\PlantController;
@@ -36,6 +37,13 @@ Route::prefix('/v1')->group(function() {
     Route::middleware('private_api')->group(function() {
         Route::post('/get-chart', [DashboardController::class, 'apiGetChart']);
 
+        // Debug APIs
+        if (env('APP_DEBUG')) {
+            Route::get('dev/reset-current-cycle', [DevMenuController::class, 'apiResetCurrentCycle']);
+            Route::get('dev/reset-findings-counter', [DevMenuController::class, 'apiResetFindingsCounter']);
+            Route::get('dev/get-app-state', [DevMenuController::class, 'apiGetAppState']);
+        }
+
         // Audit submission
         Route::post('/submit-audit', [AuditProcessController::class, 'apiSubmitAudit']);
         Route::put('/submit-audit-images', [AuditProcessController::class, 'apiSubmitImages']);
@@ -47,7 +55,6 @@ Route::prefix('/v1')->group(function() {
         Route::get('/close-cycle/{id}', [AuditCycleController::class, 'apiCloseCycle']);
 
         if (env('APP_DEBUG')) {
-            Route::get('/reset-current-cycle', [AuditCycleController::class, 'apiResetCurrent']);
         }
 
         // Audit records APIs

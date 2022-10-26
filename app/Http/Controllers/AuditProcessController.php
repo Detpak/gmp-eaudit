@@ -2,15 +2,21 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\AppStateHelpers;
+use App\Mail\AuditSubmitted;
+use App\Mail\CaseFinding;
+use App\Mail\CaseFound;
 use App\Models\AuditCycle;
 use App\Models\AuditFinding;
 use App\Models\AuditRecord;
 use App\Models\Criteria;
 use App\Models\CriteriaGroup;
 use App\Models\FailedPhoto;
+use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
@@ -76,8 +82,6 @@ class AuditProcessController extends Controller
             ->filter(function ($value) { return $value['need_action']; })
             ->map(function ($value, $key) { return [...$value, 'case_id' => $key]; } );
 
-        //dd($failedCriteria);
-
         // Get failed criteria parameters
         $failedCriteriaIds = $failedCriteria->map(function ($value) { return $value['id']; });
         $failedCriteriaParams = Criteria::whereIn('id', $failedCriteriaIds)->get();
@@ -88,13 +92,27 @@ class AuditProcessController extends Controller
 
         $criteriaGroup = CriteriaGroup::find($request->cgroup_id);
         $cycle = AuditCycle::select('id', 'cycle_id', 'total_findings')->find($request->cycle_id);
-        $totalFindings = $cycle->total_findings;
+
+        // Reset findings count after a year.
+        if (AppStateHelpers::getState()->updated_at->year < Carbon::now()->year) {
+            try {
+                AppStateHelpers::resetFindingsCounter();
+            } catch (\Throwable $th) {
+                return [
+                    'result' => 'error',
+                    'msg' => 'Cannot reset finding count',
+                    'details' => $th->getMessage()
+                ];
+            }
+        }
+
+        $lastNumberOfFindings = AppStateHelpers::getFindingsCount();
 
         // Create audit findings data
         $auditFindings = $failedCriteria
             ->zip($failedCriteriaParams)
-            ->map(function ($value, $key) use($criteriaGroup, $request, $totalFindings) {
-                $code = str_pad($totalFindings + $key + 1, 4, "0", STR_PAD_LEFT);
+            ->map(function ($value, $key) use($criteriaGroup, $request, $lastNumberOfFindings) {
+                $code = str_pad($lastNumberOfFindings + $key + 1, 4, "0", STR_PAD_LEFT);
                 $category = $value[0]['category'];
                 return [
                     'code' => "GMP/2201/{$code}",
@@ -116,7 +134,7 @@ class AuditProcessController extends Controller
         // Create image data
         $casePhotos = collect($files)
             ->zip($request->imageIndexes)
-            ->map(function ($value) use($request) {
+            ->map(function ($value) {
                 return [
                     'filename' => $value[0]['filename'],
                     'case_id' => $value[1],
@@ -126,19 +144,17 @@ class AuditProcessController extends Controller
             });
 
         // Update the number of total findings
-        $totalFindings += $failedCriteriaParams->count();
-        $cycle->total_findings = $totalFindings;
+        $cycle->total_findings += $failedCriteriaParams->count();
 
-        // Update the area status to "In-Progress" and set the auditor
+        // Update the area status to "In-Progress" or "Done" and set the auditor
         $tokenSplit = explode('|', $request->bearerToken()); // [0] = user id, [1] = token
-        $record->status = $totalFindings > 0 ? 1 : 2;
+        $record->status = $cycle->total_findings > 0 ? 1 : 2;
         $record->auditor_id = $tokenSplit[0];
 
         //dd($auditFindings->toArray());
 
         $findingIds = [];
         try {
-            /*
             foreach ($auditFindings as $value) {
                 $findingIds[$value['case_id']] = AuditFinding::insertGetId($value);
             }
@@ -158,7 +174,7 @@ class AuditProcessController extends Controller
             FailedPhoto::insert($images);
             $record->save();
             $cycle->save();
-            */
+            AppStateHelpers::advanceFindingsCounter($failedCriteriaParams->count());
         }
         catch (\Throwable $th) {
             //AuditFinding::where('record_id', $request->record_id)->delete();
@@ -167,6 +183,16 @@ class AuditProcessController extends Controller
                 'msg' => 'An error occurred when submitting reports.',
                 'details' => $th->getMessage()
             ];
+        }
+
+        if ($auditFindings->count() > 0) {
+            $auditees = $record->area->department->pics;
+            $auditor = User::find($request->auditor_id);
+            foreach ($auditFindings as $finding) {
+                foreach ($auditees as $auditee) {
+                    Mail::to($auditee)->send(new CaseFound($auditee, $auditor, $finding));
+                }
+            }
         }
 
         return [
@@ -178,6 +204,7 @@ class AuditProcessController extends Controller
                 'dept_name' => $record->area->department->name,
                 'num_criterias' => $criteriaGroup->criterias->count(),
                 'findings' => $auditFindings,
+                'pics' => $record->area->department->pics,
                 'images' => $casePhotos
                     ->groupBy('case_id')
                     ->map(function ($case) {
@@ -195,8 +222,6 @@ class AuditProcessController extends Controller
     public function apiFetch(Request $request)
     {
         $query = AuditFinding::query();
-
-        $query->withCount('images');
 
         $query->join('audit_records', 'audit_records.id', '=', 'audit_findings.record_id')
               ->join('areas', 'areas.id', '=', 'audit_records.area_id')
@@ -230,6 +255,8 @@ class AuditProcessController extends Controller
         else {
             $query->orderBy('audit_records.id', 'asc');
         }
+
+        $query->withCount('images');
 
         return $query->paginate($request->max);
     }

@@ -49,7 +49,7 @@ class AuditCycleController extends Controller
         $startDate = Carbon::createFromFormat('Y-m-d', $request->start_date);
 
         // Reset cycle count when we're in the new year
-        if ($activeCycle && Carbon::createFromTimestamp($activeCycle->created_at)->month < $startDate->month) {
+        if ($activeCycle && Carbon::createFromTimestamp($activeCycle->created_at)->year < $startDate->year) {
             AppStateHelpers::resetCycleCount();
         }
 
@@ -161,28 +161,6 @@ class AuditCycleController extends Controller
 
         $cycle->close_date = Carbon::now()->toDateTimeString();
         $cycle->save();
-
-        return ['result' => 'ok'];
-    }
-
-    public function apiResetCurrent()
-    {
-        $currentCycle = AuditCycle::whereNull('close_date')->first();
-        $currentCycle->total_findings = 0;
-        $currentCycle->save();
-
-        $records = AuditRecord::where('cycle_id', $currentCycle->id);
-        $records->update(['status' => 0]);
-
-        foreach ($records->get() as $record) {
-            $findings = AuditFinding::where('record_id', $record->id);
-
-            foreach ($findings->get() as $finding) {
-                FailedPhoto::where('finding_id', $finding->id)->delete();
-            }
-
-            $findings->delete();
-        }
 
         return ['result' => 'ok'];
     }

@@ -13,6 +13,11 @@ class AppStateHelpers
         }
     }
 
+    public static function getState()
+    {
+        return AppState::first();
+    }
+
     public static function resetCycleCount()
     {
         AppStateHelpers::init();
@@ -30,5 +35,28 @@ class AppStateHelpers
         $state->save();
 
         return $state;
+    }
+
+    public static function getFindingsCount()
+    {
+        AppStateHelpers::init();
+        $state = AppState::first();
+        return $state->num_findings;
+    }
+
+    public static function advanceFindingsCounter($count)
+    {
+        AppStateHelpers::init();
+        $state = AppState::first();
+        $state->num_findings += $count;
+        $state->save();
+    }
+
+    public static function resetFindingsCounter()
+    {
+        AppStateHelpers::init();
+        $state = AppState::first();
+        $state->num_findings = 0;
+        $state->save();
     }
 }

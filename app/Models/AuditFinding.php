@@ -26,6 +26,6 @@ class AuditFinding extends Model
 
     public function images()
     {
-        return $this->hasMany(FailedPhoto::class, 'finding_id', 'finding_id');
+        return $this->hasMany(FailedPhoto::class, 'finding_id');
     }
 }

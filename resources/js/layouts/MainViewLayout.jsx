@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Button, Toast } from 'react-bootstrap';
+import { Button, Toast, Table, Row, Col } from 'react-bootstrap';
 import { faCheck, faPowerOff } from '@fortawesome/free-solid-svg-icons';
 import { menus, rootUrl, waitForMs } from '../utils';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -20,6 +20,8 @@ import CriteriaLayout from './evaluation/CriteriaLayout';
 import CriteriaGroupLayout from './evaluation/CriteriaGroupLayout';
 import AuditFindingLayout from './audit/AuditFindingLayout';
 import httpRequest from '../api';
+import { useEffect } from 'react';
+import _ from 'lodash';
 
 function Sidebar() {
     return (
@@ -96,6 +98,14 @@ function UsersOutlet() {
 
 function DevMenuLayout() {
     const [isLoading, setLoading] = useState(false);
+    const [appState, setAppState] = useState({});
+    const [refreshTrigger, setRefreshTrigger] = useState(false);
+
+    useEffect(async () => {
+        const response = await httpRequest.get('api/v1/dev/get-app-state');
+        setAppState(response.data);
+    }, [refreshTrigger]);
+
     const handleClick = () => {
         setLoading(true);
 
@@ -106,14 +116,41 @@ function DevMenuLayout() {
     };
 
     const resetCurrentCycle = async () => {
-        const response = await httpRequest.get('api/v1/reset-current-cycle');
+        const response = await httpRequest.get('api/v1/dev/reset-current-cycle');
+        setRefreshTrigger(!refreshTrigger);
+        console.log(response.data);
+    };
+
+    const resetFindingsCounter = async () => {
+        const response = await httpRequest.get('api/v1/dev/reset-findings-counter');
+        setRefreshTrigger(!refreshTrigger);
         console.log(response.data);
     };
 
     return (
         <div className="p-4">
-            <LoadingButton isLoading={isLoading} onClick={handleClick}>Test Loading Button</LoadingButton>
-            <LoadingButton onClick={resetCurrentCycle}>Reset Current Cycle</LoadingButton>
+            <Row>
+                <Col>
+                    <div className="vstack gap-2">
+                        <LoadingButton isLoading={isLoading} onClick={handleClick}>Test Loading Button</LoadingButton>
+                        <LoadingButton onClick={resetCurrentCycle}>Reset Current Cycle</LoadingButton>
+                        <LoadingButton onClick={resetFindingsCounter}>Reset Findings Counter</LoadingButton>
+                    </div>
+                    <div>AppState</div>
+
+                    <Table>
+                        <tbody>
+                            {_.map(appState, (value, key) => (
+                                <tr key={key}>
+                                    <th>{key}</th>
+                                    <td>{value}</td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </Table>
+                </Col>
+                <Col></Col>
+            </Row>
         </div>
     )
 }
