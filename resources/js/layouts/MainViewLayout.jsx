@@ -209,7 +209,7 @@ export function MainViewLayout() {
                                 <Route path="*" element={<Navigate to="/app/dashboard" replace />} />
                             </Route>
 
-                            {document.querySelector("meta[name='development']") && <Route path="/app/testbed" element={<DevMenuLayout />} />}
+                            {document.querySelector("meta[name='development']") && <Route path="/app/dev-menu" element={<DevMenuLayout />} />}
 
                             <Route path="/app/*" element={<Navigate to="/app/dashboard" replace />} />
                         </Routes>

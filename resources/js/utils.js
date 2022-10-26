@@ -38,8 +38,8 @@ export const menus = [
 
 if (document.querySelector("meta[name='development']")) {
     menus.push({
-        name: 'Testbed',
-        link: 'testbed',
+        name: 'Dev Menu',
+        link: 'dev-menu',
         icon: faFlaskVial,
         maxAccessLevel: 1
     });
