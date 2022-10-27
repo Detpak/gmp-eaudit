@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
-import { Button, Toast, Table, Row, Col } from 'react-bootstrap';
+import React from 'react';
+import { Toast } from 'react-bootstrap';
 import { faCheck, faPowerOff } from '@fortawesome/free-solid-svg-icons';
-import { menus, rootUrl, waitForMs } from '../utils';
+import { menus, rootUrl } from '../utils';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { PageLink, PageNavbar } from "../components/PageNav";
 import { Routes, Route, Navigate, Outlet, NavLink } from "react-router-dom";
@@ -10,7 +10,6 @@ import AuditCyclesLayout from "./audit/AuditCyclesLayout";
 import AuditRecordsLayout from "./audit/AuditRecordsLayout";
 import RolesLayout from "./users/RolesLayout";
 import ManageUserLayout from "./users/ManageUserLayout";
-import LoadingButton from '../components/LoadingButton';
 import DepartmentLayout from './workplace/DepartmentLayout';
 import WorkplaceAreaLayout from './workplace/WorkplaceAreaLayout';
 import EntityLayout from './workplace/EntityLayout';
@@ -18,10 +17,10 @@ import DivisionLayout from './workplace/DivisionLayout';
 import PlantLayout from './workplace/PlantLayout';
 import CriteriaLayout from './evaluation/CriteriaLayout';
 import CriteriaGroupLayout from './evaluation/CriteriaGroupLayout';
-import AuditFindingLayout from './audit/AuditFindingLayout';
-import httpRequest from '../api';
-import { useEffect } from 'react';
+import AuditFindingsLayout from './audit/AuditFindingsLayout';
+import DevMenuLayout from './DevMenuLayout';
 import _ from 'lodash';
+import CorrectiveActionLayout from './audit/CorrectiveActionLayout';
 
 function Sidebar() {
     return (
@@ -47,6 +46,7 @@ function AuditOutlet() {
                 <PageLink to="cycles">Cycles</PageLink>
                 <PageLink to="records">Records</PageLink>
                 <PageLink to="findings">Case Findings</PageLink>
+                <PageLink to="corrective">Corrective Actions</PageLink>
             </PageNavbar>
 
             <Outlet />
@@ -96,65 +96,6 @@ function UsersOutlet() {
     );
 }
 
-function DevMenuLayout() {
-    const [isLoading, setLoading] = useState(false);
-    const [appState, setAppState] = useState({});
-    const [refreshTrigger, setRefreshTrigger] = useState(false);
-
-    useEffect(async () => {
-        const response = await httpRequest.get('api/v1/dev/get-app-state');
-        setAppState(response.data);
-    }, [refreshTrigger]);
-
-    const handleClick = () => {
-        setLoading(true);
-
-        new Promise((resolve) => setTimeout(resolve, 3000))
-            .then(() => {
-                setLoading(false);
-            })
-    };
-
-    const resetCurrentCycle = async () => {
-        const response = await httpRequest.get('api/v1/dev/reset-current-cycle');
-        setRefreshTrigger(!refreshTrigger);
-        console.log(response.data);
-    };
-
-    const resetFindingsCounter = async () => {
-        const response = await httpRequest.get('api/v1/dev/reset-findings-counter');
-        setRefreshTrigger(!refreshTrigger);
-        console.log(response.data);
-    };
-
-    return (
-        <div className="p-4">
-            <Row>
-                <Col>
-                    <div className="vstack gap-2">
-                        <LoadingButton isLoading={isLoading} onClick={handleClick}>Test Loading Button</LoadingButton>
-                        <LoadingButton onClick={resetCurrentCycle}>Reset Current Cycle</LoadingButton>
-                        <LoadingButton onClick={resetFindingsCounter}>Reset Findings Counter</LoadingButton>
-                    </div>
-                    <div>AppState</div>
-
-                    <Table>
-                        <tbody>
-                            {_.map(appState, (value, key) => (
-                                <tr key={key}>
-                                    <th>{key}</th>
-                                    <td>{value}</td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </Table>
-                </Col>
-                <Col></Col>
-            </Row>
-        </div>
-    )
-}
-
 export function MainViewLayout() {
     const [toastMsgState, setToastMsgState, updateToastMsgState] = window.globalStateStore.useState("toastMsg");
     const closeToast = () => updateToastMsgState((value) => ({ toastShown: false, msg: value.msg }));
@@ -182,7 +123,8 @@ export function MainViewLayout() {
                                 <Route index element={<Navigate to="/app/audit/cycles" replace />} />
                                 <Route path="cycles" element={<AuditCyclesLayout />} />
                                 <Route path="records" element={<AuditRecordsLayout />} />
-                                <Route path="findings" element={<AuditFindingLayout />} />
+                                <Route path="findings" element={<AuditFindingsLayout />} />
+                                <Route path="corrective" element={<CorrectiveActionLayout />} />
                                 <Route path="*" element={<Navigate to="/app/dashboard" replace />} />
                             </Route>
 

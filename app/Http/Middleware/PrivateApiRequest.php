@@ -41,6 +41,13 @@ class PrivateApiRequest
             return Response::json(['result' => 'invalid_token']);
         }
 
+        $request->merge([
+            'auth' => [
+                'user_id' => $tokenSplit[0],
+                'token' => $tokenSplit[1]
+            ]
+        ]);
+
         return $next($request);
     }
 }

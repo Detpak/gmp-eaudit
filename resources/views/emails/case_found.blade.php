@@ -40,7 +40,7 @@
 {{ $finding['desc'] }}
 
 @component('mail::button', ['url' => ''])
-Resolve
+Submit Corrective Action
 @endcomponent
 
 {{-- @component('mail::button', ['url' => ''])

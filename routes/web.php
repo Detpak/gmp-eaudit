@@ -29,6 +29,7 @@ Route::middleware('admin')->group(function() {
     Route::get('/app', function() { return redirect()->intended('/app/dashboard'); });
     Route::view('/app/{path?}', 'main_view')->where('path', '.*');
     Route::view('/audit', 'audit');
+    Route::view('/corrective-action/{findingId}', 'corrective_action')->where("findingId", ".*");
 
     // Route::prefix('/admin')->group(function() {
     //     Route::get('/', function() { return redirect()->intended('admin/dashboard'); });

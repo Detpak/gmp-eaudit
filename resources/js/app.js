@@ -9,6 +9,7 @@ import { createStore } from 'state-pool';
 import AuditProcessLayout from './layouts/AuditProcessLayout';
 import httpRequest from './api';
 import 'chart.js/auto';
+import CorrectiveActionMain from './layouts/CorrectiveActionMain';
 
 $(function() {
     axios.defaults.headers.common["X-Requested-With"] ="XMLHttpRequest";
@@ -30,11 +31,16 @@ $(function() {
     }
 
     if (window.appToken && document.getElementById('main-container')) {
-        if (window.currentPageMode && window.currentPageMode == 'audit') {
-            ReactDOM.render(<AuditProcessLayout />, document.getElementById('main-container'));
-        }
-        else {
-            ReactDOM.render(<BrowserRouter><MainViewLayout /></BrowserRouter>, document.getElementById('main-container'));
+        switch (window.currentPageMode) {
+            case 'audit':
+                ReactDOM.render(<AuditProcessLayout />, document.getElementById('main-container'));
+                break;
+            case 'corrective_action':
+                ReactDOM.render(<BrowserRouter><CorrectiveActionMain /></BrowserRouter>, document.getElementById('main-container'));
+                break;
+            default:
+                ReactDOM.render(<BrowserRouter><MainViewLayout /></BrowserRouter>, document.getElementById('main-container'));
+                break;
         }
     }
 });

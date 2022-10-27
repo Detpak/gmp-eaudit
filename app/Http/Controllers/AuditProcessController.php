@@ -11,6 +11,7 @@ use App\Models\AuditFinding;
 use App\Models\AuditRecord;
 use App\Models\Criteria;
 use App\Models\CriteriaGroup;
+use App\Models\DepartmentPIC;
 use App\Models\FailedPhoto;
 use App\Models\User;
 use Carbon\Carbon;
@@ -55,6 +56,7 @@ class AuditProcessController extends Controller
             return ['formError' => $validator->errors()];
         }
 
+        $auditDate = Carbon::now();
         $publicPath = public_path('case_images');
         $files = [];
 
@@ -111,7 +113,7 @@ class AuditProcessController extends Controller
         // Create audit findings data
         $auditFindings = $failedCriteria
             ->zip($failedCriteriaParams)
-            ->map(function ($value, $key) use($criteriaGroup, $request, $lastNumberOfFindings) {
+            ->map(function ($value, $key) use($criteriaGroup, $request, $lastNumberOfFindings, $auditDate) {
                 $code = str_pad($lastNumberOfFindings + $key + 1, 4, "0", STR_PAD_LEFT);
                 $category = $value[0]['category'];
                 return [
@@ -125,8 +127,8 @@ class AuditProcessController extends Controller
                     'category' => $category,
                     'weight_deduct' => [0, 50, 100][$category],
                     'desc' => $value[0]['desc'],
-                    'created_at' => Carbon::now()->toDateTimeString(),
-                    'updated_at' => Carbon::now()->toDateTimeString(),
+                    'created_at' => $auditDate->toDateTimeString(),
+                    'updated_at' => $auditDate->toDateTimeString(),
                     'case_id' => $value[0]['case_id']
                 ];
             });
@@ -240,6 +242,13 @@ class AuditProcessController extends Controller
                        'audit_findings.cg_code',
                        DB::raw('audit_findings.ca_weight * (audit_findings.weight_deduct / 100) as deducted_weight'),
                        'audit_findings.case_id');
+
+        $query->addSelect([
+            'auditee_id' => DepartmentPIC::select('user_id')
+                ->whereColumn('dept_id', 'areas.department_id')
+                ->where('user_id', $request->auth['user_id'])
+                ->limit(1)
+        ]);
 
         if ($request->search) {
             $query->where('audit_records.code', 'LIKE', "%{$request->search}%")
