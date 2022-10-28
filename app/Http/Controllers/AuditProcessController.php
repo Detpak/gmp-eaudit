@@ -64,7 +64,7 @@ class AuditProcessController extends Controller
             foreach ($request->file('images') as $file) {
                 $date = Carbon::now();
                 $filename = $date->valueOf() . '_' . Str::random(8) . '.' . $file->getClientOriginalExtension();
-                //$file->move($publicPath, $filename);
+                $file->move($publicPath, $filename);
                 $files[] = ['filename' => $filename, 'date' => $date->toDateString()];
             }
         }
