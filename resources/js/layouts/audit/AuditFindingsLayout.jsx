@@ -8,6 +8,16 @@ import { ImageModal } from "../../components/ImageModal";
 import { rootUrl, waitForMs } from "../../utils";
 import LoadingButton from "../../components/LoadingButton";
 
+function getCaseStatus(status)
+{
+    return [
+        <span className="fw-bold text-success">New</span>,
+        <span className="fw-bold text-primary">Resolved</span>,
+        <span className="fw-bold text-danger">Cancelled</span>,
+        <span className="fw-bold text-success">Closed</span>,
+    ][status];
+}
+
 function DescriptionModal({ msg }) {
     const [shown, setShown] = useState(false);
 
@@ -68,14 +78,14 @@ export default function AuditFindingsLayout() {
                             item.code,
                             item.department_name,
                             item.area_name,
+                            getCaseStatus(item.status),
                             <DescriptionModal msg={item.desc} />,
                             ['Observation', 'Minor NC', 'Major NC'][item.category],
                             `${item.cg_name} (${item.cg_code})`,
                             `${item.ca_name} (${item.ca_code})`,
                             `${item.ca_weight}%`,
                             `${item.deducted_weight}%`,
-                            '-',
-                            '-',
+                            item.cancel_reason ? item.cancel_reason : '-',
                             <ImageModal buttonSize="sm" src={`api/v1/fetch-finding-images/${item.id}`} disabled={item.images_count == 0} />,
                             <div className="hstack gap-1">
                                 <Button
@@ -117,6 +127,10 @@ export default function AuditFindingsLayout() {
                             name: 'Area',
                         },
                         {
+                            id: 'status',
+                            name: 'Status'
+                        },
+                        {
                             id: 'desc',
                             name: 'Description',
                         },
@@ -143,10 +157,6 @@ export default function AuditFindingsLayout() {
                         {
                             id: 'deducted_weight',
                             name: 'Weight (%)'
-                        },
-                        {
-                            id: 'status',
-                            name: 'Status'
                         },
                         {
                             id: 'cancel_reason',

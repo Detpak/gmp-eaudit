@@ -129,6 +129,7 @@ class AuditProcessController extends Controller
                     'desc' => $value[0]['desc'],
                     'created_at' => $auditDate->toDateTimeString(),
                     'updated_at' => $auditDate->toDateTimeString(),
+                    'case_id' => $value[0]['case_id']
                 ];
             });
 
@@ -157,7 +158,9 @@ class AuditProcessController extends Controller
         $findingIds = [];
         try {
             foreach ($auditFindings as $value) {
-                $findingIds[$value['case_id']] = AuditFinding::insertGetId($value);
+                $tmpValue = $value;
+                unset($tmpValue['case_id']);
+                $findingIds[$value['case_id']] = AuditFinding::insertGetId($tmpValue);
             }
 
             // Set where the image belongs to the finding
