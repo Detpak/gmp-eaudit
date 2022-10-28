@@ -5,7 +5,8 @@ import { Button, Form, InputGroup, Modal, OverlayTrigger, Tooltip } from "react-
 import { PageContent, PageContentTopbar, PageContentView } from "../../components/PageNav";
 import DynamicTable from "../../components/DynamicTable";
 import { ImageModal } from "../../components/ImageModal";
-import { rootUrl } from "../../utils";
+import { rootUrl, waitForMs } from "../../utils";
+import LoadingButton from "../../components/LoadingButton";
 
 function DescriptionModal({ msg }) {
     const [shown, setShown] = useState(false);
@@ -35,6 +36,11 @@ export default function AuditFindingsLayout() {
 
     const handleSearch = ev => {
         setSearchKeyword(ev.target.value);
+    };
+
+    const cancelCase = async (id) => {
+        await waitForMs(500);
+        console.log(id);
     };
 
     return (
@@ -71,9 +77,26 @@ export default function AuditFindingsLayout() {
                             '-',
                             '-',
                             <ImageModal buttonSize="sm" src={`api/v1/fetch-finding-images/${item.id}`} disabled={item.images_count == 0} />,
-                            <Button href={rootUrl(`corrective-action/${item.id}`)} target="_blank" variant="success" size="sm" disabled={item.auditee_id == null}>
-                                Create
-                            </Button>
+                            <div className="hstack gap-1">
+                                <Button
+                                    href={rootUrl(`corrective-action/${item.id}`)}
+                                    target="_blank"
+                                    variant="success"
+                                    size="sm"
+                                    disabled={item.auditee_id == null}
+                                >
+                                    Create CA
+                                </Button>
+                                <LoadingButton
+                                    size="sm"
+                                    variant="danger"
+                                    onClick={async () => await cancelCase(item.id)}
+                                    disabled={item.auditee_id == null}
+                                >
+                                    Cancel
+                                </LoadingButton>
+                            </div>
+
                         ]
                     }}
                     columns={[
@@ -135,7 +158,7 @@ export default function AuditFindingsLayout() {
                         },
                         {
                             sortable: false,
-                            name: 'Corrective Action'
+                            name: 'Action'
                         }
                     ]}
                 />
