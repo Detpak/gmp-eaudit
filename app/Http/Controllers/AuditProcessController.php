@@ -241,6 +241,9 @@ class AuditProcessController extends Controller
                        'audit_findings.ca_weight',
                        'audit_findings.cg_name',
                        'audit_findings.cg_code',
+                       'audit_findings.status',
+                       'audit_findings.status',
+                       'audit_findings.cancel_reason',
                        DB::raw('audit_findings.ca_weight * (audit_findings.weight_deduct / 100) as deducted_weight'));
 
         $query->addSelect([

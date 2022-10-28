@@ -19,7 +19,8 @@ class AdminSeeder extends Seeder
         Role::create([
             'name' => 'Administrator',
             'access_info' => '{}',
-            'remarks' => ''
+            'auditee' => false,
+            'remarks' => 'To be removed'
         ]);
 
         User::create([
