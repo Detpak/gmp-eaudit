@@ -85,28 +85,25 @@ export default function AuditFindingsLayout() {
                             `${item.ca_name} (${item.ca_code})`,
                             `${item.ca_weight}%`,
                             `${item.deducted_weight}%`,
-                            item.cancel_reason ? item.cancel_reason : '-',
                             <ImageModal buttonSize="sm" src={`api/v1/fetch-finding-images/${item.id}`} disabled={item.images_count == 0} />,
-                            <div className="hstack gap-1">
-                                <Button
+                            <Button
                                     href={rootUrl(`corrective-action/${item.id}`)}
                                     target="_blank"
                                     variant="success"
                                     size="sm"
                                     disabled={item.auditee_id == null}
-                                >
-                                    Create CA
-                                </Button>
-                                <LoadingButton
+                            >
+                                Create
+                            </Button>,
+                            <LoadingButton
                                     size="sm"
                                     variant="danger"
                                     onClick={async () => await cancelCase(item.id)}
                                     disabled={item.auditee_id == null}
-                                >
-                                    Cancel
-                                </LoadingButton>
-                            </div>
-
+                            >
+                                Create
+                            </LoadingButton>,
+                            item.cancel_reason ? item.cancel_reason : '-',
                         ]
                     }}
                     columns={[
@@ -159,17 +156,21 @@ export default function AuditFindingsLayout() {
                             name: 'Weight (%)'
                         },
                         {
-                            id: 'cancel_reason',
-                            name: 'Cancellation Reason'
-                        },
-                        {
                             sortable: false,
                             name: 'Images'
                         },
                         {
                             sortable: false,
-                            name: 'Action'
-                        }
+                            name: 'Corrective Action'
+                        },
+                        {
+                            sortable: false,
+                            name: 'Cancellation'
+                        },
+                        {
+                            id: 'cancel_reason',
+                            name: 'Cancellation Reason'
+                        },
                     ]}
                 />
             </PageContentView>

@@ -8,8 +8,6 @@ class CorrectiveActionController extends Controller
 {
     public function apiFetch(Request $request)
     {
-
-
         return [];
     }
 }
