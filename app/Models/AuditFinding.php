@@ -20,8 +20,8 @@ class AuditFinding extends Model
         'category',
         'weight_deduct',
         'desc',
-        'approved',
-        'case_id',
+        'status',
+        'cancel_reason',
     ];
 
     public function images()

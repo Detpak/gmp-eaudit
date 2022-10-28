@@ -129,7 +129,6 @@ class AuditProcessController extends Controller
                     'desc' => $value[0]['desc'],
                     'created_at' => $auditDate->toDateTimeString(),
                     'updated_at' => $auditDate->toDateTimeString(),
-                    'case_id' => $value[0]['case_id']
                 ];
             });
 
@@ -228,10 +227,12 @@ class AuditProcessController extends Controller
 
         $query->join('audit_records', 'audit_records.id', '=', 'audit_findings.record_id')
               ->join('areas', 'areas.id', '=', 'audit_records.area_id')
+              ->join('departments', 'departments.id', '=', 'areas.department_id')
               ->select('audit_findings.id',
                        'audit_findings.record_id',
                        'audit_findings.code',
                        'audit_records.code as record_code',
+                       'departments.name as department_name',
                        'areas.name as area_name',
                        'audit_findings.desc',
                        'audit_findings.category',
@@ -240,8 +241,7 @@ class AuditProcessController extends Controller
                        'audit_findings.ca_weight',
                        'audit_findings.cg_name',
                        'audit_findings.cg_code',
-                       DB::raw('audit_findings.ca_weight * (audit_findings.weight_deduct / 100) as deducted_weight'),
-                       'audit_findings.case_id');
+                       DB::raw('audit_findings.ca_weight * (audit_findings.weight_deduct / 100) as deducted_weight'));
 
         $query->addSelect([
             'auditee_id' => DepartmentPIC::select('user_id')
@@ -252,6 +252,7 @@ class AuditProcessController extends Controller
 
         if ($request->search) {
             $query->where('audit_records.code', 'LIKE', "%{$request->search}%")
+                ->orWhere('departments.name', 'LIKE', "%{$request->search}%")
                 ->orWhere('areas.name', 'LIKE', "%{$request->search}%")
                 ->orWhere('audit_findings.code', 'LIKE', "{$request->search}")
                 ->orWhere('audit_findings.ca_name', 'LIKE', "%{$request->search}%")

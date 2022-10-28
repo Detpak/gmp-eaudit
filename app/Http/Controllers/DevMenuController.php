@@ -19,7 +19,7 @@ class DevMenuController extends Controller
         $currentCycle->save();
 
         $records = AuditRecord::where('cycle_id', $currentCycle->id);
-        $records->update(['status' => 0]);
+        $records->update(['auditor_id' => null, 'status' => 0]);
 
         foreach ($records->get() as $record) {
             $findings = AuditFinding::where('record_id', $record->id);

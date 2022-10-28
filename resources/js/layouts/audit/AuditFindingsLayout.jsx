@@ -60,6 +60,7 @@ export default function AuditFindingsLayout() {
                         produce: item => [
                             item.record_code,
                             item.code,
+                            item.department_name,
                             item.area_name,
                             <DescriptionModal msg={item.desc} />,
                             ['Observation', 'Minor NC', 'Major NC'][item.category],
@@ -67,9 +68,11 @@ export default function AuditFindingsLayout() {
                             `${item.ca_name} (${item.ca_code})`,
                             `${item.ca_weight}%`,
                             `${item.deducted_weight}%`,
+                            '-',
+                            '-',
                             <ImageModal buttonSize="sm" src={`api/v1/fetch-finding-images/${item.id}`} disabled={item.images_count == 0} />,
                             <Button href={rootUrl(`corrective-action/${item.id}`)} target="_blank" variant="success" size="sm" disabled={item.auditee_id == null}>
-                                Submit <FontAwesomeIcon icon={faArrowRightToBracket} />
+                                Create
                             </Button>
                         ]
                     }}
@@ -81,6 +84,10 @@ export default function AuditFindingsLayout() {
                         {
                             id: 'code',
                             name: 'Code',
+                        },
+                        {
+                            id: 'department_name',
+                            name: 'Department',
                         },
                         {
                             id: 'area_name',
@@ -113,6 +120,14 @@ export default function AuditFindingsLayout() {
                         {
                             id: 'deducted_weight',
                             name: 'Weight (%)'
+                        },
+                        {
+                            id: 'status',
+                            name: 'Status'
+                        },
+                        {
+                            id: 'cancel_reason',
+                            name: 'Cancellation Reason'
                         },
                         {
                             sortable: false,

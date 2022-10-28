@@ -139,7 +139,7 @@ export default function DepartmentLayout() {
                 columns: [
                     {
                         id: 'name',
-                        name: 'Name'
+                        name: 'Department'
                     },
                     {
                         id: 'code',
