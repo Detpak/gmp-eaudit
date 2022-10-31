@@ -1,8 +1,8 @@
 @php
     $category = [
         'Observation',
-        'Minor Non-Conformance',
-        'Major Non-Conformance'
+        'Minor NC',
+        'Major NC'
     ][$finding['category']];
 @endphp
 
@@ -37,6 +37,7 @@
 <br>
 <strong>Description</strong>
 <br>
+
 {{ $finding['desc'] }}
 
 @component('mail::button', ['url' => ''])

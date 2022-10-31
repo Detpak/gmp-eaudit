@@ -79,3 +79,13 @@ export function scrollToElementById(id) {
         });
     }
 }
+
+export function getCategoryString(category) {
+    switch (category) {
+        case 0: return "Observation";
+        case 1: return "Minor NC";
+        case 2: return "Major NC";
+    }
+
+    return null;
+}

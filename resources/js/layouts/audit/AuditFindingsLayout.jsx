@@ -5,7 +5,7 @@ import { Button, Form, InputGroup, Modal, OverlayTrigger, Tooltip } from "react-
 import { PageContent, PageContentTopbar, PageContentView } from "../../components/PageNav";
 import DynamicTable from "../../components/DynamicTable";
 import { ImageModal } from "../../components/ImageModal";
-import { rootUrl, waitForMs } from "../../utils";
+import { getCategoryString, rootUrl, waitForMs } from "../../utils";
 import LoadingButton from "../../components/LoadingButton";
 
 function getCaseStatus(status)
@@ -29,7 +29,9 @@ function DescriptionModal({ msg }) {
             <Modal show={shown} onHide={() => setShown(false)}>
                 <Modal.Header closeButton>Description</Modal.Header>
                 <Modal.Body>
-                    {msg}
+                    <div className="text-multiline">
+                        {msg}
+                    </div>
                 </Modal.Body>
             </Modal>
         </>
@@ -80,7 +82,7 @@ export default function AuditFindingsLayout() {
                             item.area_name,
                             getCaseStatus(item.status),
                             <DescriptionModal msg={item.desc} />,
-                            ['Observation', 'Minor NC', 'Major NC'][item.category],
+                            getCategoryString(item.category),
                             `${item.cg_name} (${item.cg_code})`,
                             `${item.ca_name} (${item.ca_code})`,
                             `${item.ca_weight}%`,
@@ -109,11 +111,11 @@ export default function AuditFindingsLayout() {
                     columns={[
                         {
                             id: 'record_code',
-                            name: 'Record Code',
+                            name: 'Record ID',
                         },
                         {
                             id: 'code',
-                            name: 'Code',
+                            name: 'ID',
                         },
                         {
                             id: 'department_name',

@@ -12,6 +12,7 @@ import CountUp from 'react-countup';
 import { scrollToElementById, waitForMs } from "../utils";
 import httpRequest from '../api';
 import { ImageModal } from "../components/ImageModal";
+import { RequiredSpan } from "../components/LabelSpan";
 
 
 function AuditProcessResult({ auditResult, setAuditResult }) {
@@ -334,7 +335,6 @@ function AuditProcessForm({ setAuditResult }) {
 
         if (response.data.formError) {
             const errors = _.mapValues(response.data.formError, (value) => value[0]);
-            console.log(errors);
             setFormError(errors);
             setSubmitting(false);
             return;
@@ -516,7 +516,7 @@ function AuditProcessForm({ setAuditResult }) {
                                                 <div>
                                                     <hr/>
                                                     <Form.Group id={`findings.${index}.desc`} className="mb-3">
-                                                        <Form.Label>Description</Form.Label>
+                                                        <Form.Label>Description <RequiredSpan /></Form.Label>
                                                         <Form.Control
                                                             as="textarea"
                                                             rows={3}

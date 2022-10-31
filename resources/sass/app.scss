@@ -19,6 +19,10 @@
     letter-spacing: -0.025rem;
 }
 
+.text-multiline {
+    white-space: pre-line !important;
+}
+
 .backdrop-blur {
     backdrop-filter: blur(10px);
 }

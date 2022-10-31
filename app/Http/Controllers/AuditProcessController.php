@@ -21,7 +21,6 @@ use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
-use stdClass;
 
 class AuditProcessController extends Controller
 {
@@ -117,7 +116,7 @@ class AuditProcessController extends Controller
                 $code = str_pad($lastNumberOfFindings + $key + 1, 4, "0", STR_PAD_LEFT);
                 $category = $value[0]['category'];
                 return [
-                    'code' => "GMP/2201/{$code}",
+                    'code' => "CID/{$auditDate->format('y')}/{$code}",
                     'record_id' => $request->record_id,
                     'ca_name' => $value[1]->name,
                     'ca_code' => $value[1]->code,
@@ -284,5 +283,25 @@ class AuditProcessController extends Controller
             ->select('filename')
             ->get()
             ->map(function ($image) { return asset('case_images/' . $image['filename']); });
+    }
+
+    public function apiGet($id)
+    {
+        $query = AuditFinding::query();
+
+        $query->with('record', function ($query) {
+            $query->select('id', 'auditor_id', 'area_id', 'code');
+
+            $query->with('auditor', function ($query) {
+                $query->select('id', 'name');
+            });
+
+            $query->with('area', function ($query) {
+                $query->select('id', 'department_id', 'name');
+                $query->with('department');
+            });
+        });
+
+        return $query->find($id);
     }
 }

@@ -41,7 +41,7 @@ export default function AuditRecordsLayout() {
                         },
                         {
                             id: 'code',
-                            name: 'Code'
+                            name: 'ID'
                         },
                         {
                             id: 'dept_name',

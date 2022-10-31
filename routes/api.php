@@ -57,6 +57,8 @@ Route::prefix('/v1')->group(function() {
 
         // Corrective action APIs
         Route::get('/ensure-auditee-privilege/{id}', [CorrectiveActionController::class, 'apiEnsureAuditeePrivilege']);
+        Route::post('/add-corrective-action', [CorrectiveActionController::class, 'apiAdd']);
+        Route::get('/fetch-corrective-actions', [CorrectiveActionController::class, 'apiFetch']);
 
         // Audit records APIs
         Route::get('/fetch-records', [AuditRecordController::class, 'apiFetch']);
@@ -64,6 +66,7 @@ Route::prefix('/v1')->group(function() {
         // Audit findings APIs
         Route::get('/fetch-findings', [AuditProcessController::class, 'apiFetch']);
         Route::get('/fetch-finding-images/{findingId}', [AuditProcessController::class, 'apiFetchImages']);
+        Route::get('/get-finding/{id}', [AuditProcessController::class, 'apiGet']);
 
         // Criteria APIs
         Route::post('/add-criteria', [CriteriaController::class, 'apiAdd']);
