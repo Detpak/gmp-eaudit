@@ -61,8 +61,8 @@ export default function DropdownList({ source, selectedItem, setSelectedItem, ca
     };
 
     const handleScroll = (ev) => {
-        const bottomTarget = Math.ceil(ev.target.scrollHeight - ev.target.scrollTop);
-        if (!isLoading && canFetch && bottomTarget == Math.ceil(ev.target.clientHeight)) {
+        const bottomTarget = ev.target.scrollHeight - Math.ceil(ev.target.scrollTop);
+        if (!isLoading && canFetch && bottomTarget <= Math.ceil(ev.target.clientHeight)) {
             const nextPage = currentPage + 1;
             fetchData(search, nextPage, true);
         }
@@ -94,7 +94,7 @@ export default function DropdownList({ source, selectedItem, setSelectedItem, ca
     return (
         <Dropdown show={show} onSelect={handleSelect} onToggle={(nextShow) => handleShow(nextShow)}>
             <div className="d-grid gap-2">
-                <Dropdown.Toggle>
+                <Dropdown.Toggle className="text-truncate">
                     {selectedItem ? caption(selectedItem) : title}
                 </Dropdown.Toggle>
             </div>

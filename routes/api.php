@@ -4,6 +4,7 @@ use App\Http\Controllers\AreaController;
 use App\Http\Controllers\AuditCycleController;
 use App\Http\Controllers\AuditProcessController;
 use App\Http\Controllers\AuditRecordController;
+use App\Http\Controllers\CorrectiveActionController;
 use App\Http\Controllers\CriteriaController;
 use App\Http\Controllers\CriteriaGroupController;
 use App\Http\Controllers\DashboardController;
@@ -54,8 +55,8 @@ Route::prefix('/v1')->group(function() {
         Route::get('/fetch-cycles', [AuditCycleController::class, 'apiFetchCycles']);
         Route::get('/close-cycle/{id}', [AuditCycleController::class, 'apiCloseCycle']);
 
-        if (env('APP_DEBUG')) {
-        }
+        // Corrective action APIs
+        Route::get('/ensure-auditee-privilege/{id}', [CorrectiveActionController::class, 'apiEnsureAuditeePrivilege']);
 
         // Audit records APIs
         Route::get('/fetch-records', [AuditRecordController::class, 'apiFetch']);
