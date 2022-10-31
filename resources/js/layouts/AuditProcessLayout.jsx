@@ -443,15 +443,20 @@ function AuditProcessForm({ setAuditResult }) {
                                 source={`api/v1/fetch-records?list=1&cycle=${cycle.id}`}
                                 selectedItem={record}
                                 setSelectedItem={setRecord}
-                                caption={(data) => <>{data.area_name} ({data.dept_name})</>}
+                                caption={(data) => <>{data.area_name}</>}
                                 title="Please Select Area"
                             >
                                 {({ data }) => (
-                                    <span>{data.area_name} ({data.dept_name})</span>
+                                    <>
+                                        <div className="fw-bold">{data.area_name}</div>
+                                        <small>{data.dept_name}</small>
+                                    </>
                                 )}
                             </DropdownList>
                             <input type="hidden" className={formError && formError.record_id ? 'is-invalid' : ''}/>
                             <Form.Control.Feedback type="invalid">{formError && formError.record_id ? formError.record_id : ''}</Form.Control.Feedback>
+                        </Form.Group>
+                        <Form.Group className="mb-3">
                             {isLoadingDeptPIC && (
                                 <div className="text-center p-4">
                                     <Spinner animation="border" size="sm" /> Loading
@@ -459,7 +464,11 @@ function AuditProcessForm({ setAuditResult }) {
                             )}
                             {deptPIC.length > 0 && (
                                 <>
-                                    <div className="my-1"><small>Department's PIC:</small></div>
+                                    <div className="mb-3">
+                                        <div className="fw-bold">Department</div>
+                                        <div>{record.dept_name}</div>
+                                    </div>
+                                    <div className="fw-bold">Auditees</div>
                                     <ListGroup style={{ maxHeight: 200 }}>
                                         {deptPIC.map((value, index) => (
                                             <ListGroup.Item key={index}>{value.name}</ListGroup.Item>
