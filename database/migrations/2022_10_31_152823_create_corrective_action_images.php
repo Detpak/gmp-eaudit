@@ -13,10 +13,10 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('corrective_actions', function (Blueprint $table) {
+        Schema::create('corrective_action_images', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('finding_id')->nullable()->constrained('audit_findings');
-            $table->text('desc');
+            $table->foreignId('ca_id')->nullable()->constrained('corrective_actions');
+            $table->string('filename');
             $table->timestamps();
         });
     }
@@ -28,6 +28,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('corrective_actions');
+        Schema::dropIfExists('corrective_action_images');
     }
 };

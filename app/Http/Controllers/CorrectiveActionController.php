@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\AuditFinding;
+use App\Models\CorrectiveAction;
 use App\Models\DepartmentPIC;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -29,13 +30,26 @@ class CorrectiveActionController extends Controller
         }
 
         $caDate = Carbon::now();
-        $images = collect();
 
+        $images = collect();
         if (!$request->hasFile('images')) {
             foreach ($request->file('images') as $image) {
                 $name = $caDate->valueOf() . '_' . Str::random(8) . '.' . $image->getClientOriginalExtension();
                 $images->add($name);
             }
+        }
+
+        try {
+            CorrectiveAction::create([
+                'finding_id' => $request->finding_id,
+                'desc' => $request->desc
+            ]);
+        } catch (\Throwable $th) {
+            return [
+                'result' => 'error',
+                'msg' => 'Cannot insert corrective action data',
+                'details' => $th->getMessage()
+            ];
         }
 
         return [

@@ -5,12 +5,12 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class CorrectiveAction extends Model
+class CorrectiveActionImages extends Model
 {
     use HasFactory;
 
     protected $fillable = [
-        'finding_id',
-        'desc',
+        'ca_id',
+        'filename',
     ];
 }
