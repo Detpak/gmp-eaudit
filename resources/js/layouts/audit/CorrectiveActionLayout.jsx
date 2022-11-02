@@ -49,7 +49,7 @@ export default function CorrectiveActionLayout() {
                             `${item.ca_weight}%`,
                             `${item.deducted_weight}%`,
                             item.desc,
-                            '',
+                            <ImageModal buttonSize="sm" src={`api/v1/fetch-corrective-action-images/${item.id}`} disabled={item.images_count == 0} />,
                         ]
                     }}
                     columns={[

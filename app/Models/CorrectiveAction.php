@@ -13,4 +13,8 @@ class CorrectiveAction extends Model
         'finding_id',
         'desc',
     ];
+
+    public function images() {
+        return $this->hasMany(CorrectiveActionImages::class, 'ca_id');
+    }
 }

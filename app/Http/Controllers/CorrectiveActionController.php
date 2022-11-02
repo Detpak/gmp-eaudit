@@ -39,6 +39,38 @@ class CorrectiveActionController extends Controller
         return null;
     }
 
+
+    public function apiEnsureAuditeePrivilege(Request $request, $id)
+    {
+        $finding = AuditFinding::find($id);
+
+        if (!$finding) {
+            return [
+                'result' => 'error',
+                'msg' => 'Invalid case finding.',
+            ];
+        }
+
+        $statusError = $this->getCaseStatusError($finding->status);
+        if ($statusError) {
+            return $statusError;
+        }
+
+        $department = $finding->record->area->department;
+        $picExists = DepartmentPIC::where('dept_id', $department->id)
+            ->where('user_id', $request->auth['user_id'])
+            ->exists();
+
+        if (!$picExists) {
+            return [
+                'result' => 'error',
+                'msg' => 'You are not allowed to take corrective action for this case.',
+            ];
+        }
+
+        return ['result' => 'ok'];
+    }
+
     public function apiAdd(Request $request)
     {
         $validator = Validator::make(
@@ -136,37 +168,17 @@ class CorrectiveActionController extends Controller
             $query->orderBy('corrective_actions.id', 'asc');
         }
 
+        $query->withCount('images');
+
         return $query->paginate($request->max);
     }
 
-    public function apiEnsureAuditeePrivilege(Request $request, $id)
+    public function apiFetchImages($id)
     {
-        $finding = AuditFinding::find($id);
-
-        if (!$finding) {
-            return [
-                'result' => 'error',
-                'msg' => 'Invalid case finding.',
-            ];
-        }
-
-        $statusError = $this->getCaseStatusError($finding->status);
-        if ($statusError) {
-            return $statusError;
-        }
-
-        $department = $finding->record->area->department;
-        $picExists = DepartmentPIC::where('dept_id', $department->id)
-            ->where('user_id', $request->auth['user_id'])
-            ->exists();
-
-        if (!$picExists) {
-            return [
-                'result' => 'error',
-                'msg' => 'You are not allowed to take corrective action for this case.',
-            ];
-        }
-
-        return ['result' => 'ok'];
+        return CorrectiveActionImages::where('ca_id', $id)
+            ->get()
+            ->map(function ($image) {
+                return asset("ca_images/{$image->filename}");
+            });
     }
 }

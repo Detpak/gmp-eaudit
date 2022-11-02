@@ -95,11 +95,11 @@ export default function AuditFindingsLayout() {
                             `${item.deducted_weight}%`,
                             <ImageModal buttonSize="sm" src={`api/v1/fetch-finding-images/${item.id}`} disabled={item.images_count == 0} />,
                             <Button
-                            href={rootUrl(`corrective-action/${item.id}`)}
-                            target="_blank"
-                            variant="success"
-                            size="sm"
-                            disabled={item.auditee_id == null || item.status != 0}
+                                href={rootUrl(`corrective-action/${item.id}`)}
+                                target="_blank"
+                                variant="success"
+                                size="sm"
+                                disabled={item.auditee_id == null || item.status != 0}
                             >
                                 Create
                             </Button>,
