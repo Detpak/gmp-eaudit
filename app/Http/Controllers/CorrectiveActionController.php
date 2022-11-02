@@ -2,13 +2,16 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\CorrectiveActionTaken;
 use App\Models\AuditFinding;
 use App\Models\CorrectiveAction;
 use App\Models\CorrectiveActionImages;
 use App\Models\DepartmentPIC;
+use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Validator;
 
@@ -91,19 +94,17 @@ class CorrectiveActionController extends Controller
         $caDate = Carbon::now();
         $ca = null;
 
+        $finding = AuditFinding::find($request->finding_id);
+        $statusError = $this->getCaseStatusError($finding->status);
+
+        if ($statusError) {
+            return $statusError;
+        }
+
         try {
-            $finding = AuditFinding::find($request->finding_id);
-            $statusError = $this->getCaseStatusError($finding->status);
-
-            if ($statusError) {
-                return $statusError;
-            }
-
-            $finding->status = 1;
-            $finding->save();
-
             $ca = CorrectiveAction::create([
                 'finding_id' => $request->finding_id,
+                'auditee_id' => $request->auth['user_id'],
                 'desc' => $request->desc
             ]);
 
@@ -122,13 +123,24 @@ class CorrectiveActionController extends Controller
             }
 
             CorrectiveActionImages::insert($images->toArray());
+
+            $finding->status = 1;
+            $finding->save();
         } catch (\Throwable $th) {
-            $ca->delete();
+            if ($ca) {
+                $ca->delete();
+            }
+
             return [
                 'result' => 'error',
                 'msg' => 'Error occurred, cannot insert corrective action data.',
                 'details' => $th->getMessage()
             ];
+        }
+
+        $auditor = $finding->record->auditor;
+        if ($auditor->email) {
+            Mail::to($auditor->email)->send(new CorrectiveActionTaken($finding, $ca->auditee, $caDate->toDateTimeString()));
         }
 
         return [
@@ -146,9 +158,11 @@ class CorrectiveActionController extends Controller
         $query->join('audit_findings', 'audit_findings.id', '=', 'corrective_actions.finding_id')
               ->join('audit_records', 'audit_records.id', '=', 'audit_findings.record_id')
               ->join('areas', 'areas.id', '=', 'audit_records.area_id')
+              ->join('users', 'users.id', '=', 'corrective_actions.auditee_id')
               ->select('corrective_actions.id',
                        'corrective_actions.desc',
                        'areas.name as area_name',
+                       'users.name as auditee',
                        'audit_findings.ca_name',
                        'audit_findings.ca_code',
                        'audit_findings.ca_weight',

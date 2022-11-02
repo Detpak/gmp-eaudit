@@ -11,10 +11,17 @@ class CorrectiveAction extends Model
 
     protected $fillable = [
         'finding_id',
+        'auditee_id',
         'desc',
     ];
 
-    public function images() {
+    public function auditee()
+    {
+        return $this->belongsTo(User::class, 'auditee_id');
+    }
+
+    public function images()
+    {
         return $this->hasMany(CorrectiveActionImages::class, 'ca_id');
     }
 }

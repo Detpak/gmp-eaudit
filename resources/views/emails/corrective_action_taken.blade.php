@@ -3,29 +3,33 @@
         'Observation',
         'Minor NC',
         'Major NC'
-    ][$finding['category']];
+    ][$finding->category];
 @endphp
 
 @component('mail::message')
-# {{ $finding['code'] }} - {{ $finding['ca_name'] }}<br>
+# {{ $finding['code'] }} - Corrective Action for {{ $finding->ca_name }}<br>
 
 <table>
     <tbody>
         <tr>
             <td><strong>Date:</strong></td>
-            <td>{{ $finding['created_at'] }}</td>
+            <td>{{ $caDate }}</td>
         </tr>
         <tr>
-            <td><strong>Auditor:</strong></td>
-            <td>{{ $auditor['name'] }} (<a href="mailto:{{ $auditor['email'] }}">{{ $auditor['email'] }}</a>)</td>
+            <td><strong>Audit Date:</strong></td>
+            <td>{{ $finding->created_at }}</td>
+        </tr>
+        <tr>
+            <td><strong>Auditee:</strong></td>
+            <td>{{ $auditee->name }}</td>
         </tr>
         <tr>
             <td><strong>Department:</strong></td>
-            <td>{{ $area->department->name }}</td>
+            <td>{{ $finding->record->area->department->name }}</td>
         </tr>
         <tr>
             <td><strong>Area:</strong></td>
-            <td>{{ $area->name }}</td>
+            <td>{{ $finding->record->area->name }}</td>
         </tr>
         <tr>
             <td><strong>Category:</strong></td>
@@ -38,10 +42,6 @@
 <strong>Description</strong>
 <br>
 
-{{ $finding['desc'] }}
-
-@component('mail::button', ['url' => url("corrective-action/{$findingId}")])
-Submit Corrective Action
-@endcomponent
+{{ $finding->desc }}
 
 @endcomponent

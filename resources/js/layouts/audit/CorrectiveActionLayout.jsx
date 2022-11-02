@@ -8,6 +8,7 @@ import { ImageModal } from "../../components/ImageModal";
 import { getCategoryString, rootUrl, waitForMs } from "../../utils";
 import LoadingButton from "../../components/LoadingButton";
 import httpRequest from "../../api";
+import DescriptionModal from "../../components/DescriptionModal";
 
 export default function CorrectiveActionLayout() {
     const [refreshTrigger, setRefreshTrigger] = useState(false);
@@ -44,11 +45,12 @@ export default function CorrectiveActionLayout() {
                         produce: item => [
                             item.code,
                             item.area_name,
+                            item.auditee,
                             getCategoryString(item.category),
                             `${item.ca_name} (${item.ca_code})`,
                             `${item.ca_weight}%`,
                             `${item.deducted_weight}%`,
-                            item.desc,
+                            <DescriptionModal msg={item.desc} />,
                             <ImageModal buttonSize="sm" src={`api/v1/fetch-corrective-action-images/${item.id}`} disabled={item.images_count == 0} />,
                         ]
                     }}
@@ -60,6 +62,10 @@ export default function CorrectiveActionLayout() {
                         {
                             id: 'area_name',
                             name: 'Area Name',
+                        },
+                        {
+                            id: 'auditee',
+                            name: 'Auditee',
                         },
                         {
                             id: 'category',

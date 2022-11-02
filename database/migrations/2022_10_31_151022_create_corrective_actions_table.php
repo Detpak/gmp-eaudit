@@ -16,6 +16,7 @@ return new class extends Migration
         Schema::create('corrective_actions', function (Blueprint $table) {
             $table->id();
             $table->foreignId('finding_id')->nullable()->constrained('audit_findings');
+            $table->foreignId('auditee_id')->nullable()->constrained('users');
             $table->text('desc');
             $table->timestamps();
         });
