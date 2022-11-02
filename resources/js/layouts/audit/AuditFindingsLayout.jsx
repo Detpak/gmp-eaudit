@@ -1,20 +1,21 @@
-import { faArrowRightToBracket, faArrowRotateRight, faCheck, faX, faXmark } from "@fortawesome/free-solid-svg-icons";
+import { faArrowRotateRight, faXmark } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useState } from "react";
-import { Button, Form, InputGroup, Modal, OverlayTrigger, Tooltip } from "react-bootstrap";
+import { Button, Form, InputGroup, Modal } from "react-bootstrap";
 import { PageContent, PageContentTopbar, PageContentView } from "../../components/PageNav";
 import DynamicTable from "../../components/DynamicTable";
 import { ImageModal } from "../../components/ImageModal";
 import { getCategoryString, rootUrl, waitForMs } from "../../utils";
 import LoadingButton from "../../components/LoadingButton";
+import httpRequest from "../../api";
 
 function getCaseStatus(status)
 {
     return [
-        <span className="fw-bold text-success">New</span>,
-        <span className="fw-bold text-primary">Resolved</span>,
-        <span className="fw-bold text-danger">Cancelled</span>,
-        <span className="fw-bold text-success">Closed</span>,
+        "New",
+        "Resolved",
+        "Cancelled",
+        "Closed",
     ][status];
 }
 
@@ -55,6 +56,11 @@ export default function AuditFindingsLayout() {
         console.log(id);
     };
 
+    const resetCA = async (id) => {
+        const response = await httpRequest.get(`api/v1/dev/reset-ca/${id}`);
+        console.log(response);
+    };
+
     return (
         <PageContent>
             <PageContentTopbar>
@@ -89,11 +95,11 @@ export default function AuditFindingsLayout() {
                             `${item.deducted_weight}%`,
                             <ImageModal buttonSize="sm" src={`api/v1/fetch-finding-images/${item.id}`} disabled={item.images_count == 0} />,
                             <Button
-                                    href={rootUrl(`corrective-action/${item.id}`)}
-                                    target="_blank"
-                                    variant="success"
-                                    size="sm"
-                                    disabled={item.auditee_id == null}
+                            href={rootUrl(`corrective-action/${item.id}`)}
+                            target="_blank"
+                            variant="success"
+                            size="sm"
+                            disabled={item.auditee_id == null}
                             >
                                 Create
                             </Button>,
@@ -106,6 +112,14 @@ export default function AuditFindingsLayout() {
                                 Create
                             </LoadingButton>,
                             item.cancel_reason ? item.cancel_reason : '-',
+                            <LoadingButton
+                                size="sm"
+                                variant="danger"
+                                onClick={async () => await resetCA(item.id)}
+                                disabled={item.auditee_id == null}
+                            >
+                                Reset CA
+                            </LoadingButton>
                         ]
                     }}
                     columns={[
@@ -151,11 +165,11 @@ export default function AuditFindingsLayout() {
                         },
                         {
                             id: 'ca_weight',
-                            name: 'Criteria Weight (%)'
+                            name: 'Criteria Weight'
                         },
                         {
                             id: 'deducted_weight',
-                            name: 'Weight (%)'
+                            name: 'Deducted Weight'
                         },
                         {
                             sortable: false,
@@ -173,6 +187,10 @@ export default function AuditFindingsLayout() {
                             id: 'cancel_reason',
                             name: 'Cancellation Reason'
                         },
+                        {
+                            sortable: false,
+                            name: 'Debug',
+                        }
                     ]}
                 />
             </PageContentView>

@@ -57,16 +57,6 @@ class AuditProcessController extends Controller
 
         $auditDate = Carbon::now();
         $publicPath = public_path('case_images');
-        $files = [];
-
-        if ($request->hasFile(('images'))) {
-            foreach ($request->file('images') as $file) {
-                $date = Carbon::now();
-                $filename = $date->valueOf() . '_' . Str::random(8) . '.' . $file->getClientOriginalExtension();
-                $file->move($publicPath, $filename);
-                $files[] = ['filename' => $filename, 'date' => $date->toDateString()];
-            }
-        }
 
         // Check if the audit is not started
         $record = AuditRecord::select('id', 'code', 'status', 'area_id')->find($request->record_id);
@@ -132,18 +122,6 @@ class AuditProcessController extends Controller
                 ];
             });
 
-        // Create image data
-        $casePhotos = collect($files)
-            ->zip($request->imageIndexes)
-            ->map(function ($value) {
-                return [
-                    'filename' => $value[0]['filename'],
-                    'case_id' => $value[1],
-                    'created_at' => $value[0]['date'],
-                    'updated_at' => $value[0]['date']
-                ];
-            });
-
         // Update the number of total findings
         $cycle->total_findings += $failedCriteriaParams->count();
 
@@ -154,6 +132,7 @@ class AuditProcessController extends Controller
 
         //dd($auditFindings->toArray());
 
+        $imageFiles = null;
         $findingIds = [];
         try {
             foreach ($auditFindings as $value) {
@@ -162,25 +141,42 @@ class AuditProcessController extends Controller
                 $findingIds[$value['case_id']] = AuditFinding::insertGetId($tmpValue);
             }
 
-            // Set where the image belongs to the finding
-            $images = $casePhotos
-                ->map(function ($value) use ($findingIds) {
+            $imageFiles = collect($request->file('images'))
+                ->zip($request->imageIndexes)
+                ->map(function ($file) use ($findingIds, $auditDate) {
+                    $filename = $auditDate->valueOf() . '_' . Str::random(8) . '.' . $file[0]->getClientOriginalExtension();
                     return [
-                        'filename' => $value['filename'],
-                        'finding_id' => $findingIds[$value['case_id']],
-                        'created_at' => $value['created_at'],
-                        'updated_at' => $value['updated_at'],
+                        'file' => $file[0],
+                        'filename' => $filename,
+                        'finding_id' => $findingIds[$file[1]],
+                        'case_id' => $file[1]
                     ];
-                })
-                ->toArray();
+                });
 
-            FailedPhoto::insert($images);
+            if ($request->hasFile(('images'))) {
+                FailedPhoto::insert(
+                    $imageFiles->map(function ($file) use ($auditDate) {
+                        return [
+                            'filename' => $file['filename'],
+                            'finding_id' => $file['finding_id'],
+                            'created_at' => $auditDate->toDateTimeString(),
+                            'updated_at' => $auditDate->toDateTimeString(),
+                        ];
+                    })
+                    ->toArray()
+                );
+            }
+
+            $imageFiles->each(function ($image) use ($publicPath) {
+                $image['file']->move($publicPath, $image['filename']);
+            });
+
             $record->save();
             $cycle->save();
             AppStateHelpers::advanceFindingsCounter($failedCriteriaParams->count());
         }
         catch (\Throwable $th) {
-            //AuditFinding::where('record_id', $request->record_id)->delete();
+            AuditFinding::where('record_id', $request->record_id)->delete();
             return [
                 'result' => 'error',
                 'msg' => 'An error occurred when submitting reports.',
@@ -191,10 +187,10 @@ class AuditProcessController extends Controller
         if ($auditFindings->count() > 0) {
             $auditees = $record->area->department->pics;
             $auditor = User::find($request->auditor_id);
-            foreach ($auditFindings as $finding) {
-                $area = AuditRecord::find($finding['record_id'])->area;
+            foreach ($auditFindings->zip(array_values($findingIds)) as $finding) {
+                $area = AuditRecord::find($finding[0]['record_id'])->area;
                 foreach ($auditees as $auditee) {
-                    Mail::to($auditee)->send(new CaseFound($auditee, $auditor, $area, $finding));
+                    Mail::to($auditee)->send(new CaseFound($auditee, $auditor, $area, $finding[0], $finding[1]));
                 }
             }
         }
@@ -209,7 +205,7 @@ class AuditProcessController extends Controller
                 'num_criterias' => $criteriaGroup->criterias->count(),
                 'findings' => $auditFindings,
                 'pics' => $record->area->department->pics,
-                'images' => $casePhotos
+                'images' => $imageFiles
                     ->groupBy('case_id')
                     ->map(function ($case) {
                         return $case->map(function ($image) { return asset('case_images/' . $image['filename']); });

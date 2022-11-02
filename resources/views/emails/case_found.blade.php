@@ -40,7 +40,7 @@
 
 {{ $finding['desc'] }}
 
-@component('mail::button', ['url' => ''])
+@component('mail::button', ['url' => url("corrective-action/{$findingId}")])
 Submit Corrective Action
 @endcomponent
 

@@ -17,18 +17,20 @@ class CaseFound extends Mailable implements ShouldQueue
     protected $auditor;
     protected $area;
     protected $finding;
+    protected $findingId;
 
     /**
      * Create a new message instance.
      *
      * @return void
      */
-    public function __construct(User $auditee, User $auditor, Area $area, $finding)
+    public function __construct(User $auditee, User $auditor, Area $area, $finding, $findingId)
     {
         $this->auditee = $auditee;
         $this->auditor = $auditor;
         $this->area = $area;
         $this->finding = $finding;
+        $this->findingId = $findingId;
     }
 
     /**
@@ -47,7 +49,8 @@ class CaseFound extends Mailable implements ShouldQueue
                         'auditee' => $this->auditee,
                         'auditor' => $this->auditor,
                         'area' => $this->area,
-                        'finding' => $this->finding
+                        'finding' => $this->finding,
+                        'findingId' => $this->findingId
                     ]);
     }
 }

@@ -42,6 +42,7 @@ Route::prefix('/v1')->group(function() {
         if (env('APP_DEBUG')) {
             Route::get('dev/reset-current-cycle', [DevMenuController::class, 'apiResetCurrentCycle']);
             Route::get('dev/reset-findings-counter', [DevMenuController::class, 'apiResetFindingsCounter']);
+            Route::get('dev/reset-ca/{id}', [DevMenuController::class, 'apiResetCorrectiveAction']);
             Route::get('dev/get-app-state', [DevMenuController::class, 'apiGetAppState']);
         }
 
