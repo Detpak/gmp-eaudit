@@ -99,15 +99,15 @@ export default function AuditFindingsLayout() {
                             target="_blank"
                             variant="success"
                             size="sm"
-                            disabled={item.auditee_id == null}
+                            disabled={item.auditee_id == null || item.status != 0}
                             >
                                 Create
                             </Button>,
                             <LoadingButton
-                                    size="sm"
-                                    variant="danger"
-                                    onClick={async () => await cancelCase(item.id)}
-                                    disabled={item.auditee_id == null}
+                                size="sm"
+                                variant="danger"
+                                onClick={async () => await cancelCase(item.id)}
+                                disabled={item.auditee_id == null || item.status != 0}
                             >
                                 Create
                             </LoadingButton>,
