@@ -61,6 +61,7 @@ Route::prefix('/v1')->group(function() {
         Route::post('/add-corrective-action', [CorrectiveActionController::class, 'apiAdd']);
         Route::get('/fetch-corrective-actions', [CorrectiveActionController::class, 'apiFetch']);
         Route::get('/fetch-corrective-action-images/{id}', [CorrectiveActionController::class, 'apiFetchImages']);
+        Route::post('/close-corrective-action', [CorrectiveActionController::class, 'apiClose']);
 
         // Audit records APIs
         Route::get('/fetch-records', [AuditRecordController::class, 'apiFetch']);

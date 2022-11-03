@@ -2,6 +2,7 @@ import { faChartLine, faFlaskVial, faIndustry, faListCheck, faPercent, faPowerOf
 import React from 'react';
 import $ from 'jquery';
 import httpRequest from './api';
+import _ from 'lodash';
 
 export const menus = [
     {
@@ -88,4 +89,9 @@ export function getCategoryString(category) {
     }
 
     return null;
+}
+
+// Transforms laravel's message bag
+export function transformErrors(errors) {
+    return _.mapValues(errors, (value) => value[0]);
 }

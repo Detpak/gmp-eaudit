@@ -158,8 +158,7 @@ export default function ModalForm({ action, fetchUrl, initialValues, title, size
 
     const handleChange = (ev) => {
         const newState = { ...values };
-        newState[ev.target.name] = ev.target.type === 'checkbox' ?
-            ev.target.checked : ev.target.value;
+        newState[ev.target.name] = ev.target.type === 'checkbox' ? ev.target.checked : ev.target.value;
         setValues(newState);
     };
 

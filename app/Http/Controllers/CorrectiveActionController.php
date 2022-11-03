@@ -161,6 +161,7 @@ class CorrectiveActionController extends Controller
               ->join('users', 'users.id', '=', 'corrective_actions.auditee_id')
               ->select('corrective_actions.id',
                        'corrective_actions.desc',
+                       'corrective_actions.closing_remarks',
                        'areas.name as area_name',
                        'users.name as auditee',
                        'audit_findings.ca_name',
@@ -168,6 +169,7 @@ class CorrectiveActionController extends Controller
                        'audit_findings.ca_weight',
                        'audit_findings.category',
                        'audit_findings.code',
+                       'audit_findings.status',
                        DB::raw('audit_findings.ca_weight * (audit_findings.weight_deduct / 100) as deducted_weight'));
 
         if ($request->search) {
@@ -194,5 +196,39 @@ class CorrectiveActionController extends Controller
             ->map(function ($image) {
                 return asset("ca_images/{$image->filename}");
             });
+    }
+
+    public function apiClose(Request $request)
+    {
+        $validator = Validator::make(
+            $request->all(),
+            [
+                'remarks'  => 'max:65536',
+            ],
+            [],
+            [
+                'remarks'  => 'remarks'
+            ]);
+
+        if ($validator->fails()) {
+            return ['formError' => $validator->errors()];
+        }
+
+        $ca = CorrectiveAction::find($request->id);
+
+        if ($ca->finding->status == 3) {
+            return [
+                'result' => 'error',
+                'msg' => 'Unable to close the corrective action. Corrective Action has been closed by auditor.'
+            ];
+        }
+
+        $ca->closing_remarks = $request->remarks;
+        $ca->save();
+
+        $ca->finding->status = 3;
+        $ca->finding->save();
+
+        return ['result' => 'ok'];
     }
 }

@@ -13,7 +13,13 @@ class CorrectiveAction extends Model
         'finding_id',
         'auditee_id',
         'desc',
+        'closing_remarks',
     ];
+
+    public function finding()
+    {
+        return $this->belongsTo(AuditFinding::class, 'finding_id');
+    }
 
     public function auditee()
     {

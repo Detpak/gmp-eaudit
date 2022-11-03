@@ -18,6 +18,7 @@ return new class extends Migration
             $table->foreignId('finding_id')->nullable()->constrained('audit_findings');
             $table->foreignId('auditee_id')->nullable()->constrained('users');
             $table->text('desc');
+            $table->text('closing_remarks')->nullable();
             $table->timestamps();
         });
     }

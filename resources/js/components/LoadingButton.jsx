@@ -27,13 +27,13 @@ export default class LoadingButton extends React.Component {
             const result = this.props.onClick();
 
             if (!this.handledManually) {
-                result.then(() => {
+                result.then((value) => {
                     this.setState({
                         isLoading: false,
                     });
 
                     if (this.props.afterLoading) {
-                        this.props.afterLoading();
+                        this.props.afterLoading(value);
                     }
                 })
                 .catch((reason) => {

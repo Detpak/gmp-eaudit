@@ -39,8 +39,7 @@ function CorrectiveActionForm() {
         const response = await httpRequest.post('api/v1/add-corrective-action', formData, config);
 
         if (response.data.formError) {
-            const errors = _.mapValues(response.data.formError, (value) => value[0]);
-            setFormError(errors);
+            setFormError(transformErrors(response.data.formError));
             setSubmitting(false);
             return;
         }
@@ -124,6 +123,10 @@ function CorrectiveActionForm() {
                                     <tr>
                                         <th>Area</th>
                                         <td>{finding.record.area.name}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Criteria</th>
+                                        <td>{finding.ca_name} ({finding.ca_code})</td>
                                     </tr>
                                     <tr>
                                         <th>Category</th>
