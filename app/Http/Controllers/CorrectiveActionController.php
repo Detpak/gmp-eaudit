@@ -101,6 +101,7 @@ class CorrectiveActionController extends Controller
             return $statusError;
         }
 
+        $images = collect();
         try {
             $ca = CorrectiveAction::create([
                 'finding_id' => $request->finding_id,
@@ -108,7 +109,6 @@ class CorrectiveActionController extends Controller
                 'desc' => $request->desc
             ]);
 
-            $images = collect();
             if ($request->hasFile('images')) {
                 foreach ($request->file('images') as $image) {
                     $filename = $caDate->valueOf() . '_' . Str::random(8) . '.' . $image->getClientOriginalExtension();
@@ -140,7 +140,8 @@ class CorrectiveActionController extends Controller
 
         $auditor = $finding->record->auditor;
         if ($auditor->email) {
-            Mail::to($auditor->email)->send(new CorrectiveActionTaken($finding, $ca->auditee, $ca->desc, $caDate->toDateTimeString()));
+            Mail::to($auditor->email)->send(
+                new CorrectiveActionTaken($finding, $ca->auditee, $ca->desc, $images, $caDate->toDateTimeString()));
         }
 
         return [

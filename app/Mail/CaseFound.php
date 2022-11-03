@@ -8,6 +8,7 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\Log;
 
 class CaseFound extends Mailable implements ShouldQueue
 {
@@ -18,19 +19,21 @@ class CaseFound extends Mailable implements ShouldQueue
     protected $area;
     protected $finding;
     protected $findingId;
+    protected $images;
 
     /**
      * Create a new message instance.
      *
      * @return void
      */
-    public function __construct(User $auditee, User $auditor, Area $area, $finding, $findingId)
+    public function __construct(User $auditee, User $auditor, Area $area, $finding, $findingId, $images)
     {
         $this->auditee = $auditee;
         $this->auditor = $auditor;
         $this->area = $area;
         $this->finding = $finding;
         $this->findingId = $findingId;
+        $this->images = $images;
     }
 
     /**
@@ -50,7 +53,8 @@ class CaseFound extends Mailable implements ShouldQueue
                         'auditor' => $this->auditor,
                         'area' => $this->area,
                         'finding' => $this->finding,
-                        'findingId' => $this->findingId
+                        'findingId' => $this->findingId,
+                        'images' => $this->images,
                     ]);
     }
 }

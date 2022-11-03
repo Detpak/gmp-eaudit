@@ -17,6 +17,7 @@ use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
@@ -189,8 +190,9 @@ class AuditProcessController extends Controller
             $auditor = User::find($request->auditor_id);
             foreach ($auditFindings->zip(array_values($findingIds)) as $finding) {
                 $area = AuditRecord::find($finding[0]['record_id'])->area;
+                $images = FailedPhoto::where('finding_id', $finding[1])->get();
                 foreach ($auditees as $auditee) {
-                    Mail::to($auditee)->send(new CaseFound($auditee, $auditor, $area, $finding[0], $finding[1]));
+                    Mail::to($auditee)->send(new CaseFound($auditee, $auditor, $area, $finding[0], $finding[1], $images));
                 }
             }
         }

@@ -44,6 +44,16 @@
 @endforeach
 </p>
 
+<strong>Images</strong>
+<br>
+
+@foreach ($images as $key => $image)
+@php
+    $idx = $key + 1;
+@endphp
+[{{ "Image {$idx}" }}]({{ asset("case_images/{$image->filename}") }})<br>
+@endforeach
+
 @component('mail::button', ['url' => url("corrective-action/{$findingId}")])
 Submit Corrective Action
 @endcomponent

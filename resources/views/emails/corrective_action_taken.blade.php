@@ -48,4 +48,14 @@
 @endforeach
 </p>
 
+<strong>Images</strong>
+<br>
+
+@foreach ($images as $key => $image)
+@php
+    $idx = $key + 1;
+@endphp
+[{{ "Image {$idx}" }}]({{ asset("ca_images/{$image['filename']}") }})<br>
+@endforeach
+
 @endcomponent
