@@ -38,7 +38,11 @@
 <strong>Description</strong>
 <br>
 
-{{ $finding['desc'] }}
+<p>
+@foreach (explode("\n", $finding['desc']) as $line)
+{{ $line }}<br>
+@endforeach
+</p>
 
 @component('mail::button', ['url' => url("corrective-action/{$findingId}")])
 Submit Corrective Action

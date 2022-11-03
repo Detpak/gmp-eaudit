@@ -42,6 +42,10 @@
 <strong>Description</strong>
 <br>
 
-{{ $finding->desc }}
+<p>
+@foreach (explode("\n", $desc) as $line)
+{{ $line }}<br>
+@endforeach
+</p>
 
 @endcomponent

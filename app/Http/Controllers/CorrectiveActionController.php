@@ -140,7 +140,7 @@ class CorrectiveActionController extends Controller
 
         $auditor = $finding->record->auditor;
         if ($auditor->email) {
-            Mail::to($auditor->email)->send(new CorrectiveActionTaken($finding, $ca->auditee, $caDate->toDateTimeString()));
+            Mail::to($auditor->email)->send(new CorrectiveActionTaken($finding, $ca->auditee, $ca->desc, $caDate->toDateTimeString()));
         }
 
         return [

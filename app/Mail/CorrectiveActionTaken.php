@@ -13,6 +13,7 @@ class CorrectiveActionTaken extends Mailable implements ShouldQueue
 
     protected $finding;
     protected $auditee;
+    protected $desc;
     protected $caDate;
 
     /**
@@ -20,10 +21,11 @@ class CorrectiveActionTaken extends Mailable implements ShouldQueue
      *
      * @return void
      */
-    public function __construct($finding, $auditee, $caDate)
+    public function __construct($finding, $auditee, $desc, $caDate)
     {
         $this->finding = $finding;
         $this->auditee = $auditee;
+        $this->desc = $desc;
         $this->caDate = $caDate;
     }
 
@@ -39,6 +41,7 @@ class CorrectiveActionTaken extends Mailable implements ShouldQueue
                     ->with([
                         'finding' => $this->finding,
                         'auditee' => $this->auditee,
+                        'desc' => $this->desc,
                         'caDate' => $this->caDate,
                     ]);
     }
