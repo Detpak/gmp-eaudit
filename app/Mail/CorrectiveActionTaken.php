@@ -11,6 +11,7 @@ class CorrectiveActionTaken extends Mailable implements ShouldQueue
 {
     use Queueable, SerializesModels;
 
+    protected $caId;
     protected $finding;
     protected $auditee;
     protected $desc;
@@ -22,8 +23,9 @@ class CorrectiveActionTaken extends Mailable implements ShouldQueue
      *
      * @return void
      */
-    public function __construct($finding, $auditee, $desc, $images, $caDate)
+    public function __construct($caId, $finding, $auditee, $desc, $images, $caDate)
     {
+        $this->caId = $caId;
         $this->finding = $finding;
         $this->auditee = $auditee;
         $this->desc = $desc;
@@ -41,6 +43,7 @@ class CorrectiveActionTaken extends Mailable implements ShouldQueue
         return $this->markdown('emails.corrective_action_taken')
                     ->subject("{$this->finding->code} - Corrective Action for {$this->finding->ca_name} ({$this->caDate})")
                     ->with([
+                        'caId' => $this->caId,
                         'finding' => $this->finding,
                         'auditee' => $this->auditee,
                         'desc' => $this->desc,

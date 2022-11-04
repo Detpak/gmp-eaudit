@@ -62,7 +62,7 @@ No Image.
 @endif
 
 
-@component('mail::button', ['url' => url("approve-ca/{$finding->id}")])
+@component('mail::button', ['url' => url("approve-ca/{$caId}")])
 Approve Corrective Action
 @endcomponent
 
