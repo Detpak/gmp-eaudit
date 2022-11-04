@@ -92,6 +92,23 @@ class DevMenuController extends Controller
         return ['result' => 'ok'];
     }
 
+    public function apiResetApproval($id)
+    {
+        $ca = CorrectiveAction::find($id);
+
+        if (!$ca) {
+            return ['result' => 'ok'];
+        }
+
+        $ca->closing_remarks = null;
+        $ca->save();
+
+        $ca->finding->status = 1;
+        $ca->finding->save();
+
+        return ['result' => 'ok'];
+    }
+
     public function apiGetAppState()
     {
         return AppState::first();

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\CorrectiveActionApproved;
 use App\Mail\CorrectiveActionTaken;
 use App\Models\AuditFinding;
 use App\Models\CorrectiveAction;
@@ -224,11 +225,23 @@ class CorrectiveActionController extends Controller
             ];
         }
 
-        $ca->closing_remarks = $request->remarks;
-        $ca->save();
+        try {
+            $ca->closing_remarks = $request->remarks;
+            $ca->save();
 
-        $ca->finding->status = 3;
-        $ca->finding->save();
+            $ca->finding->status = 3;
+            $ca->finding->save();
+        } catch (\Throwable $th) {
+            return [
+                'result' => 'error',
+                'msg' => 'An error occurred while closing the corrective action.'
+            ];
+        }
+
+        $auditee = $ca->auditee;
+        if ($auditee->email) {
+            Mail::to($auditee->email)->send(new CorrectiveActionApproved($ca));
+        }
 
         return ['result' => 'ok'];
     }

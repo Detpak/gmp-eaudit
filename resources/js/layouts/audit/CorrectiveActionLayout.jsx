@@ -37,10 +37,10 @@ function CloseCorrectiveActionForm({ id, disabled, refreshTable }) {
 
     return (
         <>
-            <Button size="sm" onClick={() => setShown(true)} disabled={disabled}>Approve and Close</Button>
+            <Button size="sm" onClick={() => setShown(true)} disabled={disabled}>Approve</Button>
             <Modal show={shown} onHide={() => setShown(false)}>
                 <Modal.Header closeButton>
-                    <Modal.Title className="fw-bold display-spacing">Approve and Close Corrective Action</Modal.Title>
+                    <Modal.Title className="fw-bold display-spacing">Approve Corrective Action</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
                     <Form>
@@ -99,6 +99,11 @@ export default function CorrectiveActionLayout() {
         setSearchKeyword(ev.target.value);
     };
 
+    const resetApproval = async (id) => {
+        const response = await httpRequest.get(`api/v1/dev/reset-ca-approval/${id}`);
+        console.log(response.data);
+    };
+
     return (
         <PageContent>
             <PageContentTopbar>
@@ -131,7 +136,8 @@ export default function CorrectiveActionLayout() {
                             <DescriptionModal msg={item.desc} />,
                             <DescriptionModal msg={item.closing_remarks} />,
                             <ImageModal buttonSize="sm" src={`api/v1/fetch-corrective-action-images/${item.id}`} disabled={item.images_count == 0} />,
-                            <CloseCorrectiveActionForm id={item.id} disabled={item.status == 3} refreshTable={refreshTable} />
+                            <CloseCorrectiveActionForm id={item.id} disabled={item.status == 3} refreshTable={refreshTable} />,
+                            <LoadingButton size="sm" onClick={async () => resetApproval(item.id)}>Reset Approval</LoadingButton>
                         ]
                     }}
                     columns={[
@@ -182,6 +188,10 @@ export default function CorrectiveActionLayout() {
                         {
                             sortable: false,
                             name: 'Action'
+                        },
+                        {
+                            sortable: false,
+                            name: 'Debug'
                         }
                     ]}
                 />
