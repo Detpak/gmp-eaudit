@@ -28,8 +28,9 @@ Route::middleware('admin')->group(function() {
     Route::get('/deauth', [LoginController::class, 'deauth']);
     Route::get('/app', function() { return redirect()->intended('/app/dashboard'); });
     Route::view('/app/{path?}', 'main_view')->where('path', '.*');
-    Route::view('/audit', 'audit');
-    Route::view('/corrective-action/{findingId}', 'corrective_action')->where("findingId", ".*");
+    Route::view('/audit', 'secondary_page', ['page' => 'audit']);
+    Route::view('/corrective-action/{findingId}', 'secondary_page', ['page' => 'corrective_action'])->where("findingId", ".*");
+    Route::view('/approve-ca/{caId}', 'secondary_page', ['page' => 'approve_ca'])->where("caId", ".*");
 
     // Route::prefix('/admin')->group(function() {
     //     Route::get('/', function() { return redirect()->intended('admin/dashboard'); });

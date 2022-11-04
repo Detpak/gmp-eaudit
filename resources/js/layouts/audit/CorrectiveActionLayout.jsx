@@ -12,11 +12,11 @@ import DescriptionModal from "../../components/DescriptionModal";
 import ModalForm from "../../components/ModalForm";
 import { useEffect } from "react";
 
-function CloseCorrectiveActionForm({ id, disabled, refreshTable }) {
+function ApproveCorrectiveActionForm({ id, disabled, refreshTable }) {
     const [shown, setShown] = useState(false);
     const [isSubmitting, setSubmitting] = useState(false);
     const [remarks, setRemarks] = useState('');
-    const [formError, setFormError] = useState(null)
+    const [formError, setFormError] = useState(null);
 
     const closeCA = async () => {
         if (!confirm('Are you sure?')) return;
@@ -63,7 +63,7 @@ function CloseCorrectiveActionForm({ id, disabled, refreshTable }) {
                 <Modal.Footer>
                     <LoadingButton
                         onClick={closeCA}
-                        afterLoading={(responseData) => {
+                        afterLoading={responseData => {
                             if (responseData.formError) {
                                 setFormError(transformErrors(responseData.formError));
                                 setSubmitting(false);
@@ -136,7 +136,7 @@ export default function CorrectiveActionLayout() {
                             <DescriptionModal msg={item.desc} />,
                             <DescriptionModal msg={item.closing_remarks} />,
                             <ImageModal buttonSize="sm" src={`api/v1/fetch-corrective-action-images/${item.id}`} disabled={item.images_count == 0} />,
-                            <CloseCorrectiveActionForm id={item.id} disabled={item.status == 3} refreshTable={refreshTable} />,
+                            <ApproveCorrectiveActionForm id={item.id} disabled={item.status == 3} refreshTable={refreshTable} />,
                             <LoadingButton size="sm" onClick={async () => resetApproval(item.id)}>Reset Approval</LoadingButton>
                         ]
                     }}

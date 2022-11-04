@@ -50,12 +50,20 @@
 
 <strong>Images</strong>
 <br>
-
+@if ($images->count() > 0)
 @foreach ($images as $key => $image)
 @php
     $idx = $key + 1;
 @endphp
 [{{ "Image {$idx}" }}]({{ asset("ca_images/{$image['filename']}") }})<br>
 @endforeach
+@else
+No Image.
+@endif
+
+
+@component('mail::button', ['url' => url("approve-ca/{$finding->id}")])
+Approve Corrective Action
+@endcomponent
 
 @endcomponent

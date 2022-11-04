@@ -10,6 +10,7 @@ import AuditProcessLayout from './layouts/AuditProcessLayout';
 import httpRequest from './api';
 import 'chart.js/auto';
 import CorrectiveActionMain from './layouts/CorrectiveActionMain';
+import ApproveCorrectiveActionLayout from './layouts/ApproveCorrectiveActionLayout';
 
 $(function() {
     axios.defaults.headers.common["X-Requested-With"] ="XMLHttpRequest";
@@ -37,6 +38,9 @@ $(function() {
                 break;
             case 'corrective_action':
                 ReactDOM.render(<BrowserRouter><CorrectiveActionMain /></BrowserRouter>, document.getElementById('main-container'));
+                break;
+            case 'approve_ca':
+                ReactDOM.render(<BrowserRouter><ApproveCorrectiveActionLayout /></BrowserRouter>, document.getElementById('main-container'));
                 break;
             default:
                 ReactDOM.render(<BrowserRouter><MainViewLayout /></BrowserRouter>, document.getElementById('main-container'));

@@ -214,15 +214,13 @@ function CorrectiveActionForm() {
 
 export default function CorrectiveActionMain() {
     return (
-        <>
-            <Card className="audit-card mx-sm-auto mx-2 my-2 w-auto">
-                <Card.Header className="p-3">
-                    <h3 className="fw-bold display-spacing m-0">Create Corrective Action</h3>
-                </Card.Header>
-                <Routes>
-                    <Route path="/corrective-action/:findingId" element={<CorrectiveActionForm />} />
-                </Routes>
-            </Card>
-        </>
+        <Card className="audit-card mx-sm-auto mx-2 my-2 w-auto">
+            <Card.Header className="p-3">
+                <h3 className="fw-bold display-spacing m-0">Create Corrective Action</h3>
+            </Card.Header>
+            <Routes>
+                <Route path="/corrective-action/:findingId" element={<CorrectiveActionForm />} />
+            </Routes>
+        </Card>
     );
 }

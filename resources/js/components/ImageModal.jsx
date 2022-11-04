@@ -20,7 +20,7 @@ export function ImageModal({ buttonSize, src, imageDescriptors, disabled }) {
     return (
         <>
             {src ?
-                <LoadingButton onClick={fetchData} size={buttonSize ? buttonSize : 'md'} className="me-2" disabled={disabled ? disabled : false}>Show</LoadingButton>
+                <LoadingButton onClick={fetchData} size={buttonSize ? buttonSize : 'md'} className="d-block w-100" disabled={disabled ? disabled : false}>Show</LoadingButton>
                 :
                 <Button className="d-block w-100" size={buttonSize ? buttonSize : 'md'} onClick={() => setShown(true)} disabled={disabled ? disabled : false}>Show</Button>
             }

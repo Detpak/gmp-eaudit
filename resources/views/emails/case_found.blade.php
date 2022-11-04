@@ -45,14 +45,17 @@
 </p>
 
 <strong>Images</strong>
+@if ($images->count() > 0)
 <br>
-
 @foreach ($images as $key => $image)
 @php
     $idx = $key + 1;
 @endphp
 [{{ "Image {$idx}" }}]({{ asset("case_images/{$image->filename}") }})<br>
 @endforeach
+@else
+No Image.
+@endif
 
 @component('mail::button', ['url' => url("corrective-action/{$findingId}")])
 Submit Corrective Action

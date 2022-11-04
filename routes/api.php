@@ -63,6 +63,7 @@ Route::prefix('/v1')->group(function() {
         Route::get('/fetch-corrective-actions', [CorrectiveActionController::class, 'apiFetch']);
         Route::get('/fetch-corrective-action-images/{id}', [CorrectiveActionController::class, 'apiFetchImages']);
         Route::post('/close-corrective-action', [CorrectiveActionController::class, 'apiClose']);
+        Route::get('/get-corrective-action/{id}', [CorrectiveActionController::class, 'apiGet']);
 
         // Audit records APIs
         Route::get('/fetch-records', [AuditRecordController::class, 'apiFetch']);

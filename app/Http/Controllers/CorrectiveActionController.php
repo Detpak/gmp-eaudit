@@ -26,7 +26,7 @@ class CorrectiveActionController extends Controller
             case 1:
                 return [
                     'result' => 'error',
-                    'msg' => 'Unable to proceed corrective action. Corrective action for the desired case has been taken by another auditee.'
+                    'msg' => 'Unable to proceed corrective action. Corrective action for the desired case has been taken.'
                 ];
             case 2:
                 return [
@@ -198,6 +198,24 @@ class CorrectiveActionController extends Controller
             ->map(function ($image) {
                 return asset("ca_images/{$image->filename}");
             });
+    }
+
+    public function apiGet($id)
+    {
+        $query = CorrectiveAction::query();
+
+        $query->with('finding', function ($query) {
+            $query->with('record', function ($query) {
+                $query->with('area', function ($query) {
+                    $query->with('department');
+                });
+            });
+        });
+
+        $query->with('auditee');
+        $query->withCount('images');
+
+        return $query->find($id);
     }
 
     public function apiClose(Request $request)
