@@ -1,7 +1,7 @@
 import { faArrowRotateRight, faXmark } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useState } from "react";
-import { Button, Form, InputGroup, Modal } from "react-bootstrap";
+import { Button, Card, Form, InputGroup, Modal } from "react-bootstrap";
 import { PageContent, PageContentTopbar, PageContentView } from "../../components/PageNav";
 import DynamicTable from "../../components/DynamicTable";
 import { ImageModal } from "../../components/ImageModal";
@@ -9,6 +9,8 @@ import { getCategoryString, rootUrl, waitForMs } from "../../utils";
 import LoadingButton from "../../components/LoadingButton";
 import httpRequest from "../../api";
 import DescriptionModal from "../../components/DescriptionModal";
+import ModalForm from "../../components/ModalForm";
+import { CorrectiveActionForm } from "../CorrectiveActionMain";
 
 function getCaseStatus(status)
 {
@@ -23,6 +25,7 @@ function getCaseStatus(status)
 export default function AuditFindingsLayout() {
     const [refreshTrigger, setRefreshTrigger] = useState(false);
     const [searchKeyword, setSearchKeyword] = useState('');
+    const [findingId, setFindingId] = useState(null);
 
     const refreshTable = () => {
         setRefreshTrigger(!refreshTrigger);
@@ -76,8 +79,7 @@ export default function AuditFindingsLayout() {
                             `${item.deducted_weight}%`,
                             <ImageModal buttonSize="sm" src={`api/v1/fetch-finding-images/${item.id}`} disabled={item.images_count == 0} />,
                             <Button
-                                href={rootUrl(`corrective-action/${item.id}`)}
-                                target="_blank"
+                                onClick={_ => setFindingId(item.id)}
                                 variant="success"
                                 size="sm"
                                 disabled={item.auditee_id == null || item.status != 0}
@@ -175,6 +177,21 @@ export default function AuditFindingsLayout() {
                     ]}
                 />
             </PageContentView>
+
+            <Modal show={findingId != null} onHide={_ => setFindingId(null)}>
+                <Modal.Header closeButton>
+                    <h3 className="fw-bold display-spacing m-0">Create Corrective Action</h3>
+                </Modal.Header>
+                <Card className="border-0">
+                    <CorrectiveActionForm
+                        findingId={findingId}
+                        afterSubmit={_ => {
+                            setFindingId(null);
+                            refreshTable();
+                        }}
+                    />
+                </Card>
+            </Modal>
         </PageContent>
     );
 }

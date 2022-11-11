@@ -9,8 +9,7 @@ import FileInput from "../components/FileInput";
 import { RequiredSpan } from "../components/LabelSpan";
 import { getCategoryString, scrollToElementById, waitForMs } from "../utils";
 
-function CorrectiveActionForm() {
-    const params = useParams();
+export function CorrectiveActionForm({ findingId, afterSubmit }) {
     const [finding, setFinding] = useState(null);
     const [errorMsg, setErrorMsg] = useState(null);
     const [loading, setLoading] = useState(true);
@@ -50,6 +49,11 @@ function CorrectiveActionForm() {
             return;
         }
 
+        if (afterSubmit != null) {
+            afterSubmit();
+            return;
+        }
+
         setSubmitProgress(100);
         await waitForMs(500);
 
@@ -59,12 +63,12 @@ function CorrectiveActionForm() {
     };
 
     const fetchData = async () => {
-        const auditeeCheck = await httpRequest.get(`api/v1/ensure-auditee-privilege/${params.findingId}`);
+        const auditeeCheck = await httpRequest.get(`api/v1/ensure-auditee-privilege/${findingId}`);
         if (auditeeCheck.data.result == 'error') {
             throw auditeeCheck.data;
         }
 
-        const caseFinding = await httpRequest.get(`api/v1/get-finding/${params.findingId}`);
+        const caseFinding = await httpRequest.get(`api/v1/get-finding/${findingId}`);
         setFinding(caseFinding.data);
         setCAData({ ...caData, finding_id: caseFinding.data.id });
     };
@@ -212,6 +216,11 @@ function CorrectiveActionForm() {
     )
 }
 
+function CorrectiveActionFormWrapper() {
+    const params = useParams();
+    return <CorrectiveActionForm findingId={params.findingId} />;
+}
+
 export default function CorrectiveActionMain() {
     return (
         <Card className="audit-card mx-sm-auto mx-2 my-2 w-auto">
@@ -219,7 +228,7 @@ export default function CorrectiveActionMain() {
                 <h3 className="fw-bold display-spacing m-0">Create Corrective Action</h3>
             </Card.Header>
             <Routes>
-                <Route path="/corrective-action/:findingId" element={<CorrectiveActionForm />} />
+                <Route path="/corrective-action/:findingId" element={<CorrectiveActionFormWrapper />} />
             </Routes>
         </Card>
     );
