@@ -5,7 +5,7 @@ import httpRequest from "../../api";
 import { OptionalSpan, RequiredSpan } from "../../components/LabelSpan";
 import CommonView from "../CommonView";
 
-function UserForm({ shown, handleChange, values, errors, isEdit }) {
+function UserForm({ shown, handleChange, values, setValues, errors, isEdit }) {
     const [isLoadingRole, setLoadingRole] = useState(false);
     const [roles, setRoles] = useState([]);
     const [changePassword, setChangePassword] = useState(false);
@@ -21,6 +21,15 @@ function UserForm({ shown, handleChange, values, errors, isEdit }) {
                 });
         }
     }, [shown]);
+
+    useEffect(() => {
+        const newValues = {
+            ...values,
+            password: ''
+        };
+
+        setValues(newValues);
+    }, [changePassword]);
 
     return (
         <>
@@ -71,7 +80,7 @@ function UserForm({ shown, handleChange, values, errors, isEdit }) {
             {isEdit &&
                 <>
                     <hr/>
-                    <Form.Group className="mb-3" controlId="password">
+                    <Form.Group className="mb-3">
                         <Form.Check
                             className="mb-3"
                             type="checkbox"
