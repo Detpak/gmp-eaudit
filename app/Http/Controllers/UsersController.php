@@ -3,9 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Helpers\CommonHelpers;
+use App\Models\ApiAccessToken;
 use App\Models\Role;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Response;
 use Illuminate\Support\Facades\Validator;
@@ -171,6 +173,7 @@ class UsersController extends Controller
                 'employee_id' => 'required|numeric',
                 'login_id' => 'required|string|max:255',
                 'email' => 'nullable|string|email|max:255',
+                'password' => 'required|string|max:255|min:8|confirmed',
                 'role_id' => 'required|exists:roles,id'
             ],
             [],
@@ -182,7 +185,13 @@ class UsersController extends Controller
             return Response::json(['formError' => $validator->errors()]);
         }
 
-        User::create($request->all());
+        $user = $request->except('password');
+        $user = [
+            ...$user,
+            'password' => Hash::make($request->password)
+        ];
+
+        User::create($user);
 
         return Response::json(['result' => 'ok']);
     }
@@ -200,6 +209,7 @@ class UsersController extends Controller
                 'employee_id' => 'required|numeric',
                 'login_id' => 'required|string|max:255',
                 'email' => 'nullable|string|email|max:255',
+                'password' => 'nullable|string|max:255|min:8|confirmed',
                 'role_id' => 'required|exists:roles,id'
             ],
             [],
@@ -217,7 +227,10 @@ class UsersController extends Controller
             return Response::json(['result' => 'Data not found']);
         }
 
-        $user->update($request->except('id'));
+        $user->update($request->except('id', 'password'));
+
+        $user->password = Hash::make($request->password);
+        $user->save();
 
         return Response::json(['result' => 'ok']);
     }
@@ -262,13 +275,17 @@ class UsersController extends Controller
             $query->where('roles.auditee', 1);
         }
 
-
         return $request->all ? $query->get() : $query->paginate($request->max);
     }
 
     public function apiDeleteUser($id)
     {
-        User::find($id)->delete();
+        try {
+            User::find($id)->delete();
+        } catch (\Throwable $th) {
+            return Response::json(['error' => 'Cannot delete the user.']);
+        }
+
         return Response::json(['result' => 'ok']);
     }
 
@@ -278,7 +295,11 @@ class UsersController extends Controller
             return Response::json(['result' => 'error'], 404);
         }
 
-        User::whereIn('id', $request->rowIds)->delete();
+        try {
+            User::whereIn('id', $request->rowIds)->delete();
+        } catch (\Throwable $th) {
+            return Response::json(['error' => 'Cannot delete users.']);
+        }
 
         return Response::json(['result' => 'ok']);
     }

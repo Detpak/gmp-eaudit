@@ -105,7 +105,7 @@ export default function ModalForm({ action, fetchUrl, initialValues, title, size
             setSubmitting(true);
             httpRequest.get(`${fetchUrl}/${editId}`)
                 .then((response) => {
-                    const newValues = {};
+                    const newValues = { ...values };
 
                     // Fill the new values
                     for (const key in response.data) {
@@ -177,6 +177,7 @@ export default function ModalForm({ action, fetchUrl, initialValues, title, size
                                 values: values,
                                 setValues: setValues,
                                 errors: errors,
+                                isEdit: editId != null,
                             };
 
                             return React.createElement(children, formProps);

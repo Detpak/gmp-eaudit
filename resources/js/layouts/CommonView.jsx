@@ -154,13 +154,14 @@ export default class CommonView extends React.Component {
                             }
                         }}
                         >
-                            {({ shown, handleChange, values, setValues, errors }) => {
+                            {({ shown, handleChange, values, setValues, errors, isEdit }) => {
                                 const formProps = {
                                     shown: shown,
                                     handleChange: handleChange,
                                     values: values,
                                     setValues: setValues,
                                     errors: errors,
+                                    isEdit: isEdit
                                 };
 
                                 return React.createElement(this.props.editItem.form, formProps);
@@ -183,8 +184,7 @@ export default class CommonView extends React.Component {
 
     static ActionButtons({ itemId, deleteAction, onDeleted, onEditClick }) {
         const handleDeleteClick = async () => {
-            const response = await axios.get(`${deleteAction}/${itemId}`);
-
+            const response = await httpRequest.get(`${deleteAction}/${itemId}`);
             if (response.data.result == 'ok') {
                 onDeleted();
             }

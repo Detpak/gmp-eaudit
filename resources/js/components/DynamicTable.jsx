@@ -71,7 +71,7 @@ export default function DynamicTable({ refreshTrigger, columns, selectedItems, o
     };
 
     const handleDeleteClick = async (itemId) => {
-        const response = await axios.get(`${actionColumn.deleteAction}/${itemId}`);
+        const response = await httpRequest.get(`${actionColumn.deleteAction}/${itemId}`);
 
         if (response.data.error) {
             throw Error(response.data.error);

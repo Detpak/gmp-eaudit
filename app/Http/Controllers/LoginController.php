@@ -52,20 +52,27 @@ class LoginController extends Controller
         }
 
         // This only applies on production
-        if (env('APP_ENV') == 'production') {
-            $ldap = ldap_connect("ldap://internal.detmold.com.au");
-            $bind = @ldap_connect($ldap, "detmold\\" . $request->loginID, $request->loginPassword);
-            ldap_close($ldap);
+        // if (env('APP_ENV') == 'production') {
+        //     $ldap = ldap_connect("ldap://internal.detmold.com.au");
+        //     $bind = @ldap_connect($ldap, "detmold\\" . $request->loginID, $request->loginPassword);
+        //     ldap_close($ldap);
 
-            // Reject login
-            if (!$bind) {
-                return Redirect::intended('/')
-                    ->withErrors(['loginPassword' => 'Password is incorrect.'])
-                    ->withInput();
-            }
-        }
+        //     // Reject login
+        //     if (!$bind) {
+        //         return Redirect::intended('/')
+        //             ->withErrors(['loginPassword' => 'Password is incorrect.'])
+        //             ->withInput();
+        //     }
+        // }
 
         $user = User::where('login_id', $request->loginID)->first();
+
+        if (!Hash::check($request->loginPassword, $user->password)) {
+            return redirect('/')
+                ->withErrors(['loginPassword' => 'Wrong Password'])
+                ->withInput();
+        }
+
         $token = Str::random(32);
         $tokenHash = Hash::make($token);
 
