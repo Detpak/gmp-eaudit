@@ -41,9 +41,9 @@ export function PageContentTopbar({ children }) {
     );
 }
 
-export function PageContentView({ children }) {
+export function PageContentView({ children, className }) {
     return (
-        <div className="flex-fill overflow-auto px-4">
+        <div className={`flex-fill overflow-auto px-4 ${className}`}>
             {children}
         </div>
     )

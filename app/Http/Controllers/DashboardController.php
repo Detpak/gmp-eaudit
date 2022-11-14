@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\AuditCycle;
+use App\Models\AuditFinding;
+use App\Models\CorrectiveAction;
 use App\Models\Machine;
 use App\Models\MtCheckGroup;
 use App\Models\TrAudit;
@@ -15,6 +17,16 @@ class DashboardController extends Controller
     public function show()
     {
         return view('main_view', ['viewtype' => 'dashboard']);
+    }
+
+    public function apiGetSummary(Request $request)
+    {
+        return [
+            'cycles' => AuditCycle::count(),
+            'case_submitted' => AuditFinding::count(),
+            'corrective_actions' => CorrectiveAction::count(),
+            'approved_ca' => AuditFinding::where('status', '3')->count()
+        ];
     }
 
     public function apiGetChart(Request $request)

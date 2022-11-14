@@ -47,6 +47,8 @@ Route::prefix('/v1')->group(function() {
             Route::get('dev/get-app-state', [DevMenuController::class, 'apiGetAppState']);
         }
 
+        Route::get('/get-summary', [DashboardController::class, 'apiGetSummary']);
+
         // Audit submission
         Route::post('/submit-audit', [AuditProcessController::class, 'apiSubmitAudit']);
         Route::put('/submit-audit-images', [AuditProcessController::class, 'apiSubmitImages']);
