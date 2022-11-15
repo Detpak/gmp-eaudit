@@ -25,6 +25,7 @@ $(function() {
     document.querySelector("meta[name='root-url']").remove();
 
     window.globalStateStore = createStore();
+    window.globalStateStore.setState("userData", null);
     window.globalStateStore.setState("toastMsg", { toastShown: false, msg: "" });
 
     if (document.querySelector("meta[name='page']")) {

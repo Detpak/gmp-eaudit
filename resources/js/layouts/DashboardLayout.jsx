@@ -1,9 +1,10 @@
 import { faCheckToSlot, faListCheck, faRecycle, faRotateRight, faThumbsUp } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useState, useEffect } from "react";
-import { Button, Col, Row, Spinner } from "react-bootstrap";
+import { Button, Card, Col, Row, Spinner } from "react-bootstrap";
 import httpRequest from "../api";
 import { PageContent, PageContentView, PageNavbar } from "../components/PageNav";
+import { Pie } from "react-chartjs-2"
 
 function SummaryButton({ href, caption, value, icon }) {
     return (
@@ -23,9 +24,21 @@ function SummaryButton({ href, caption, value, icon }) {
     )
 }
 
+function ChartColumn({ caption, children }) {
+    return (
+        <Col className="h-100">
+            <Card className="p-3 h-100">
+                <h4 className="fw-bold display-spacing">{caption}</h4>
+                {children}
+            </Card>
+        </Col>
+    );
+}
+
 export default function DashboardLayout() {
     const [summary, setSummary] = useState({});
     const [refreshTrigger, setRefreshTrigger] = useState(false);
+    const [areaStatus, setAreaStatus] = useState(null);
 
     const refresh = _ => {
         setRefreshTrigger(!refreshTrigger);
@@ -33,8 +46,11 @@ export default function DashboardLayout() {
 
     useEffect(async () => {
         setSummary({});
-        const response = await httpRequest.get('api/v1/get-summary');
-        setSummary(response.data);
+        const summary = await httpRequest.get('api/v1/get-summary');
+        setSummary(summary.data);
+
+        const areaStatusData = await httpRequest.post('api/v1/get-chart', { type: 'area_status' });
+        setAreaStatus(areaStatusData.data);
     }, [refreshTrigger]);
 
     return (
@@ -44,8 +60,8 @@ export default function DashboardLayout() {
             </PageNavbar>
 
             <PageContent>
-                <PageContentView className="py-4">
-                    <Row className="mb-3">
+                <PageContentView className="vstack gap-3 py-4">
+                    <Row>
                         <Col>
                             <SummaryButton
                                 caption="Total Cycles"
@@ -77,10 +93,54 @@ export default function DashboardLayout() {
                                 value={summary.approved_ca}
                                 icon={faThumbsUp}
                             />
+
                         </Col>
                     </Row>
                     <Row>
-                        <Col>Placeholder: In development</Col>
+                        <ChartColumn caption="Area Status for Current Cycle">
+                            {areaStatus != null &&
+                                <Pie
+                                    style={{ maxHeight: 250 }}
+                                    data={{
+                                        labels: ['Not Started', 'In-Progress', 'Done'],
+                                        datasets: [
+                                            {
+                                                label: '# of Votes',
+                                                data: [
+                                                    areaStatus.not_started,
+                                                    areaStatus.in_progress,
+                                                    areaStatus.done,
+                                                ],
+                                                backgroundColor: [
+                                                    'rgba(255, 99, 132, 0.2)',
+                                                    'rgba(255, 206, 86, 0.2)',
+                                                    'rgba(75, 192, 192, 0.2)',
+
+                                                ],
+                                                borderColor: [
+                                                    'rgba(255, 99, 132, 1)',
+                                                    'rgba(255, 206, 86, 1)',
+                                                    'rgba(75, 192, 192, 1)',
+                                                ],
+                                                borderWidth: 1,
+                                            },
+                                        ],
+                                    }}
+                                    options={{
+                                        plugins: {
+                                            legend: {
+                                                position: 'right'
+                                            }
+                                        }
+                                    }}
+                                />
+                            }
+                        </ChartColumn>
+                        <ChartColumn caption="Test" />
+                    </Row>
+                    <Row>
+                        <ChartColumn caption="Test" />
+                        <ChartColumn caption="Test" />
                     </Row>
                 </PageContentView>
             </PageContent>

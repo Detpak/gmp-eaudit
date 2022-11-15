@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\AuditCycle;
 use App\Models\AuditFinding;
+use App\Models\AuditRecord;
 use App\Models\CorrectiveAction;
 use App\Models\Machine;
 use App\Models\MtCheckGroup;
@@ -33,19 +34,15 @@ class DashboardController extends Controller
     {
         // return ['error' => 'Work in progress'];
 
-        if (!$request->has('type')) {
-            return ['error' => 'Type not specified'];
-        }
-
         switch ($request->type) {
-            case 'totalCycles':
+            case 'area_status':
                 return [
-                    'result' => AuditCycle::count(),
-                    'type' => $request->type
+                    'not_started' => AuditRecord::where('status', 0)->count(),
+                    'in_progress' => AuditRecord::where('status', 1)->count(),
+                    'done' => AuditRecord::where('status', 2)->count(),
                 ];
 
             default:
-                return ['result' => 'Unknown type'];
 
             // case 'totalAuditSubmitted':
             //     return [
@@ -124,6 +121,6 @@ class DashboardController extends Controller
             //     ];
         }
 
-        return Response::json(['error' => 'Unknown type']);
+        return Response::json([]);
     }
 }

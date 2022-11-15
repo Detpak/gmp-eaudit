@@ -1,19 +1,24 @@
-import { Nav, Navbar, NavDropdown } from "react-bootstrap";
+import { useEffect } from "react";
+import { Nav, Navbar, NavDropdown, Spinner } from "react-bootstrap";
 import { NavLink } from "react-router-dom";
+import { rootUrl } from "../utils";
 
 export function PageNavbar({ children }) {
+    const [userData, setUserData, updateUserData] = window.globalStateStore.useState("userData");
+
     return (
         <Navbar bg="light" className="p-3">
             <Nav variant="pills" className="nav me-auto" navbar={false}>
                 {children}
-                {/* <NavDropdown title="Dropdown" id="nav-dropdown">
-                    <NavDropdown.Item eventKey="4.1">Action</NavDropdown.Item>
-                    <NavDropdown.Item eventKey="4.2">Another action</NavDropdown.Item>
-                    <NavDropdown.Item eventKey="4.3">Something else here</NavDropdown.Item>
-                    <NavDropdown.Divider />
-                    <NavDropdown.Item eventKey="4.4">Separated link</NavDropdown.Item>
-                </NavDropdown> */}
             </Nav>
+            <NavDropdown
+                title={userData == null ? <Spinner size="sm" animation="border" /> : userData.name}
+                className="px-3"
+                id="nav-dropdown"
+                align="end"
+            >
+                <NavDropdown.Item href={rootUrl('deauth')}>Logout</NavDropdown.Item>
+            </NavDropdown>
         </Navbar>
     );
 }

@@ -21,6 +21,7 @@ import AuditFindingsLayout from './audit/AuditFindingsLayout';
 import DevMenuLayout from './DevMenuLayout';
 import _ from 'lodash';
 import CorrectiveActionLayout from './audit/CorrectiveActionLayout';
+import httpRequest from '../api';
 
 function Sidebar() {
     return (
@@ -100,8 +101,9 @@ export function MainViewLayout() {
     const [toastMsgState, setToastMsgState, updateToastMsgState] = window.globalStateStore.useState("toastMsg");
     const closeToast = () => updateToastMsgState((value) => ({ toastShown: false, msg: value.msg }));
 
-    useEffect(() => {
-        console.log('test');
+    useEffect(async () => {
+        const response = await httpRequest.get('api/v1/get-current-user');
+        window.globalStateStore.getState("userData").updateValue((value) => response.data.result);
     }, []);
 
     return (
@@ -109,14 +111,14 @@ export function MainViewLayout() {
             <div className="d-flex flex-row main">
                 <div className="d-flex flex-column min-vh-100 p-2 bg-primary bg-gradient text-white" style={{ minWidth: '100px' }}>
                     <Sidebar />
-                    <a role="button" href={rootUrl('audit')} className="text-white mb-3">
+                    <a role="button" href={rootUrl('audit')} className="text-white">
                         <FontAwesomeIcon icon={faCheck} className="menu-icon d-block mx-auto"/>
-                        <div className="menu-text text-center m-0">Audit</div>
+                        <div className="menu-text text-center m-0">Submit Audit</div>
                     </a>
-                    <a role="button" href={rootUrl('deauth')} className="text-white">
+                    {/* <a role="button" href={rootUrl('deauth')} className="text-white">
                         <FontAwesomeIcon icon={faPowerOff} className="menu-icon d-block mx-auto"/>
                         <div className="menu-text text-center m-0">Logout</div>
-                    </a>
+                    </a> */}
                 </div>
                 <div className="vh-100 flex-fill bg-white overflow-auto">
                     <div className="d-flex flex-column h-100">
