@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Toast } from 'react-bootstrap';
 import { faCheck, faPowerOff } from '@fortawesome/free-solid-svg-icons';
 import { menus, rootUrl } from '../utils';
@@ -99,6 +99,10 @@ function UsersOutlet() {
 export function MainViewLayout() {
     const [toastMsgState, setToastMsgState, updateToastMsgState] = window.globalStateStore.useState("toastMsg");
     const closeToast = () => updateToastMsgState((value) => ({ toastShown: false, msg: value.msg }));
+
+    useEffect(() => {
+        console.log('test');
+    }, []);
 
     return (
         <>

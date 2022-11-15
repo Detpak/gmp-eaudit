@@ -39,6 +39,16 @@
 </table>
 
 <br>
+<strong>Case Description</strong>
+<br>
+
+<p>
+@foreach (explode("\n", $finding->desc) as $line)
+{{ $line }}<br>
+@endforeach
+</p>
+
+<br>
 <strong>Description</strong>
 <br>
 

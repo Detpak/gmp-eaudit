@@ -21,7 +21,7 @@ class PlantController extends Controller
                 'address'       => 'required|string|max:65535',
                 'city'          => 'required|string|max:255',
                 'zip'           => ['required', 'regex:/(^\d{5}$)|(^\d{9}$)|(^\d{5}-\d{4}$)/', 'max:255'],
-                'entity_id'     => 'required|string|exists:entities,id',
+                'entity_id'     => 'required|exists:entities,id',
             ],
             [
                 'zip.regex'     => 'The :attribute is invalid.',
@@ -60,7 +60,7 @@ class PlantController extends Controller
                 'address'       => 'required|string|max:65535',
                 'city'          => 'required|string|max:255',
                 'zip'           => ['required', 'regex:/(^\d{5}$)|(^\d{9}$)|(^\d{5}-\d{4}$)/', 'max:255'],
-                'entity_id'     => 'required|string|exists:entities,id',
+                'entity_id'     => 'required|exists:entities,id',
             ],
             [
                 'zip.regex'     => 'The :attribute is invalid.',

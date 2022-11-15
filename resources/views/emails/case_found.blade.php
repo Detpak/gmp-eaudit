@@ -45,8 +45,8 @@
 </p>
 
 <strong>Images</strong>
-@if ($images->count() > 0)
 <br>
+@if ($images->count() > 0)
 @foreach ($images as $key => $image)
 @php
     $idx = $key + 1;

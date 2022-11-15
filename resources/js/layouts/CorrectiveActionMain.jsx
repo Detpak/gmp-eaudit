@@ -148,12 +148,23 @@ export function CorrectiveActionForm({ findingId, afterSubmit }) {
                             </Table>
                         </Form.Group>
                         <Form.Group className="mb-3">
+                            <Form.Label className="fw-bold">Case Description</Form.Label>
+                            <Form.Control
+                                as="textarea"
+                                id="desc"
+                                rows={3}
+                                value={finding.desc}
+                                disabled={true}
+                            />
+                        </Form.Group>
+                        <hr/>
+                        <Form.Group className="mb-3">
                             <Form.Label>Description <RequiredSpan /></Form.Label>
                             <Form.Control
                                 as="textarea"
                                 id="desc"
                                 rows={3}
-                                value={caData.description}
+                                value={caData.desc}
                                 onChange={(ev) => {
                                     setCAData({ ...caData, desc: ev.target.value });
                                 }}

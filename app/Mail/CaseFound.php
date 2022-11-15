@@ -26,9 +26,9 @@ class CaseFound extends Mailable implements ShouldQueue
      *
      * @return void
      */
-    public function __construct(User $auditee, User $auditor, Area $area, $finding, $findingId, $images)
+    public function __construct(User $auditor, Area $area, $finding, $findingId, $images)
     {
-        $this->auditee = $auditee;
+
         $this->auditor = $auditor;
         $this->area = $area;
         $this->finding = $finding;
@@ -49,7 +49,6 @@ class CaseFound extends Mailable implements ShouldQueue
         return $this->markdown('emails.case_found')
                     ->subject("{$code} - {$name} ({$date})")
                     ->with([
-                        'auditee' => $this->auditee,
                         'auditor' => $this->auditor,
                         'area' => $this->area,
                         'finding' => $this->finding,

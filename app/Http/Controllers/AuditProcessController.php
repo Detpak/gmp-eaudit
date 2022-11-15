@@ -191,9 +191,9 @@ class AuditProcessController extends Controller
             foreach ($auditFindings->zip(array_values($findingIds)) as $finding) {
                 $area = AuditRecord::find($finding[0]['record_id'])->area;
                 $images = FailedPhoto::where('finding_id', $finding[1])->get();
-                foreach ($auditees as $auditee) {
-                    Mail::to($auditee)->send(new CaseFound($auditee, $auditor, $area, $finding[0], $finding[1], $images));
-                }
+                Mail::to($auditees)
+                    ->cc($auditor)
+                    ->send(new CaseFound($auditor, $area, $finding[0], $finding[1], $images));
             }
         }
 

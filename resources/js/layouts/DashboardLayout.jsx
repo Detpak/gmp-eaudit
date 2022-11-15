@@ -80,7 +80,7 @@ export default function DashboardLayout() {
                         </Col>
                     </Row>
                     <Row>
-                        <Col>Test</Col>
+                        <Col>Placeholder: In development</Col>
                     </Row>
                 </PageContentView>
             </PageContent>
