@@ -143,22 +143,14 @@ export default function DynamicTable({ refreshTrigger, columns, selectedItems, o
     return (
         <div className="d-flex flex-column h-100">
             <div className="d-flex flex-fill overflow-auto h-100 mb-3 position-relative">
-                {/* {isLoading && !error && (
-                    <div className="position-relative">
-                        <div className="position-absolute">
-                            <h1>Test</h1>
-                        </div>
-                    </div>
-                )} */}
                 {isLoading && !error &&
-                    <div className="d-flex flex-column position-absolute w-100 h-100 bg-white bg-opacity-50 text-center justify-content-center" style={{ zIndex: 1 }}>
+                    <div className="d-flex flex-column position-absolute w-100 h-100 bg-white bg-opacity-50 text-center justify-content-center" style={{ zIndex: 2 }}>
                         <div>
                             <Spinner animation="border"/>
                         </div>
                         <h2>Loading</h2>
                     </div>
                 }
-
                 <div className="flex-fill overflow-auto">
                     <Table hover borderless striped className="align-middle table-nowrap mb-0">
                         <thead>
@@ -171,7 +163,7 @@ export default function DynamicTable({ refreshTrigger, columns, selectedItems, o
                                 {columns.map((column, index) => {
                                     const sortable = !('sortable' in column) ? true : column.sortable;
                                     return (
-                                        <th key={index} className={thClassName} style={{ zIndex: 'auto' }} onClick={() => sortable && handleSort(column.id)}>
+                                        <th key={index} className={thClassName} style={{ zIndex: 1 }} onClick={() => sortable && handleSort(column.id)}>
                                             <div className={`hstack gap-3 px-3 py-2 border ${selectedItems || index != 0 ? 'border-start-0' : ''}`}>
                                                 <span className="user-select-none flex-fill">{column.name}</span>
                                                 {sortable && <FontAwesomeIcon icon={sort && sort.column == column.id ? (sort.dir == 1 ? faSortUp : faSortDown) : faSort} />}

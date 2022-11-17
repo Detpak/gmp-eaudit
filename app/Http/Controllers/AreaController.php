@@ -108,7 +108,11 @@ class AreaController extends Controller
 
     public function apiDelete($id)
     {
-        Area::find($id)->delete();
+        try {
+            Area::find($id)->delete();
+        } catch (\Throwable $th) {
+            return ['error' => 'Cannot delete area'];
+        }
         return ['result' => 'ok'];
     }
 
@@ -118,7 +122,11 @@ class AreaController extends Controller
             return Response::json(['result' => 'error'], 404);
         }
 
-        Area::whereIn('id', $request->rowIds)->delete();
+        try {
+            Area::whereIn('id', $request->rowIds)->delete();
+        } catch (\Throwable $th) {
+            return ['error' => 'Cannot delete selected area'];
+        }
 
         return Response::json(['result' => 'ok']);
     }
