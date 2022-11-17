@@ -8,6 +8,7 @@ import { PageContent, PageContentTopbar, PageContentView } from "../../component
 export default function AuditRecordsLayout() {
     const [refreshTrigger, setRefreshTrigger] = useState(false);
     const [searchKeyword, setSearchKeyword] = useState('');
+    const [showCurrentCycle, setShowCurrentCycle] = useState(false);
 
     const refreshTable = () => {
         setRefreshTrigger(!refreshTrigger);
@@ -21,7 +22,7 @@ export default function AuditRecordsLayout() {
         <PageContent>
             <PageContentTopbar>
                 <Button variant="outline-primary" onClick={refreshTable} className="me-2"><FontAwesomeIcon icon={faArrowRotateRight} /></Button>
-                <Form.Group>
+                <Form.Group className="me-3">
                     <InputGroup>
                         <Form.Control type="text" value={searchKeyword} onChange={handleSearch} placeholder="Search" />
                         <Button variant="outline-secondary" onClick={() => setSearchKeyword('')}>
@@ -29,6 +30,11 @@ export default function AuditRecordsLayout() {
                         </Button>
                     </InputGroup>
                 </Form.Group>
+                <Form.Check
+                    label="Show Current Cycle"
+                    value={showCurrentCycle}
+                    onChange={_ => setShowCurrentCycle(!showCurrentCycle)}
+                />
             </PageContentTopbar>
             <PageContentView>
                 <DynamicTable

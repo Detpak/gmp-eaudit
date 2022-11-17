@@ -13,9 +13,9 @@ function SummaryButton({ href, caption, value, icon }) {
                 <div className="flex-fill">
                     <h5 className="fw-bold display-spacing">{caption}</h5>
                     {value != null ?
-                        <h2 className="fw-bold">{value}</h2>
+                        <h2 className="fw-bold my-0">{value}</h2>
                         :
-                        <Spinner animation="border" />
+                        <Spinner animation="border"/>
                     }
                 </div>
                 <FontAwesomeIcon icon={icon} className="chart-icon" />

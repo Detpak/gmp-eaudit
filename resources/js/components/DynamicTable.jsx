@@ -142,106 +142,127 @@ export default function DynamicTable({ refreshTrigger, columns, selectedItems, o
 
     return (
         <div className="d-flex flex-column h-100">
-            <div className="flex-fill overflow-auto h-100 mb-3">
-                <Table hover borderless striped className="align-middle table-nowrap mb-0">
-                    <thead>
-                        <tr>
-                            {selectedItems &&
-                                <th className={thFixedLeftClassName}>
-                                    <div className="px-3 py-2 border"><FontAwesomeIcon icon={faCheck} /></div>
-                                </th>
-                            }
-                            {columns.map((column, index) => {
-                                const sortable = !('sortable' in column) ? true : column.sortable;
-                                return (
-                                    <th key={index} className={thClassName} style={{ zIndex: 'inherit' }} onClick={() => sortable && handleSort(column.id)}>
-                                        <div className={`hstack gap-3 px-3 py-2 border ${selectedItems || index != 0 ? 'border-start-0' : ''}`}>
-                                            <span className="user-select-none flex-fill">{column.name}</span>
-                                            {sortable && <FontAwesomeIcon icon={sort && sort.column == column.id ? (sort.dir == 1 ? faSortUp : faSortDown) : faSort} />}
-                                        </div>
-                                    </th>
-                                )
-                            })}
-                            {actionColumn &&
-                                <th className={thFixedRightClassName}>
-                                    <div className="px-3 py-2 border">Action</div>
-                                </th>
-                            }
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {
-                            isLoading && !error ? (
-                                // Show loading shimmer
-                                _.range(0, 5).map((_, index) => (
-                                    <tr key={index}>
-                                        {selectedItems &&
-                                            <td className={tdFixedLeftClassName}>
-                                                <input type="checkbox" className="form-check-input" disabled />
-                                            </td>
-                                        }
-                                        {columns.map((data, columnIndex) => (
-                                            <td key={columnIndex} className={tdClassName}>
-                                                <div className="shimmer"></div>
-                                            </td>
-                                        ))}
-                                        {actionColumn &&
-                                            <td className={tdFixedRightClassName}>
-                                                <Button size="sm" className="me-1" disabled><FontAwesomeIcon icon={faPenToSquare}/></Button>
-                                                <Button variant="danger" size="sm" disabled><FontAwesomeIcon icon={faTrash}/></Button>
-                                            </td>
-                                        }
-                                    </tr>
-                                ))
-                            ) : (
-                                listData.map((item, index) => (
-                                    <tr key={index}>
-                                        {selectedItems &&
-                                            <td className={tdFixedLeftClassName}>
-                                                <input
-                                                    type="checkbox"
-                                                    className="form-check-input"
-                                                    defaultChecked={item.id in selectedItems ? selectedItems[item.id] : false}
-                                                    onChange={(ev) => handleSelect(item.id, ev.target.checked)}
-                                                />
-                                            </td>
-                                        }
-                                        {source.produce(item).map((data, columnIndex) => (
-                                            <td key={columnIndex} className={tdClassName}>{data}</td>
-                                        ))}
-                                        {actionColumn &&
-                                            <td className={tdFixedRightClassName}>
-                                                <Button
-                                                    size="sm"
-                                                    className="me-1"
-                                                    onClick={() => actionColumn.onEditClick(item.id)}
-                                                    disabled={actionColumn.allowEditIf && actionColumn.allowEditIf(item)}
-                                                >
-                                                    <FontAwesomeIcon icon={faPenToSquare}/>
-                                                </Button>
-                                                <LoadingButton
-                                                    variant="danger"
-                                                    size="sm"
-                                                    icon={faTrash}
-                                                    onClick={() => handleDeleteClick(item.id)}
-                                                    afterLoading={() => fetchData()}
-                                                    disabled={actionColumn.allowDeleteIf && actionColumn.allowDeleteIf(item)}
-                                                />
-                                            </td>
-                                        }
-                                    </tr>
-                                ))
-                            )
-                        }
-                    </tbody>
-                </Table>
-                {
-                    !isLoading && listData.length == 0 &&
-                        <div className="text-center p-4">
-                            No records available.
+            <div className="d-flex flex-fill overflow-auto h-100 mb-3 position-relative">
+                {/* {isLoading && !error && (
+                    <div className="position-relative">
+                        <div className="position-absolute">
+                            <h1>Test</h1>
                         </div>
+                    </div>
+                )} */}
+                {isLoading && !error &&
+                    <div className="d-flex flex-column position-absolute w-100 h-100 bg-white bg-opacity-50 text-center justify-content-center" style={{ zIndex: 1 }}>
+                        <div>
+                            <Spinner animation="border"/>
+                        </div>
+                        <h2>Loading</h2>
+                    </div>
                 }
-                {error && <div className="text-center p-4">Failed to retrieve data.</div>}
+
+                <div className="flex-fill overflow-auto">
+                    <Table hover borderless striped className="align-middle table-nowrap mb-0">
+                        <thead>
+                            <tr>
+                                {selectedItems &&
+                                    <th className={thFixedLeftClassName}>
+                                        <div className="px-3 py-2 border"><FontAwesomeIcon icon={faCheck} /></div>
+                                    </th>
+                                }
+                                {columns.map((column, index) => {
+                                    const sortable = !('sortable' in column) ? true : column.sortable;
+                                    return (
+                                        <th key={index} className={thClassName} style={{ zIndex: 'auto' }} onClick={() => sortable && handleSort(column.id)}>
+                                            <div className={`hstack gap-3 px-3 py-2 border ${selectedItems || index != 0 ? 'border-start-0' : ''}`}>
+                                                <span className="user-select-none flex-fill">{column.name}</span>
+                                                {sortable && <FontAwesomeIcon icon={sort && sort.column == column.id ? (sort.dir == 1 ? faSortUp : faSortDown) : faSort} />}
+                                            </div>
+                                        </th>
+                                    )
+                                })}
+                                {actionColumn &&
+                                    <th className={thFixedRightClassName}>
+                                        <div className="px-3 py-2 border">Action</div>
+                                    </th>
+                                }
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {
+                                // isLoading && !error ? (
+                                //     // Show loading shimmer
+                                //     // _.range(0, 5).map((_, index) => (
+                                //     //     <tr key={index}>
+                                //     //         {selectedItems &&
+                                //     //             <td className={tdFixedLeftClassName}>
+                                //     //                 <input type="checkbox" className="form-check-input" disabled />
+                                //     //             </td>
+                                //     //         }
+                                //     //         {columns.map((data, columnIndex) => (
+                                //     //             <td key={columnIndex} className={tdClassName}>
+                                //     //                 <div className="shimmer"></div>
+                                //     //             </td>
+                                //     //         ))}
+                                //     //         {actionColumn &&
+                                //     //             <td className={tdFixedRightClassName}>
+                                //     //                 <Button size="sm" className="me-1" disabled><FontAwesomeIcon icon={faPenToSquare}/></Button>
+                                //     //                 <Button variant="danger" size="sm" disabled><FontAwesomeIcon icon={faTrash}/></Button>
+                                //     //             </td>
+                                //     //         }
+                                //     //     </tr>
+                                //     // ))
+                                //     <></>
+                                // ) : (
+
+                                // )
+                            }
+                            {listData.map((item, index) => (
+                                <tr key={index}>
+                                    {selectedItems &&
+                                        <td className={tdFixedLeftClassName}>
+                                            <input
+                                                type="checkbox"
+                                                className="form-check-input"
+                                                defaultChecked={item.id in selectedItems ? selectedItems[item.id] : false}
+                                                onChange={(ev) => handleSelect(item.id, ev.target.checked)}
+                                            />
+                                        </td>
+                                    }
+                                    {source.produce(item).map((data, columnIndex) => (
+                                        <td key={columnIndex} className={tdClassName}>{data}</td>
+                                    ))}
+                                    {actionColumn &&
+                                        <td className={tdFixedRightClassName}>
+                                            <Button
+                                                size="sm"
+                                                className="me-1"
+                                                onClick={() => actionColumn.onEditClick(item.id)}
+                                                disabled={actionColumn.allowEditIf && actionColumn.allowEditIf(item)}
+                                            >
+                                                <FontAwesomeIcon icon={faPenToSquare}/>
+                                            </Button>
+                                            <LoadingButton
+                                                variant="danger"
+                                                size="sm"
+                                                icon={faTrash}
+                                                onClick={() => handleDeleteClick(item.id)}
+                                                afterLoading={() => fetchData()}
+                                                disabled={actionColumn.allowDeleteIf && actionColumn.allowDeleteIf(item)}
+                                            />
+                                        </td>
+                                    }
+                                </tr>
+                            ))
+                            }
+                        </tbody>
+                    </Table>
+                    {
+                        !isLoading && listData.length == 0 &&
+                            <div className="text-center p-4">
+                                No records available.
+                            </div>
+                    }
+                    {error && <div className="text-center p-4">Failed to retrieve data.</div>}
+                </div>
             </div>
             <div className="d-flex align-items-center mb-3">
                 <div className="flex-fill hstack gap-1">
