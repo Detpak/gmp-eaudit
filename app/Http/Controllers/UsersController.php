@@ -27,7 +27,6 @@ class UsersController extends Controller
             [
                 'roleName' => 'required|string|unique:roles,name|max:255',
                 'remarks' => 'nullable|string|max:255',
-                'auditee' => 'required'
             ]
         );
 
@@ -35,13 +34,12 @@ class UsersController extends Controller
             return Response::json(['formError' => $validator->errors()]);
         }
 
-        $accessInfo = $request->except(['userId', 'roleName', 'remarks']);
-
         Role::create([
             'name' => $request->roleName,
-            'access_info' => json_encode($accessInfo),
+            'access_info' => json_encode($request->access),
             'remarks' => $request->remarks,
-            'auditee' => $request->auditee ? 1 : 0
+            'auditee' => $request->auditee ? 1 : 0,
+            'auditor' => $request->auditor,
         ]);
 
         return Response::json(['result' => 'ok']);
@@ -56,10 +54,8 @@ class UsersController extends Controller
             'roleName' => $role->name,
             'remarks' => $role->remarks,
             'auditee' => $role->auditee,
-            'dashboard' => isset($accessInfo->dashboard) ? $accessInfo->dashboard : null,
-            'audit' => isset($accessInfo->audit) ? $accessInfo->audit : null,
-            'workplace' => isset($accessInfo->workplace) ? $accessInfo->workplace : null,
-            'users' => isset($accessInfo->users) ? $accessInfo->users : null,
+            'auditor' => $role->auditor,
+            'access' => $accessInfo
         ];
     }
 
@@ -87,6 +83,8 @@ class UsersController extends Controller
             $subject = CommonHelpers::getSubjectWord($role->users_count);
             return ['error' => "Cannot delete role \"{$role->name}\". There {$subject} {$role->users_count} registered user(s) under the role."];
         }
+
+        $role->delete();
 
         return Response::json(['result' => 'ok']);
     }
@@ -132,7 +130,6 @@ class UsersController extends Controller
             [
                 'roleName' => 'required|string|max:255',
                 'remarks' => 'nullable|string|max:255',
-                'auditee' => 'required'
             ]
         );
 
@@ -143,14 +140,10 @@ class UsersController extends Controller
         $updateColumn = [
             'name' => $request->roleName,
             'remarks' => $request->remarks,
-            'auditee' => $request->auditee ? 1 : 0
+            'auditee' => $request->auditee ? 1 : 0,
+            'auditor' => $request->auditor,
+            'access_info' => json_encode($request->access),
         ];
-
-        $accessInfo = $request->except(['id', 'roleName', 'remarks']);
-
-        if (sizeof($accessInfo) != 0) {
-            $updateColumn['access_info'] = $accessInfo;
-        }
 
         $data->update($updateColumn);
 

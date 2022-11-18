@@ -12,6 +12,7 @@ class Role extends Model
     protected $fillable = [
         'name',
         'auditee',
+        'auditor',
         'access_info',
         'remarks'
     ];

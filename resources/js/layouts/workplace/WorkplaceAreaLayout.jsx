@@ -1,4 +1,3 @@
-import axios from "axios";
 import CommonView from "./../CommonView";
 import { Form } from "react-bootstrap";
 import { useState } from "react";

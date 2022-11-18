@@ -8,7 +8,6 @@ import _ from "lodash";
 import LoadingButton from "./LoadingButton";
 import { useInRouterContext } from "react-router-dom";
 import { useRef } from "react";
-import { showToastMsg } from "../utils";
 import httpRequest from "../api";
 
 const MAX_PAGES = 3;
@@ -21,7 +20,6 @@ export default function DynamicTable({ refreshTrigger, columns, selectedItems, o
     const tdFixedLeftClassName = "px-3 table-column-fixed-left py-2";
     const tdFixedRightClassName = "px-3 table-column-fixed-right py-2";
     const entriesList = _.range(1, 11).map((value) => value * 10); // 5, 10, 15, 20, ...
-    const isInRouterContext = useInRouterContext();
     const [search, setSearch] = useState('');
     const [sort, setSort] = useState(null);
     const [listData, setListData] = useState([]);
@@ -179,34 +177,6 @@ export default function DynamicTable({ refreshTrigger, columns, selectedItems, o
                             </tr>
                         </thead>
                         <tbody>
-                            {
-                                // isLoading && !error ? (
-                                //     // Show loading shimmer
-                                //     // _.range(0, 5).map((_, index) => (
-                                //     //     <tr key={index}>
-                                //     //         {selectedItems &&
-                                //     //             <td className={tdFixedLeftClassName}>
-                                //     //                 <input type="checkbox" className="form-check-input" disabled />
-                                //     //             </td>
-                                //     //         }
-                                //     //         {columns.map((data, columnIndex) => (
-                                //     //             <td key={columnIndex} className={tdClassName}>
-                                //     //                 <div className="shimmer"></div>
-                                //     //             </td>
-                                //     //         ))}
-                                //     //         {actionColumn &&
-                                //     //             <td className={tdFixedRightClassName}>
-                                //     //                 <Button size="sm" className="me-1" disabled><FontAwesomeIcon icon={faPenToSquare}/></Button>
-                                //     //                 <Button variant="danger" size="sm" disabled><FontAwesomeIcon icon={faTrash}/></Button>
-                                //     //             </td>
-                                //     //         }
-                                //     //     </tr>
-                                //     // ))
-                                //     <></>
-                                // ) : (
-
-                                // )
-                            }
                             {listData.map((item, index) => (
                                 <tr key={index}>
                                     {selectedItems &&

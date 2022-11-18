@@ -46,12 +46,12 @@ export default class CommonView extends React.Component {
                                                 { headers: { 'Content-Type': 'application/json' } });
 
         if (response.data.result == 'ok') {
-            showToastMsg(this.props.messages.onSelectedItemDeletedMsg);
+            //showToastMsg(this.props.messages.onSelectedItemDeletedMsg);
             this.refreshTable();
         }
 
         if (response.data.error) {
-            showToastMsg(response.data.error);
+            //showToastMsg(response.data.error);
         }
     }
 
@@ -95,7 +95,7 @@ export default class CommonView extends React.Component {
                             allowDeleteIf: this.props.deleteItem.allowDeleteIf,
                             deleteAction: this.props.deleteItem.action,
                             onDeleted: () => {
-                                showToastMsg(this.props.messages.onItemDeleted);
+                                //showToastMsg(this.props.messages.onItemDeleted);
                                 this.refreshTable();
                             }
                         }}
@@ -103,35 +103,61 @@ export default class CommonView extends React.Component {
                         onItemSelected={(items) => this.setState({ selectedItems: items })}/>
                 </PageContentView>
 
-                <ModalForm
-                    title={this.props.addNewItem.name}
-                    size={this.props.addNewItem.size}
-                    action={this.props.addNewItem.action}
-                    initialValues={this.props.addNewItem.initialValues}
-                    closeButton={true}
-                    show={this.state.addNewItemModalShown}
-                    onClose={() => this.setState({ addNewItemModalShown: false })}
-                    submitBtn={{
-                        name: "Save",
-                        icon: faPlus,
-                        afterSubmit: () => {
-                            showToastMsg(this.props.messages.onItemAdded);
-                            this.refreshTable();
-                        }
-                    }}
-                >
-                    {({ shown, handleChange, values, setValues, errors }) => {
-                        const formProps = {
-                            shown: shown,
-                            handleChange: handleChange,
-                            values: values,
-                            setValues: setValues,
-                            errors: errors,
-                        };
+                {/* {this.props.addNewItem.modal &&
+                    <Modal show={this.state.addNewItemModalShown} backdrop="static">
+                        <Modal.Header>
+                            <Modal.Title className="fw-bold display-spacing">{this.props.addNewItem.name}</Modal.Title>
+                        </Modal.Header>
+                        {React.createElement(this.props.addNewItem.modal, { closeModal: () => this.setState({ addNewItemModalShown: false }) })}
+                    </Modal>
+                }
 
-                        return React.createElement(this.props.addNewItem.form, formProps);
-                    }}
-                </ModalForm>
+                {this.props.editItem.modal &&
+                    <Modal show={this.state.editItemModalShown} backdrop="static">
+                        <Modal.Header>
+                            <Modal.Title className="fw-bold display-spacing">{this.props.editItem.name}</Modal.Title>
+                        </Modal.Header>
+                        {React.createElement(
+                            this.props.editItem.modal,
+                            {
+                                closeModal: () => this.setState({ editItemModalShown: false }),
+                                editId: this.state.editId
+                            }
+                        )}
+                    </Modal>
+                } */}
+
+                {this.props.addNewItem &&
+                    <ModalForm
+                        title={this.props.addNewItem.name}
+                        size={this.props.addNewItem.size}
+                        action={this.props.addNewItem.action}
+                        initialValues={this.props.addNewItem.initialValues}
+                        closeButton={false}
+                        show={this.state.addNewItemModalShown}
+                        onClose={() => this.setState({ addNewItemModalShown: false })}
+                        submitBtn={{
+                            name: "Save",
+                            icon: faPlus,
+                            afterSubmit: () => {
+                                this.refreshTable();
+                                showToastMsg(this.props.messages.onItemAdded);
+                            }
+                        }}
+                    >
+                        {({ shown, handleChange, values, setValues, errors }) => {
+                            const formProps = {
+                                shown: shown,
+                                handleChange: handleChange,
+                                values: values,
+                                setValues: setValues,
+                                errors: errors,
+                            };
+
+                            return React.createElement(this.props.addNewItem.form, formProps);
+                        }}
+                    </ModalForm>
+                }
 
                 {
                     this.props.editItem ?
@@ -142,14 +168,14 @@ export default class CommonView extends React.Component {
                         fetchUrl={this.props.editItem.fetchUrl}
                         initialValues={this.props.editItem.initialValues}
                         editId={this.state.editId}
-                        closeButton={true}
+                        closeButton={false}
                         show={this.state.editItemModalShown}
                         onClose={() => this.setState({ editItemModalShown: false })}
                         submitBtn={{
                             name: "Save",
                             icon: faPenToSquare,
                             afterSubmit: () => {
-                                showToastMsg(this.props.messages.onItemEdited);
+                                //showToastMsg(this.props.messages.onItemEdited);
                                 this.refreshTable();
                             }
                         }}

@@ -86,7 +86,7 @@ function UserForm({ shown, handleChange, values, setValues, errors, isEdit }) {
                             type="checkbox"
                             name="change_password"
                             label="Change Password"
-                            value={changePassword}
+                            checked={changePassword}
                             onChange={_ => setChangePassword(!changePassword)}
                         />
                         <Form.Control

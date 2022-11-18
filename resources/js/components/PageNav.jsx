@@ -1,10 +1,12 @@
-import { useEffect } from "react";
+import { useContext } from "react";
 import { Nav, Navbar, NavDropdown, Spinner } from "react-bootstrap";
 import { NavLink } from "react-router-dom";
+import { globalState } from "../app_state";
+import AppContext from "../layouts/AppContext";
 import { rootUrl } from "../utils";
 
 export function PageNavbar({ children }) {
-    const [userData, setUserData, updateUserData] = window.globalStateStore.useState("userData");
+    const [userData, _] = globalState.useGlobalState('userData');
 
     return (
         <Navbar bg="light" className="p-3">

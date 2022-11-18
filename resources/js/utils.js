@@ -3,31 +3,48 @@ import React from 'react';
 import $ from 'jquery';
 import httpRequest from './api';
 import _ from 'lodash';
+import { globalState } from './app_state';
 
 export const menus = [
     {
         name: 'Dashboard',
         link: 'dashboard',
         icon: faChartLine,
-        maxAccessLevel: 2,
+        access: {
+            main: 'Main'
+        },
     },
     {
         name: 'Audit',
         link: 'audit',
         icon: faListCheck,
-        maxAccessLevel: 2,
+        access: {
+            cycles: 'Cycles',
+            records: 'Records',
+            findings: 'Case Findings',
+            corrective: 'Corrective Actions',
+        },
     },
     {
         name: 'Parameters',
         link: 'parameters',
         icon: faPercent,
-        maxAccessLevel: 2,
+        access: {
+            criteria: 'Criteria',
+            criteria_group: 'Criteria Group',
+        }
     },
     {
         name: 'Workplace',
         link: 'workplace',
         icon: faIndustry,
-        maxAccessLevel: 2,
+        access: {
+            entity: 'Entity',
+            division: 'Division',
+            plant: 'Plant',
+            department: 'Department',
+            area: 'Area',
+        },
     },
     {
         name: 'Users',
@@ -51,7 +68,7 @@ export function rootUrl(url) {
 }
 
 export function showToastMsg(msg) {
-    window.globalStateStore.getState("toastMsg").updateValue((value) => ({ toastShown: true, msg: msg }));
+    globalState.setGlobalState('toastMsg', { toastShown: true, msg: msg });
 }
 
 export function useIsMounted() {

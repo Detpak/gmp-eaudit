@@ -32,7 +32,7 @@ export default function AuditRecordsLayout() {
                 </Form.Group>
                 <Form.Check
                     label="Show Current Cycle"
-                    value={showCurrentCycle}
+                    checked={showCurrentCycle}
                     onChange={_ => setShowCurrentCycle(!showCurrentCycle)}
                 />
             </PageContentTopbar>

@@ -5,6 +5,7 @@ import { Button, Card, Col, Row, Spinner } from "react-bootstrap";
 import httpRequest from "../api";
 import { PageContent, PageContentView, PageNavbar } from "../components/PageNav";
 import { Pie } from "react-chartjs-2"
+import { useIsMounted } from "../utils";
 
 function SummaryButton({ href, caption, value, icon }) {
     return (
@@ -39,6 +40,7 @@ export default function DashboardLayout() {
     const [summary, setSummary] = useState({});
     const [refreshTrigger, setRefreshTrigger] = useState(false);
     const [areaStatus, setAreaStatus] = useState(null);
+    const mounted = useIsMounted();
 
     const refresh = _ => {
         setRefreshTrigger(!refreshTrigger);
@@ -47,10 +49,16 @@ export default function DashboardLayout() {
     useEffect(async () => {
         setSummary({});
         const summary = await httpRequest.get('api/v1/get-summary');
-        setSummary(summary.data);
+
+        if (mounted.current) {
+            setSummary(summary.data);
+        }
 
         const areaStatusData = await httpRequest.post('api/v1/get-chart', { type: 'area_status' });
-        setAreaStatus(areaStatusData.data);
+
+        if (mounted.current) {
+            setAreaStatus(areaStatusData.data);
+        }
     }, [refreshTrigger]);
 
     return (
@@ -136,7 +144,7 @@ export default function DashboardLayout() {
                                 />
                             }
                         </ChartColumn>
-                        <ChartColumn caption="Test" />
+                        <ChartColumn caption="Top 10 Case Criteria For Current Cycle" />
                     </Row>
                     <Row>
                         <ChartColumn caption="Test" />
