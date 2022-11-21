@@ -44,6 +44,7 @@ Route::prefix('/v1')->group(function() {
             Route::get('dev/reset-findings-counter', [DevMenuController::class, 'apiResetFindingsCounter']);
             Route::get('dev/reset-ca/{id}', [DevMenuController::class, 'apiResetCorrectiveAction']);
             Route::get('dev/reset-ca-approval/{id}', [DevMenuController::class, 'apiResetApproval']);
+            Route::get('dev/uncancel-ca/{id}', [DevMenuController::class, 'apiUncancel']);
             Route::get('dev/get-app-state', [DevMenuController::class, 'apiGetAppState']);
         }
 
@@ -52,6 +53,7 @@ Route::prefix('/v1')->group(function() {
         // Audit submission
         Route::post('/submit-audit', [AuditProcessController::class, 'apiSubmitAudit']);
         Route::put('/submit-audit-images', [AuditProcessController::class, 'apiSubmitImages']);
+        Route::post('/cancel-finding', [AuditProcessController::class, 'apiCancel']);
 
         // Audit cycle APIs
         Route::post('/new-cycle', [AuditCycleController::class, 'apiNewCycle']);

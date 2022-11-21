@@ -95,7 +95,7 @@ export default class CommonView extends React.Component {
                             allowDeleteIf: this.props.deleteItem.allowDeleteIf,
                             deleteAction: this.props.deleteItem.action,
                             onDeleted: () => {
-                                //showToastMsg(this.props.messages.onItemDeleted);
+                                showToastMsg(this.props.messages.onItemDeleted);
                                 this.refreshTable();
                             }
                         }}
@@ -103,7 +103,7 @@ export default class CommonView extends React.Component {
                         onItemSelected={(items) => this.setState({ selectedItems: items })}/>
                 </PageContentView>
 
-                {/* {this.props.addNewItem.modal &&
+                {this.props.addNewItem.modal &&
                     <Modal show={this.state.addNewItemModalShown} backdrop="static">
                         <Modal.Header>
                             <Modal.Title className="fw-bold display-spacing">{this.props.addNewItem.name}</Modal.Title>
@@ -125,9 +125,9 @@ export default class CommonView extends React.Component {
                             }
                         )}
                     </Modal>
-                } */}
+                }
 
-                {this.props.addNewItem &&
+                {this.props.addNewItem.form &&
                     <ModalForm
                         title={this.props.addNewItem.name}
                         size={this.props.addNewItem.size}
@@ -160,7 +160,7 @@ export default class CommonView extends React.Component {
                 }
 
                 {
-                    this.props.editItem ?
+                    this.props.editItem.form ?
                     (<ModalForm
                         title={this.props.editItem.name}
                         size={this.props.editItem.size}
@@ -175,7 +175,7 @@ export default class CommonView extends React.Component {
                             name: "Save",
                             icon: faPenToSquare,
                             afterSubmit: () => {
-                                //showToastMsg(this.props.messages.onItemEdited);
+                                showToastMsg(this.props.messages.onItemEdited);
                                 this.refreshTable();
                             }
                         }}

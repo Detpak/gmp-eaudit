@@ -24,12 +24,6 @@ function ToastWrapper() {
 }
 
 export default function AdminLayout() {
-
-    useEffect(() => {
-
-        console.log('updated');
-    }, []);
-
     return (
         <>
             <div className="d-flex flex-row main">

@@ -11,7 +11,6 @@ class AuditFinding extends Model
 
     protected $fillable = [
         'record_id',
-        'auditor_id',
         'ca_name',
         'ca_code',
         'ca_weight',

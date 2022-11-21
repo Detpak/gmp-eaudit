@@ -3,9 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Helpers\AppStateHelpers;
-use App\Mail\AuditSubmitted;
 use App\Mail\CaseFinding;
 use App\Mail\CaseFound;
+use App\Mail\CaseFindingCancelled;
 use App\Models\AuditCycle;
 use App\Models\AuditFinding;
 use App\Models\AuditRecord;
@@ -301,5 +301,37 @@ class AuditProcessController extends Controller
         });
 
         return $query->find($id);
+    }
+
+    public function apiCancel(Request $request)
+    {
+        $validator = Validator::make(
+            $request->all(),
+            [
+                'id' => 'required|exists:audit_findings,id',
+                'reason' => 'nullable|max:65536'
+            ]);
+
+        if ($validator->fails()) {
+            return ['formError' => $validator->errors()];
+        }
+
+        $finding = null;
+
+        try {
+            $finding = AuditFinding::find($request->id);
+            $finding->status = 2;
+            $finding->cancel_reason = $request->reason;
+            $finding->save();
+        } catch (\Throwable $th) {
+            return ['error' => 'Unable to cancel case finding.'];
+        }
+
+        $auditees = $finding->record->area->department->pics;
+        Mail::to($auditees)
+            ->cc($finding->auditor)
+            ->send(new CaseFindingCancelled($finding));
+
+        return ['result' => 'ok'];
     }
 }

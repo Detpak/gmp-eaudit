@@ -113,4 +113,18 @@ class DevMenuController extends Controller
     {
         return AppState::first();
     }
+
+    public function apiUncancel($id)
+    {
+        $finding = AuditFinding::find($id);
+
+        if ($finding->status == 2) {
+            $finding->status = 0;
+            $finding->cancel_reason = null;
+        }
+
+        $finding->save();
+
+        return ['result' => 'ok'];
+    }
 }

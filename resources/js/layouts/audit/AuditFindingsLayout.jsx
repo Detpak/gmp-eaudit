@@ -5,12 +5,13 @@ import { Button, Card, Form, InputGroup, Modal } from "react-bootstrap";
 import { PageContent, PageContentTopbar, PageContentView } from "../../components/PageNav";
 import DynamicTable from "../../components/DynamicTable";
 import { ImageModal } from "../../components/ImageModal";
-import { getCategoryString, rootUrl, waitForMs } from "../../utils";
+import { getCategoryString, rootUrl, showToastMsg, waitForMs } from "../../utils";
 import LoadingButton from "../../components/LoadingButton";
 import httpRequest from "../../api";
 import DescriptionModal from "../../components/DescriptionModal";
 import ModalForm from "../../components/ModalForm";
 import { CorrectiveActionForm } from "../CorrectiveActionMain";
+import { useEffect } from "react";
 
 function getCaseStatus(status)
 {
@@ -22,10 +23,70 @@ function getCaseStatus(status)
     ][status];
 }
 
+function CancelFinding({ id, setId, refreshTable }) {
+    const [isCancelling, setCancelling] = useState(false);
+    const [reason, setReason] = useState('');
+    const [formError, setFormError] = useState({});
+
+    const cancel = async _ => {
+        setCancelling(true);
+
+        const data = {
+            id: id,
+            reason: reason,
+        };
+
+        const response = await httpRequest.post('api/v1/cancel-finding', data);
+
+        if (response.data.formError) {
+            console.log(response.data.formError);
+            setFormError(response.data.formError);
+            setCancelling(false);
+            return;
+        }
+        else if (response.data.error) {
+            showToastMsg(response.data.error);
+        }
+
+        setCancelling(false);
+        setId(null);
+        refreshTable();
+    };
+
+    useEffect(_ => {
+        setReason('');
+    }, [id]);
+
+    return (
+        <Modal show={id != null} backdrop="static" onHide={_ => setId(null)}>
+            <Modal.Header closeButton={!isCancelling}>
+                <Modal.Title>Cancel Case Finding</Modal.Title>
+            </Modal.Header>
+            <Modal.Body>
+                <Form.Group>
+                    <Form.Label>Reason</Form.Label>
+                    <Form.Control
+                        as="textarea"
+                        rows={3}
+                        value={reason}
+                        onChange={ev => setReason(ev.target.value)}
+                        isInvalid={!!formError.reason}
+                    />
+                    <Form.Control.Feedback type="invalid">{formError.reason && formError.reason[0]}</Form.Control.Feedback>
+                </Form.Group>
+            </Modal.Body>
+            <Modal.Footer>
+                <LoadingButton variant="danger" isLoading={isCancelling} onClick={cancel}>Cancel</LoadingButton>
+            </Modal.Footer>
+        </Modal>
+    );
+}
+
 export default function AuditFindingsLayout() {
     const [refreshTrigger, setRefreshTrigger] = useState(false);
     const [searchKeyword, setSearchKeyword] = useState('');
     const [findingId, setFindingId] = useState(null);
+    const [cancelFindingId, setCancelFindingId] = useState(null);
     const [showCurrentCycle, setShowCurrentCycle] = useState(false);
 
     const refreshTable = () => {
@@ -36,12 +97,14 @@ export default function AuditFindingsLayout() {
         setSearchKeyword(ev.target.value);
     };
 
-    const cancelCase = async (id) => {
-        await waitForMs(500);
-    };
-
     const resetCA = async (id) => {
         await httpRequest.get(`api/v1/dev/reset-ca/${id}`);
+        refreshTable();
+    };
+
+    const uncancel = async id => {
+        await httpRequest.get(`api/v1/dev/uncancel-ca/${id}`);
+        refreshTable();
     };
 
     return (
@@ -90,23 +153,33 @@ export default function AuditFindingsLayout() {
                             >
                                 Create
                             </Button>,
-                            <LoadingButton
+                            <Button
+                                onClick={_ => setCancelFindingId(item.id)}
                                 size="sm"
                                 variant="danger"
-                                onClick={async () => await cancelCase(item.id)}
                                 disabled={item.auditee_id == null || item.status != 0}
                             >
                                 Create
-                            </LoadingButton>,
+                            </Button>,
                             item.cancel_reason ? item.cancel_reason : '-',
-                            <LoadingButton
-                                size="sm"
-                                variant="danger"
-                                onClick={async () => await resetCA(item.id)}
-                                disabled={item.auditee_id == null}
-                            >
-                                Reset CA
-                            </LoadingButton>
+                            <>
+                                <LoadingButton
+                                    size="sm"
+                                    variant="danger"
+                                    onClick={async () => await resetCA(item.id)}
+                                    disabled={item.auditee_id == null}
+                                >
+                                    Reset CA
+                                </LoadingButton>
+                                <LoadingButton
+                                    size="sm"
+                                    variant="danger"
+                                    onClick={async () => await uncancel(item.id)}
+                                    disabled={item.auditee_id == null}
+                                >
+                                    Uncancel
+                                </LoadingButton>
+                            </>
                         ]
                     }}
                     columns={[
@@ -196,6 +269,8 @@ export default function AuditFindingsLayout() {
                     />
                 </Card>
             </Modal>
+
+            <CancelFinding id={cancelFindingId} setId={setCancelFindingId} refreshTable={refreshTable} />
         </PageContent>
     );
 }
