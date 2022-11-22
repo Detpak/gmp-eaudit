@@ -145,41 +145,47 @@ export default function AuditFindingsLayout() {
                             `${item.ca_weight}%`,
                             `${item.deducted_weight}%`,
                             <ImageModal buttonSize="sm" src={`api/v1/fetch-finding-images/${item.id}`} disabled={item.images_count == 0} />,
-                            <Button
-                                onClick={_ => setFindingId(item.id)}
-                                variant="success"
-                                size="sm"
-                                disabled={item.auditee_id == null || item.status != 0}
-                            >
-                                Create
-                            </Button>,
-                            <Button
-                                onClick={_ => setCancelFindingId(item.id)}
-                                size="sm"
-                                variant="danger"
-                                disabled={item.auditee_id == null || item.status != 0}
-                            >
-                                Create
-                            </Button>,
-                            item.cancel_reason ? item.cancel_reason : '-',
                             <>
-                                <LoadingButton
+                                <Button
+                                    onClick={_ => setFindingId(item.id)}
+                                    variant="success"
+                                    size="sm"
+                                    disabled={item.auditee_id == null || item.status != 0}
+                                >
+                                    Create
+                                </Button>
+                                {process.env.MIX_APP_DEBUG &&
+                                    <LoadingButton
+                                        size="sm"
+                                        variant="danger"
+                                        onClick={async () => await resetCA(item.id)}
+                                        disabled={item.auditee_id == null}
+                                    >
+                                        Reset CA
+                                    </LoadingButton>
+                                }
+                            </>,
+                            <>
+                                <Button
+                                    onClick={_ => setCancelFindingId(item.id)}
                                     size="sm"
                                     variant="danger"
-                                    onClick={async () => await resetCA(item.id)}
-                                    disabled={item.auditee_id == null}
+                                    disabled={item.auditee_id == null || item.status != 0}
                                 >
-                                    Reset CA
-                                </LoadingButton>
-                                <LoadingButton
-                                    size="sm"
-                                    variant="danger"
-                                    onClick={async () => await uncancel(item.id)}
-                                    disabled={item.auditee_id == null}
-                                >
-                                    Uncancel
-                                </LoadingButton>
-                            </>
+                                    Create
+                                </Button>
+                                {process.env.MIX_APP_DEBUG &
+                                    <LoadingButton
+                                        size="sm"
+                                        variant="danger"
+                                        onClick={async () => await uncancel(item.id)}
+                                        disabled={item.auditee_id == null}
+                                    >
+                                        Uncancel
+                                    </LoadingButton>
+                                }
+                            </>,
+                            item.cancel_reason ? item.cancel_reason : '-',
                         ]
                     }}
                     columns={[
@@ -246,10 +252,6 @@ export default function AuditFindingsLayout() {
                         {
                             id: 'cancel_reason',
                             name: 'Cancellation Reason'
-                        },
-                        {
-                            sortable: false,
-                            name: 'Debug',
                         }
                     ]}
                 />

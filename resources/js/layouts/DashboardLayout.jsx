@@ -135,6 +135,7 @@ export default function DashboardLayout() {
                                         ],
                                     }}
                                     options={{
+                                        maintainAspectRatio: true,
                                         plugins: {
                                             legend: {
                                                 position: 'right'

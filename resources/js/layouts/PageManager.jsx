@@ -2,7 +2,9 @@ import { faChartLine, faIndustry, faListCheck, faPercent, faUsers } from "@forta
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import _, { runInContext } from "lodash";
 import React from "react";
+import { Spinner } from "react-bootstrap";
 import { Navigate, NavLink, Outlet, Route, Routes } from "react-router-dom";
+import { globalState } from "../app_state";
 import { PageLink, PageNavbar } from "../components/PageNav";
 import AuditCyclesLayout from "./audit/AuditCyclesLayout";
 import AuditFindingsLayout from "./audit/AuditFindingsLayout";
@@ -74,55 +76,90 @@ export const routes = [
 ];
 
 export function PageRoutes() {
+    const [userData, setUserData] = globalState.useGlobalState('userData');
+
     return (
-        <Routes>
-            {routes.map((route, routeKey) => {
-                const routeLink = `/app/${route.link}`;
+        <>
+            {!userData ?
+                <div className="vstack justify-content-center w-100 h-100 text-center p-2">
+                    <div>
+                        <Spinner animation="border" />
+                    </div>
+                    <h5>Please Wait</h5>
+                </div>
+                :
+                <Routes>
+                    {routes
+                        .filter(route =>
+                            _.isBoolean(userData.access[route.link]) && userData.access[route.link] ||
+                            _.some(Object.values(userData.access[route.link]), value => _.isBoolean(value) && value))
+                        .map((route, routeKey) => {
+                            const routeLink = `/app/${route.link}`;
 
-                if (route.page) {
-                    return <Route key={routeKey} path={routeLink} element={React.createElement(route.page)} />
-                }
+                            if (route.page) {
+                                return <Route key={routeKey} path={routeLink} element={React.createElement(route.page)} />
+                            }
 
-                const outlet = () => (
-                    <>
-                        <PageNavbar>
-                            {Object.keys(route.pages).map((pageLink, key) => (
-                                <PageLink key={key} to={pageLink}>{route.pages[pageLink].name}</PageLink>
-                            ))}
-                        </PageNavbar>
+                            const outlet = () => (
+                                <>
+                                    <PageNavbar>
+                                        {Object.keys(route.pages)
+                                            .filter((page) => userData.access[route.link][page])
+                                            .map((pageLink, key) => (
+                                                <PageLink key={key} to={pageLink}>{route.pages[pageLink].name}</PageLink>
+                                            ))}
+                                    </PageNavbar>
 
-                        <Outlet />
-                    </>
-                );
+                                    <Outlet />
+                                </>
+                            );
 
-                return (
-                    <Route key={routeKey} path={routeLink} element={React.createElement(outlet)}>
-                        {Object.keys(route.pages).map((pageLink, pageKey) => (
-                            <React.Fragment key={pageKey}>
-                                {route.index == pageLink && <Route index element={<Navigate to={`${routeLink}/${pageLink}`} replace />} />}
-                                <Route path={pageLink} element={React.createElement(route.pages[pageLink].element)} />
-                            </React.Fragment>
-                        ))}
-                    </Route>
-                )
-            })}
-        </Routes>
+                            return (
+                                <Route key={routeKey} path={routeLink} element={React.createElement(outlet)}>
+                                    {Object.keys(route.pages)
+                                        .filter((page) => userData.access[route.link][page])
+                                        .map((pageLink, pageKey) => (
+                                            <React.Fragment key={pageKey}>
+                                                {route.index == pageLink && <Route index element={<Navigate to={`${routeLink}/${pageLink}`} replace />} />}
+                                                <Route path={pageLink} element={React.createElement(route.pages[pageLink].element)} />
+                                            </React.Fragment>
+                                        ))
+                                    }
+                                </Route>
+                            )
+                        })
+                    }
+                </Routes>
+            }
+        </>
     )
 }
 
 export function PageButtons() {
+    const [userData, setUserData] = globalState.useGlobalState('userData');
+
     return (
         <ul className="nav nav-pills flex-column mb-auto">
-            {routes.map((route, key) => {
-                return (
-                    <li key={key} className="nav-item">
-                        <NavLink to={`app/${route.link}`} className={({ isActive }) => `nav-link ${isActive ? 'active bg-white text-primary' : 'text-white'} px-2 mb-1`}>
-                            <FontAwesomeIcon icon={route.icon} className="menu-icon d-block mx-auto"/>
-                            <div className="menu-text text-center m-0">{route.name}</div>
-                        </NavLink>
-                    </li>
-                );
-            })}
+            {!userData &&
+                <div className="w-100 text-center p-2">
+                    <Spinner animation="border" />
+                </div>
+            }
+            {userData && routes
+                .filter(route =>
+                    _.isBoolean(userData.access[route.link]) && userData.access[route.link] ||
+                    _.some(Object.values(userData.access[route.link]), value => _.isBoolean(value) && value))
+                .map((route, key) => {
+                    return (
+                        <li key={key} className="nav-item">
+                            <NavLink to={`app/${route.name}`} className={({ isActive }) => `nav-link ${isActive ? 'active bg-white text-primary' : 'text-white'} px-2 mb-1`}>
+                                <FontAwesomeIcon icon={route.icon} className="menu-icon d-block mx-auto"/>
+                                <div className="menu-text text-center m-0">{route.name}</div>
+                            </NavLink>
+                        </li>
+                    );
+                })
+            }
         </ul>
     )
 }

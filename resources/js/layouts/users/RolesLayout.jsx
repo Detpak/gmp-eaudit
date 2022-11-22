@@ -33,15 +33,29 @@ function RolesForm({ editId, closeModal, refreshTable }) {
         )
     });
 
-    const fetchData = async _ => {
+    const fetchData = async () => {
         setLoading(true);
 
         const response = await httpRequest.get(`api/v1/get-role/${editId}`);
-        const newValues = { ...values };
-        newValues.roleName = response.data.roleName;
+        const newValues = { ...response.data };
+
         newValues.remarks = response.data.remarks ? response.data.remarks : '';
-        newValues.auditor = response.data.auditor != 0;
-        newValues.auditee = response.data.auditee != 0;
+        newValues.access = _.mapValues(
+            _.keyBy(routes, 'link'),
+            route => (
+                route.page ?
+                    response.data.access[route.link] && typeof response.data.access[route.link] === 'boolean'
+                        ? response.data.access[route.link] : false
+                    :
+                    _.mapValues(route.pages,
+                        (value, key) =>
+                            response.data.access[route.link] != null &&
+                            typeof response.data.access[route.link] === 'object' &&
+                            typeof response.data.access[route.link][key] === 'boolean'
+                                ? response.data.access[route.link][key]
+                                : false)
+            )
+        );
 
         setValues(newValues);
         setLoading(false);
@@ -56,10 +70,11 @@ function RolesForm({ editId, closeModal, refreshTable }) {
             .then((response) => {
                 setLoading(false);
                 closeModal();
+                refreshTable();
                 showToastMsg("Role successfully saved!");
             })
             .catch((reason) => {
-                ///setLoading(false);
+                setLoading(false);
                 closeModal();
                 showToastMsg("An error occurred. Unable to save role.");
             });
@@ -110,7 +125,7 @@ function RolesForm({ editId, closeModal, refreshTable }) {
                                         onChange={_ => {
                                             const newValues = { ...values };
                                             newValues.access[route.link] = !newValues.access[route.link];
-                                            setValues(newValues);
+                                                setValues(newValues);
                                         }}
                                     />
                                     :

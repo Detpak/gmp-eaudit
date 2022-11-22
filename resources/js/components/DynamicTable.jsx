@@ -146,7 +146,7 @@ export default function DynamicTable({ refreshTrigger, columns, selectedItems, o
                         <div>
                             <Spinner animation="border"/>
                         </div>
-                        <h2>Loading</h2>
+                        <h5>Please Wait</h5>
                     </div>
                 }
                 <div className="flex-fill overflow-auto">

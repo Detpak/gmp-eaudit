@@ -300,6 +300,14 @@ class UsersController extends Controller
     public function apiGetCurrentUser(Request $request)
     {
         $tokenSplit = explode('|', $request->bearerToken()); // [0] = user id, [1] = token
-        return ['result' => User::find($tokenSplit[0])];
+
+        $result = User::find($tokenSplit[0])->toArray();
+        $role = Role::find($result['role_id']);
+
+        $result['auditee'] = $role->auditee;
+        $result['auditor'] = $role->auditor;
+        $result['access'] = json_decode($role->access_info);
+
+        return ['result' => $result];
     }
 }

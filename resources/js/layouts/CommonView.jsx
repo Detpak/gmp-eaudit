@@ -46,12 +46,12 @@ export default class CommonView extends React.Component {
                                                 { headers: { 'Content-Type': 'application/json' } });
 
         if (response.data.result == 'ok') {
-            //showToastMsg(this.props.messages.onSelectedItemDeletedMsg);
+            showToastMsg(this.props.messages.onSelectedItemDeletedMsg);
             this.refreshTable();
         }
 
         if (response.data.error) {
-            //showToastMsg(response.data.error);
+            showToastMsg(response.data.error);
         }
     }
 
@@ -108,7 +108,13 @@ export default class CommonView extends React.Component {
                         <Modal.Header>
                             <Modal.Title className="fw-bold display-spacing">{this.props.addNewItem.name}</Modal.Title>
                         </Modal.Header>
-                        {React.createElement(this.props.addNewItem.modal, { closeModal: () => this.setState({ addNewItemModalShown: false }) })}
+                        {React.createElement(
+                            this.props.addNewItem.modal,
+                            {
+                                closeModal: () => this.setState({ addNewItemModalShown: false }),
+                                refreshTable: this.refreshTable
+                            })
+                        }
                     </Modal>
                 }
 
@@ -121,6 +127,7 @@ export default class CommonView extends React.Component {
                             this.props.editItem.modal,
                             {
                                 closeModal: () => this.setState({ editItemModalShown: false }),
+                                refreshTable: this.refreshTable,
                                 editId: this.state.editId
                             }
                         )}
