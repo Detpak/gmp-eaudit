@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Helpers\AppStateHelpers;
+use App\Models\AppState;
 use App\Models\Area;
 use App\Models\AuditCycle;
 use App\Models\AuditFinding;
@@ -40,16 +41,16 @@ class AuditCycleController extends Controller
             return ['formError' => $validator->errors()];
         }
 
-        $activeCycle = AuditCycle::whereNull('close_date')->first();
 
-        if ($activeCycle) {
+        if (AuditCycle::whereNull('close_date')->exists()) {
             return ['result' => 'error', 'msg' => 'Unable to start new cycle, there is one unfinished cycle.'];
         }
 
         $startDate = Carbon::createFromFormat('Y-m-d', $request->start_date);
+        $lastCycleDate = AppStateHelpers::getState()->last_cycle_date;
 
         // Reset cycle count when we're in the new year
-        if ($activeCycle && Carbon::createFromTimestamp($activeCycle->created_at)->year < $startDate->year) {
+        if ($lastCycleDate && $startDate->year > Carbon::createFromFormat('Y-m-d', $lastCycleDate)->year) {
             AppStateHelpers::resetCycleCount();
         }
 

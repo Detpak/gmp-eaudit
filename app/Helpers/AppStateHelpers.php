@@ -15,6 +15,7 @@ class AppStateHelpers
 
     public static function getState()
     {
+        AppStateHelpers::init();
         return AppState::first();
     }
 
@@ -31,6 +32,7 @@ class AppStateHelpers
         AppStateHelpers::init();
         $state = AppState::first();
 
+        $state->last_cycle_date = $time;
         $state->current_cycle++;
         $state->save();
 

@@ -13,6 +13,7 @@ class AppState extends Model
 
     protected $fillable = [
         'current_cycle',
+        'last_cycle_date',
         'num_findings'
     ];
 }
