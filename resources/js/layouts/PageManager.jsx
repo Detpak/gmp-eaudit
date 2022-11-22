@@ -91,8 +91,8 @@ export function PageRoutes() {
                 <Routes>
                     {routes
                         .filter(route =>
-                            _.isBoolean(userData.access[route.link]) && userData.access[route.link] ||
-                            _.some(Object.values(userData.access[route.link]), value => _.isBoolean(value) && value))
+                            userData.access[route.link] != null && (_.isBoolean(userData.access[route.link]) && userData.access[route.link] ||
+                            _.some(Object.values(userData.access[route.link]), value => _.isBoolean(value) && value)))
                         .map((route, routeKey) => {
                             const routeLink = `/app/${route.link}`;
 
@@ -117,7 +117,7 @@ export function PageRoutes() {
                             return (
                                 <Route key={routeKey} path={routeLink} element={React.createElement(outlet)}>
                                     {Object.keys(route.pages)
-                                        .filter((page) => userData.access[route.link][page])
+                                        .filter((page) => userData.access[route.link] != null && userData.access[route.link][page])
                                         .map((pageLink, pageKey) => (
                                             <React.Fragment key={pageKey}>
                                                 {route.index == pageLink && <Route index element={<Navigate to={`${routeLink}/${pageLink}`} replace />} />}
@@ -147,8 +147,8 @@ export function PageButtons() {
             }
             {userData && routes
                 .filter(route =>
-                    _.isBoolean(userData.access[route.link]) && userData.access[route.link] ||
-                    _.some(Object.values(userData.access[route.link]), value => _.isBoolean(value) && value))
+                    userData.access[route.link] != null && (_.isBoolean(userData.access[route.link]) && userData.access[route.link] ||
+                    _.some(Object.values(userData.access[route.link]), value => _.isBoolean(value) && value)))
                 .map((route, key) => {
                     return (
                         <li key={key} className="nav-item">
