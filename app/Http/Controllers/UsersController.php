@@ -203,7 +203,7 @@ class UsersController extends Controller
                 'login_id' => 'required|string|max:255',
                 'email' => 'nullable|string|email|max:255',
                 'password' => 'nullable|string|max:255|min:8|confirmed',
-                'role_id' => 'required|exists:roles,id'
+                'role_id' => 'nullable|exists:roles,id'
             ],
             [],
             [

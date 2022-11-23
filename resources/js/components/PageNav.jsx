@@ -5,11 +5,11 @@ import { globalState } from "../app_state";
 import AppContext from "../layouts/AppContext";
 import { rootUrl } from "../utils";
 
-export function PageNavbar({ children }) {
+export function PageNavbar({ className, children }) {
     const [userData, _] = globalState.useGlobalState('userData');
 
     return (
-        <Navbar bg="light" className="p-3">
+        <Navbar bg="light" className={`p-3 ${className}`}>
             <Nav variant="pills" className="nav me-auto" navbar={false}>
                 {children}
             </Nav>

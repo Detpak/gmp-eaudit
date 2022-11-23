@@ -174,7 +174,7 @@ export default function AuditFindingsLayout() {
                                 >
                                     Create
                                 </Button>
-                                {process.env.MIX_APP_DEBUG &
+                                {process.env.MIX_APP_DEBUG &&
                                     <LoadingButton
                                         size="sm"
                                         variant="danger"

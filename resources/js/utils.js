@@ -71,6 +71,11 @@ export function showToastMsg(msg) {
     globalState.setGlobalState('toastMsg', { toastShown: true, msg: msg });
 }
 
+export async function updateUserData() {
+    const response = await httpRequest.get(`api/v1/get-current-user`);
+    globalState.setGlobalState('userData', response.data.result);
+}
+
 export function useIsMounted() {
     const isMounted = React.useRef(true);
 

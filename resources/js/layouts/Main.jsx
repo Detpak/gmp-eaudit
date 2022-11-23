@@ -4,6 +4,7 @@ import { useReducer } from "react";
 import { BrowserRouter } from "react-router-dom";
 import httpRequest from "../api";
 import { globalState } from "../app_state";
+import { updateUserData } from "../utils";
 import AdminLayout from "./AdminLayout";
 import AppContext, { appStates, appStateReducer } from "./AppContext";
 import ApproveCorrectiveActionLayout from "./ApproveCorrectiveActionLayout";
@@ -11,10 +12,7 @@ import AuditProcessLayout from "./AuditProcessLayout";
 import CorrectiveActionMain from "./CorrectiveActionMain";
 
 export default function App({ mode }) {
-    useEffect(async () => {
-        const response = await httpRequest.get('api/v1/get-current-user');
-        globalState.setGlobalState('userData', response.data.result);
-    }, []);
+    useEffect(updateUserData, []);
 
     const layoutProvider = () => {
         switch (mode) {

@@ -1,4 +1,4 @@
-import { faChartLine, faIndustry, faListCheck, faPercent, faUsers } from "@fortawesome/free-solid-svg-icons";
+import { faChartLine, faIndustry, faListCheck, faPercent, faUser, faUsers } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import _, { runInContext } from "lodash";
 import React from "react";
@@ -13,6 +13,7 @@ import CorrectiveActionLayout from "./audit/CorrectiveActionLayout";
 import DashboardLayout from "./DashboardLayout";
 import CriteriaGroupLayout from "./evaluation/CriteriaGroupLayout";
 import CriteriaLayout from "./evaluation/CriteriaLayout";
+import ProfileLayout from "./ProfileLayout";
 import ManageUserLayout from "./users/ManageUserLayout";
 import RolesUserLayout from "./users/RolesLayout";
 import DepartmentLayout from "./workplace/DepartmentLayout";
@@ -72,6 +73,13 @@ export const routes = [
             roles: { name: 'Roles', element: RolesUserLayout },
             manage_user: { name: 'User Management', element: ManageUserLayout },
         }
+    },
+    {
+        name: 'Profile',
+        link: 'profile',
+        icon: faUser,
+        page: ProfileLayout,
+        noRestrict: true,
     }
 ];
 
@@ -91,7 +99,8 @@ export function PageRoutes() {
                 <Routes>
                     {routes
                         .filter(route =>
-                            userData.access[route.link] != null && (_.isBoolean(userData.access[route.link]) && userData.access[route.link] ||
+                            route.noRestrict || userData.access[route.link] != null &&
+                            (_.isBoolean(userData.access[route.link]) && userData.access[route.link] ||
                             _.some(Object.values(userData.access[route.link]), value => _.isBoolean(value) && value)))
                         .map((route, routeKey) => {
                             const routeLink = `/app/${route.link}`;
@@ -147,12 +156,13 @@ export function PageButtons() {
             }
             {userData && routes
                 .filter(route =>
-                    userData.access[route.link] != null && (_.isBoolean(userData.access[route.link]) && userData.access[route.link] ||
+                    route.noRestrict || userData.access[route.link] != null &&
+                    (_.isBoolean(userData.access[route.link]) && userData.access[route.link] ||
                     _.some(Object.values(userData.access[route.link]), value => _.isBoolean(value) && value)))
                 .map((route, key) => {
                     return (
                         <li key={key} className="nav-item">
-                            <NavLink to={`app/${route.name}`} className={({ isActive }) => `nav-link ${isActive ? 'active bg-white text-primary' : 'text-white'} px-2 mb-1`}>
+                            <NavLink to={`app/${route.link}`} className={({ isActive }) => `nav-link ${isActive ? 'active bg-white text-primary' : 'text-white'} px-2 mb-1`}>
                                 <FontAwesomeIcon icon={route.icon} className="menu-icon d-block mx-auto"/>
                                 <div className="menu-text text-center m-0">{route.name}</div>
                             </NavLink>
