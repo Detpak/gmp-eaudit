@@ -19,7 +19,7 @@ class PrivateApiRequest
      * @param  \Closure(\Illuminate\Http\Request): (\Illuminate\Http\Response|\Illuminate\Http\RedirectResponse)  $next
      * @return \Illuminate\Http\Response|\Illuminate\Http\RedirectResponse
      */
-    public function handle(Request $request, Closure $next)
+    public function handle(Request $request, Closure $next, $role = null)
     {
         if (!$request->bearerToken()) {
             return Response::json(['result' => 'error'], 404);
@@ -33,6 +33,23 @@ class PrivateApiRequest
         foreach ($accessTokens as $accessToken) {
             if (Hash::check($tokenSplit[1], $accessToken->token)) {
                 $result = true;
+                $roleData = $accessToken->user->role;
+
+                switch ($role) {
+                    case 'auditee':
+                        if (!$roleData->auditee) {
+                            abort(404);
+                        }
+                        break;
+                    case 'auditor':
+                        if (!$roleData->auditor) {
+                            abort(404);
+                        }
+                        break;
+                    default:
+                        break;
+                }
+
                 break;
             }
         }

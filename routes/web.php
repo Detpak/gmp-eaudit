@@ -24,13 +24,19 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', [LoginController::class, 'show']);
 Route::post('/auth', [LoginController::class, 'auth']);
 
-Route::middleware('admin')->group(function() {
+Route::middleware('user')->group(function() {
     Route::get('/deauth', [LoginController::class, 'deauth']);
     Route::get('/app', function() { return redirect()->intended('/app/dashboard'); });
     Route::view('/app/{path?}', 'main_view')->where('path', '.*');
-    Route::view('/audit', 'secondary_page', ['page' => 'audit']);
-    Route::view('/corrective-action/{findingId}', 'secondary_page', ['page' => 'corrective_action'])->where("findingId", ".*");
-    Route::view('/approve-ca/{caId}', 'secondary_page', ['page' => 'approve_ca'])->where("caId", ".*");
+    Route::view('/audit', 'secondary_page', ['page' => 'audit'])->middleware('auditor');
+
+    Route::view('/approve-ca/{caId}', 'secondary_page', ['page' => 'approve_ca'])
+        ->where("caId", ".*")
+        ->middleware('auditor');
+
+    Route::view('/corrective-action/{findingId}', 'secondary_page', ['page' => 'corrective_action'])
+        ->where("findingId", ".*")
+        ->middleware('auditee');
 
     // Route::prefix('/admin')->group(function() {
     //     Route::get('/', function() { return redirect()->intended('admin/dashboard'); });

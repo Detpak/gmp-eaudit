@@ -448,7 +448,7 @@ function AuditProcessForm({ setAuditResult }) {
                             >
                                 {({ data }) => (
                                     <>
-                                        <div className="fw-bold">{data.area_name}</div>
+                                        <div className="fw-bold text-wrap">{data.area_name}</div>
                                         <small>{data.dept_name}</small>
                                     </>
                                 )}

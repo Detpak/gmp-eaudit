@@ -35,6 +35,18 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 });
 
 Route::prefix('/v1')->group(function() {
+    Route::middleware('private_api:auditor')->group(function() {
+        Route::post('/submit-audit', [AuditProcessController::class, 'apiSubmitAudit']);
+        Route::put('/submit-audit-images', [AuditProcessController::class, 'apiSubmitImages']);
+        Route::post('/cancel-finding', [AuditProcessController::class, 'apiCancel']);
+    });
+
+    Route::middleware('private_api:auditee')->group(function() {
+        Route::get('/ensure-auditee-privilege/{id}', [CorrectiveActionController::class, 'apiEnsureAuditeePrivilege']);
+        Route::post('/add-corrective-action', [CorrectiveActionController::class, 'apiAdd']);
+        Route::post('/close-corrective-action', [CorrectiveActionController::class, 'apiClose']);
+    });
+
     Route::middleware('private_api')->group(function() {
         Route::post('/get-chart', [DashboardController::class, 'apiGetChart']);
 
@@ -50,11 +62,6 @@ Route::prefix('/v1')->group(function() {
 
         Route::get('/get-summary', [DashboardController::class, 'apiGetSummary']);
 
-        // Audit submission
-        Route::post('/submit-audit', [AuditProcessController::class, 'apiSubmitAudit']);
-        Route::put('/submit-audit-images', [AuditProcessController::class, 'apiSubmitImages']);
-        Route::post('/cancel-finding', [AuditProcessController::class, 'apiCancel']);
-
         // Audit cycle APIs
         Route::post('/new-cycle', [AuditCycleController::class, 'apiNewCycle']);
         Route::get('/get-active-cycle', [AuditCycleController::class, 'apiGetActiveCycle']);
@@ -62,11 +69,11 @@ Route::prefix('/v1')->group(function() {
         Route::get('/close-cycle/{id}', [AuditCycleController::class, 'apiCloseCycle']);
 
         // Corrective action APIs
-        Route::get('/ensure-auditee-privilege/{id}', [CorrectiveActionController::class, 'apiEnsureAuditeePrivilege']);
-        Route::post('/add-corrective-action', [CorrectiveActionController::class, 'apiAdd']);
+        //Route::get('/ensure-auditee-privilege/{id}', [CorrectiveActionController::class, 'apiEnsureAuditeePrivilege']);
+        //Route::post('/add-corrective-action', [CorrectiveActionController::class, 'apiAdd']);
         Route::get('/fetch-corrective-actions', [CorrectiveActionController::class, 'apiFetch']);
         Route::get('/fetch-corrective-action-images/{id}', [CorrectiveActionController::class, 'apiFetchImages']);
-        Route::post('/close-corrective-action', [CorrectiveActionController::class, 'apiClose']);
+        //Route::post('/close-corrective-action', [CorrectiveActionController::class, 'apiClose']);
         Route::get('/get-corrective-action/{id}', [CorrectiveActionController::class, 'apiGet']);
 
         // Audit records APIs

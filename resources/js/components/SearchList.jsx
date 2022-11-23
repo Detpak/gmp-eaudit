@@ -73,8 +73,9 @@ export default function SearchList({ source, height, placeholder, onDone, childr
     };
 
     const handleScroll = (ev) => {
-        const bottomTarget = ev.target.scrollHeight - Math.ceil(ev.target.scrollTop);
-        if (!isLoading && canFetch && bottomTarget <= Math.ceil(ev.target.clientHeight)) {
+        const bottomTarget = ev.target.scrollHeight - Math.round(ev.target.scrollTop);
+        const halfHeight =  Math.round(ev.target.clientHeight * 0.5);
+        if (!isLoading && canFetch && bottomTarget == halfHeight) {
             const nextPage = currentPage + 1;
             fetchData(search, nextPage, true);
         }
@@ -125,7 +126,7 @@ export default function SearchList({ source, height, placeholder, onDone, childr
                                 <div className="flex-fill overflow-auto" style={{ maxHeight: height }} onScroll={handleScroll}>
                                     <ListGroup>
                                         {listData.map((item, index) => (
-                                            <ListGroup.Item key={index}>
+                                            <ListGroup.Item key={index} className="w-100">
                                                 <div className="d-flex">
                                                     <Form.Group className="align-self-center me-3">
                                                         <Form.Check
