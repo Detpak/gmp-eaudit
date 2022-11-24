@@ -189,8 +189,18 @@ function AuditProcessForm({ setAuditResult }) {
             throw { result: 'error', msg: "Unable to continue audit process, there is no active cycle. Please contact QC administrator." };
         }
 
-        activeCycle.data.result.formatted_start_date = new Date(activeCycle.data.result.start_date).toDateString();
-        activeCycle.data.result.formatted_finish_date = new Date(activeCycle.data.result.finish_date).toDateString();
+        const currentDate = new Date();
+        const startDate = new Date(activeCycle.data.result.start_date);
+        const finishDate = new Date(activeCycle.data.result.finish_date);
+
+        if (currentDate < startDate && currentDate > finishDate) {
+            throw { result: 'error', msg: "Unable to continue audit process, the cycle period has been ended." };
+        }
+
+        console.log(currentDate);
+
+        activeCycle.data.result.formatted_start_date = startDate.toDateString();
+        activeCycle.data.result.formatted_finish_date = finishDate.toDateString();
         setCycle(activeCycle.data.result);
 
         const cycleCriteriaGroup = await httpRequest.get(`api/v1/get-criteria-group/${activeCycle.data.result.cgroup_id}`);
