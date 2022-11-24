@@ -12,6 +12,8 @@ import DescriptionModal from "../../components/DescriptionModal";
 import ModalForm from "../../components/ModalForm";
 import { useEffect } from "react";
 
+const FETCH_URL = 'api/v1/fetch-corrective-actions';
+
 function ApproveCorrectiveActionForm({ id, disabled, refreshTable }) {
     const [shown, setShown] = useState(false);
     const [isSubmitting, setSubmitting] = useState(false);
@@ -91,6 +93,7 @@ export default function CorrectiveActionLayout() {
     const [refreshTrigger, setRefreshTrigger] = useState(false);
     const [searchKeyword, setSearchKeyword] = useState('');
     const [showCurrentCycle, setShowCurrentCycle] = useState(false);
+    const [fetchUrl, setFetchUrl] = useState(FETCH_URL);
 
     const refreshTable = () => {
         setRefreshTrigger(!refreshTrigger);
@@ -104,6 +107,18 @@ export default function CorrectiveActionLayout() {
         const response = await httpRequest.get(`api/v1/dev/reset-ca-approval/${id}`);
         console.log(response.data);
     };
+
+    useEffect(async () => {
+        if (showCurrentCycle) {
+            const response = await httpRequest.get('api/v1/get-active-cycle');
+            setFetchUrl(`${FETCH_URL}?cycle_id=${response.data.result.id}`);
+        }
+        else {
+            setFetchUrl(FETCH_URL);
+        }
+
+        refreshTable();
+    }, [showCurrentCycle]);
 
     return (
         <PageContent>
@@ -128,7 +143,7 @@ export default function CorrectiveActionLayout() {
                     refreshTrigger={refreshTrigger}
                     searchKeyword={searchKeyword}
                     source={{
-                        url: 'api/v1/fetch-corrective-actions',
+                        url: fetchUrl,
                         method: 'GET',
                         produce: item => [
                             item.code,

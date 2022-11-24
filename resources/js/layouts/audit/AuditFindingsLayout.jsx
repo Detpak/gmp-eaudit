@@ -13,6 +13,8 @@ import ModalForm from "../../components/ModalForm";
 import { CorrectiveActionForm } from "../CorrectiveActionMain";
 import { useEffect } from "react";
 
+const FETCH_URL = 'api/v1/fetch-findings';
+
 function getCaseStatus(status)
 {
     return [
@@ -88,6 +90,7 @@ export default function AuditFindingsLayout() {
     const [findingId, setFindingId] = useState(null);
     const [cancelFindingId, setCancelFindingId] = useState(null);
     const [showCurrentCycle, setShowCurrentCycle] = useState(false);
+    const [fetchUrl, setFetchUrl] = useState(FETCH_URL);
 
     const refreshTable = () => {
         setRefreshTrigger(!refreshTrigger);
@@ -106,6 +109,18 @@ export default function AuditFindingsLayout() {
         await httpRequest.get(`api/v1/dev/uncancel-ca/${id}`);
         refreshTable();
     };
+
+    useEffect(async () => {
+        if (showCurrentCycle) {
+            const response = await httpRequest.get('api/v1/get-active-cycle');
+            setFetchUrl(`${FETCH_URL}?cycle_id=${response.data.result.id}`);
+        }
+        else {
+            setFetchUrl(FETCH_URL);
+        }
+
+        refreshTable();
+    }, [showCurrentCycle]);
 
     return (
         <PageContent>
@@ -130,7 +145,7 @@ export default function AuditFindingsLayout() {
                     refreshTrigger={refreshTrigger}
                     searchKeyword={searchKeyword}
                     source={{
-                        url: 'api/v1/fetch-findings',
+                        url: fetchUrl,
                         method: 'GET',
                         produce: item => [
                             item.record_code,

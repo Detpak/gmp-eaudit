@@ -169,11 +169,6 @@ export default function AuditCyclesLayout() {
                             sortable: false,
                             id: 'desc',
                             name: 'Description'
-                        },
-                        {
-                            sortable: false,
-                            id: 'controls',
-                            name: 'Action'
                         }
                     ]}
                     source={{
@@ -186,16 +181,7 @@ export default function AuditCyclesLayout() {
                             item.close_date ? item.close_date : '-',
                             item.criteria_group.name,
                             item.total_findings,
-                            item.desc && item.desc.length > 0 ? item.desc : '-',
-                            <LoadingButton
-                                type="button"
-                                variant="danger"
-                                size="sm"
-                                onClick={async () => await closeCycle(item.id)}
-                                disabled={!!item.close_date}
-                            >
-                                Close
-                            </LoadingButton>
+                            item.desc && item.desc.length > 0 ? item.desc : '-'
                         ],
                     }}
                 />

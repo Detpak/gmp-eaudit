@@ -12,6 +12,7 @@ import AuditProcessLayout from "./AuditProcessLayout";
 import CorrectiveActionMain from "./CorrectiveActionMain";
 
 export default function App({ mode }) {
+
     useEffect(updateUserData, []);
 
     const layoutProvider = () => {

@@ -1,14 +1,19 @@
 import { faArrowRotateRight, faXmark } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { useEffect } from "react";
 import { useState } from "react";
 import { Button, Form, InputGroup, OverlayTrigger, Tooltip } from "react-bootstrap";
+import httpRequest from "../../api";
 import DynamicTable from "../../components/DynamicTable";
 import { PageContent, PageContentTopbar, PageContentView } from "../../components/PageNav";
+
+const FETCH_URL = 'api/v1/fetch-records';
 
 export default function AuditRecordsLayout() {
     const [refreshTrigger, setRefreshTrigger] = useState(false);
     const [searchKeyword, setSearchKeyword] = useState('');
     const [showCurrentCycle, setShowCurrentCycle] = useState(false);
+    const [fetchUrl, setFetchUrl] = useState(FETCH_URL);
 
     const refreshTable = () => {
         setRefreshTrigger(!refreshTrigger);
@@ -17,6 +22,18 @@ export default function AuditRecordsLayout() {
     const handleSearch = ev => {
         setSearchKeyword(ev.target.value);
     };
+
+    useEffect(async () => {
+        if (showCurrentCycle) {
+            const response = await httpRequest.get('api/v1/get-active-cycle');
+            setFetchUrl(`${FETCH_URL}?cycle_id=${response.data.result.id}`);
+        }
+        else {
+            setFetchUrl(FETCH_URL);
+        }
+
+        refreshTable();
+    }, [showCurrentCycle]);
 
     return (
         <PageContent>
@@ -101,7 +118,7 @@ export default function AuditRecordsLayout() {
                         }
                     ]}
                     source={{
-                        url: 'api/v1/fetch-records',
+                        url: fetchUrl,
                         method: 'GET',
                         produce: item => [
                             item.cycle_id,

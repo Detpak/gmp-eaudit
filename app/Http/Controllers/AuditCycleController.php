@@ -28,7 +28,7 @@ class AuditCycleController extends Controller
         $validator = Validator::make(
             $request->all(),
             [
-                'start_date' => 'required',
+                'start_date' => 'required|date|date_format:Y-m-d',
                 'finish_date' => 'required|date|date_format:Y-m-d|after:start_date',
                 'cgroup_id' => 'required|exists:criteria_groups,id',
                 'desc' => 'nullable|string'
@@ -41,9 +41,11 @@ class AuditCycleController extends Controller
             return ['formError' => $validator->errors()];
         }
 
+        $activeCycle = AuditCycle::whereNull('close_date')->first();
 
-        if (AuditCycle::whereNull('close_date')->exists()) {
-            return ['result' => 'error', 'msg' => 'Unable to start new cycle, there is one unfinished cycle.'];
+        if ($activeCycle) {
+            $activeCycle->close_date = Carbon::now()->toDateTimeString();
+            $activeCycle->save();
         }
 
         $startDate = Carbon::createFromFormat('Y-m-d', $request->start_date);

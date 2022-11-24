@@ -113,7 +113,7 @@ function RolesForm({ editId, closeModal, refreshTable }) {
                     <Form.Check className="mb-3" type="checkbox" name="auditee" label="Auditee" checked={values.auditee} onChange={handleChange} />
                     <Form.Check className="mb-3" type="checkbox" name="auditor" label="Auditor" checked={values.auditor} onChange={handleChange} />
                     <hr/>
-                    {routes.map((route, index) => (
+                    {routes.filter((route) => !route.noRestrict).map((route, index) => (
                         <Form.Group key={index} className="mb-3">
                             <Form.Label>{route.name} access privilege</Form.Label>
                             <div className="hstack gap-3">

@@ -263,6 +263,10 @@ class AuditProcessController extends Controller
                 ->orWhere('audit_findings.cg_name', 'LIKE', "%{$request->search}%");
         }
 
+        if ($request->cycle_id) {
+            $query->orWhere('audit_records.cycle_id', 'LIKE', "%{$request->cycle_id}%");
+        }
+
         if ($request->sort && $request->dir) {
             $query->orderBy($request->sort, $request->dir);
         }

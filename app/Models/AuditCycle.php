@@ -18,6 +18,12 @@ class AuditCycle extends Model
         'desc',
     ];
 
+    protected $casts = [
+        'start_date' => 'datetime:Y-m-d',
+        'close_date' => 'datetime:Y-m-d',
+        'finish_date' => 'datetime:Y-m-d',
+    ];
+
     public function criteriaGroup()
     {
         return $this->belongsTo(CriteriaGroup::class, 'cgroup_id');

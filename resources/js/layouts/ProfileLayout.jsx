@@ -5,7 +5,7 @@ import { globalState } from "../app_state";
 import { RequiredSpan } from "../components/LabelSpan";
 import LoadingButton from "../components/LoadingButton";
 import { PageContent, PageContentView, PageNavbar } from "../components/PageNav";
-import { updateUserData, waitForMs } from "../utils";
+import { showToastMsg, updateUserData, waitForMs } from "../utils";
 
 export function ProfileForm() {
     const [name, setName] = useState("");
@@ -27,7 +27,7 @@ export function ProfileForm() {
             login_id: loginId,
             email: email,
             password: password,
-            confirm_password: confirmPassword,
+            password_confirmation: confirmPassword,
         };
 
         const response = await httpRequest.post('api/v1/edit-user', formData);
@@ -38,7 +38,11 @@ export function ProfileForm() {
         }
 
         await updateUserData();
-    }
+        setChangePassword(false);
+        setPassword('');
+        setConfirmPassword('');
+        showToastMsg('Profile successfully saved!');
+    };
 
     useEffect(async () => {
         setName(userData.name);

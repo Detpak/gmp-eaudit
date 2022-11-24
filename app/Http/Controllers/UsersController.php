@@ -222,7 +222,10 @@ class UsersController extends Controller
 
         $user->update($request->except('id', 'password'));
 
-        $user->password = Hash::make($request->password);
+        if ($request->password) {
+            $user->password = Hash::make($request->password);
+        }
+
         $user->save();
 
         return Response::json(['result' => 'ok']);

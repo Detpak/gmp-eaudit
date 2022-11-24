@@ -20,6 +20,10 @@ class AuditRecordController extends Controller
                 ->orWhere('departments.name', 'LIKE', "%{$request->search}%");
         }
 
+        if ($request->cycle_id) {
+            $query->orWhere('audit_records.cycle_id', 'LIKE', "%{$request->cycle_id}%");
+        }
+
         $query->join('areas', 'areas.id', '=', 'audit_records.area_id')
               ->join('departments', 'departments.id', '=', 'areas.department_id')
               ->join('audit_cycles', 'audit_cycles.id', '=', 'audit_records.cycle_id')

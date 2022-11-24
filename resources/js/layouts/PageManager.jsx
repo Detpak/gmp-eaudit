@@ -129,7 +129,7 @@ export function PageRoutes() {
                                         .filter((page) => userData.access[route.link] != null && userData.access[route.link][page])
                                         .map((pageLink, pageKey) => (
                                             <React.Fragment key={pageKey}>
-                                                {route.index == pageLink && <Route index element={<Navigate to={`${routeLink}/${pageLink}`} replace />} />}
+                                                {pageKey == 0 && <Route index element={<Navigate to={`${routeLink}/${pageLink}`} replace />} />}
                                                 <Route path={pageLink} element={React.createElement(route.pages[pageLink].element)} />
                                             </React.Fragment>
                                         ))
