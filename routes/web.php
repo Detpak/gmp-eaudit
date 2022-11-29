@@ -26,7 +26,9 @@ Route::post('/auth', [LoginController::class, 'auth']);
 
 Route::middleware('user')->group(function() {
     Route::get('/deauth', [LoginController::class, 'deauth']);
-    Route::get('/app', function() { return redirect()->intended('/app/dashboard'); });
+    //Route::get('/app', function() { return redirect()->intended('/app/dashboard'); });
+    Route::view('/portal', 'secondary_page', ['page' => 'portal']);
+    Route::redirect('/app', '/app/dashboard');
     Route::view('/app/{path?}', 'main_view')->where('path', '.*');
     Route::view('/audit', 'secondary_page', ['page' => 'audit'])->middleware('auditor');
 
@@ -34,7 +36,7 @@ Route::middleware('user')->group(function() {
         ->where("caId", ".*")
         ->middleware('auditor');
 
-    Route::view('/corrective-action/{findingId}', 'secondary_page', ['page' => 'corrective_action'])
+    Route::view('/corrective-action/{findingId?}', 'secondary_page', ['page' => 'corrective_action'])
         ->where("findingId", ".*")
         ->middleware('auditee');
 

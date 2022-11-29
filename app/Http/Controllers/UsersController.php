@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Helpers\CommonHelpers;
+use App\Helpers\UserHelpers;
 use App\Models\ApiAccessToken;
 use App\Models\Role;
 use App\Models\User;
@@ -36,7 +37,7 @@ class UsersController extends Controller
 
         Role::create([
             'name' => $request->roleName,
-            'access_info' => json_encode($request->access),
+            'access_info' => $request->access,
             'remarks' => $request->remarks,
             'auditee' => $request->auditee ? 1 : 0,
             'auditor' => $request->auditor,
@@ -48,13 +49,14 @@ class UsersController extends Controller
     public function apiGetRole($id)
     {
         $role = Role::find($id);
-        $accessInfo = json_decode($role->access_info);
+        $accessInfo = $role->access_info;
 
         return [
             'roleName' => $role->name,
             'remarks' => $role->remarks,
             'auditee' => $role->auditee,
             'auditor' => $role->auditor,
+            'admin_access' => UserHelpers::canOpenAdminPage(),
             'access' => $accessInfo
         ];
     }
@@ -142,7 +144,7 @@ class UsersController extends Controller
             'remarks' => $request->remarks,
             'auditee' => $request->auditee ? 1 : 0,
             'auditor' => $request->auditor,
-            'access_info' => json_encode($request->access),
+            'access_info' => $request->access,
         ];
 
         $data->update($updateColumn);
@@ -309,7 +311,7 @@ class UsersController extends Controller
 
         $result['auditee'] = $role->auditee;
         $result['auditor'] = $role->auditor;
-        $result['access'] = json_decode($role->access_info);
+        $result['access'] = $role->access_info;
 
         return ['result' => $result];
     }

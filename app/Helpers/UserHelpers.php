@@ -3,6 +3,7 @@
 namespace App\Helpers;
 
 use App\Models\ApiAccessToken;
+use App\Models\Role;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Session;
@@ -32,5 +33,41 @@ class UserHelpers
     {
         $token = explode('|', Session::get('eaudit_token'));
         return (object)['id' => $token[0], 'token' => $token[1]];
+    }
+
+    public static function getRole()
+    {
+        return Role::find(Session::get('eaudit_role'));
+    }
+
+    public static function isAuditee()
+    {
+        return UserHelpers::getRole()->auditee;
+    }
+
+    public static function isAuditor()
+    {
+        return UserHelpers::getRole()->auditor;
+    }
+
+    public static function canOpenAdminPage()
+    {
+        $role = UserHelpers::getRole();
+
+        foreach ($role->access_info as $route => $value) {
+            switch (gettype($value)) {
+                case 'boolean':
+                    if ($value) {
+                        return true;
+                    }
+                    break;
+                case 'array':
+                    if (collect($value)->some(true)) {
+                        return true;
+                    }
+            }
+        }
+
+        return false;
     }
 }

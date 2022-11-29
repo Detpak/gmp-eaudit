@@ -10,13 +10,15 @@ import AppContext, { appStates, appStateReducer } from "./AppContext";
 import ApproveCorrectiveActionLayout from "./ApproveCorrectiveActionLayout";
 import AuditProcessLayout from "./AuditProcessLayout";
 import CorrectiveActionMain from "./CorrectiveActionMain";
+import PortalPage from "./PortalPage";
 
 export default function App({ mode }) {
-
     useEffect(updateUserData, []);
 
     const layoutProvider = () => {
         switch (mode) {
+            case 'portal':
+                return <PortalPage />;
             case 'audit':
                 return <AuditProcessLayout />;
             case 'corrective_action':

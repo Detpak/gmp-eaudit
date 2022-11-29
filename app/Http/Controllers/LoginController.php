@@ -15,10 +15,35 @@ use Illuminate\Support\Facades\Validator;
 
 class LoginController extends Controller
 {
+    private function openView()
+    {
+        $isAuditor = UserHelpers::isAuditor();
+        $isAuditee = UserHelpers::isAuditee();
+        $adminAccess =  UserHelpers::canOpenAdminPage();
+
+        if (($isAuditor && $isAuditee) || $adminAccess) {
+            return Redirect::intended('portal');
+        }
+        else if ($isAuditor && $adminAccess) {
+            return Redirect::intended('portal');
+        }
+        else if ($isAuditee && $adminAccess) {
+            return Redirect::intended('portal');
+        }
+        else if ($isAuditor && $isAuditee) {
+            return Redirect::intended('portal');
+        }
+        else if ($isAuditor) {
+            return Redirect::intended('audit');
+        }
+
+        return Redirect::intended('app');
+    }
+
     public function show()
     {
         if (UserHelpers::isLoggedIn()) {
-            return Redirect::intended('app');
+            return $this->openView();
         }
 
         return view('login');
@@ -27,7 +52,7 @@ class LoginController extends Controller
     public function auth(Request $request)
     {
         if (UserHelpers::isLoggedIn()) {
-            return Redirect::intended('app');
+            return $this->openView();
         }
 
         $validator = Validator::make(
@@ -95,7 +120,7 @@ class LoginController extends Controller
         Session::put('eaudit_role', $user->role_id);
         Session::put('eaudit_token', "{$user->id}|{$token}");
 
-        return Redirect::intended('app');
+        return $this->openView();
     }
 
     public function deauth()
