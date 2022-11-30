@@ -119,7 +119,12 @@ class AuditCycleController extends Controller
 
     public function apiGetActiveCycle()
     {
-        return ['result' => AuditCycle::whereNull('close_date')->first()];
+        $currentDate = Carbon::now();
+        $cycle = AuditCycle::whereNull('close_date')->first();
+        $finishDate = $cycle->finish_date->addDay();
+        $cycle->expired = $currentDate > $finishDate;
+
+        return ['result' => $cycle];
     }
 
     public function apiFetchCycles(Request $request)

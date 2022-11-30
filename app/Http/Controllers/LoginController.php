@@ -24,17 +24,11 @@ class LoginController extends Controller
         if (($isAuditor && $isAuditee) || $adminAccess) {
             return Redirect::intended('portal');
         }
-        else if ($isAuditor && $adminAccess) {
-            return Redirect::intended('portal');
-        }
-        else if ($isAuditee && $adminAccess) {
-            return Redirect::intended('portal');
-        }
-        else if ($isAuditor && $isAuditee) {
-            return Redirect::intended('portal');
-        }
         else if ($isAuditor) {
             return Redirect::intended('audit');
+        }
+        else if ($isAuditee) {
+            return Redirect::intended('corrective-action');
         }
 
         return Redirect::intended('app');

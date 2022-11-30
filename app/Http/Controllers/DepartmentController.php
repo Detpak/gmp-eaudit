@@ -137,12 +137,16 @@ class DepartmentController extends Controller
             ->select('departments.id',
                      'departments.name',
                      'departments.code',
-                     'divisions.name as division_name')
-            ->with('pics', function ($query) {
-                $query->select('name')
-                    ->orderBy('name');
-            })
-            ->withCount('areas');
+                     'divisions.name as division_name');
+
+        if (!$request->list) {
+            $query->with('pics', function ($query) {
+                 $query->select('name')
+                     ->orderBy('name');
+            });
+        }
+
+        $query->withCount('areas');
 
         return $query->paginate($request->max);
     }

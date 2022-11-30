@@ -57,6 +57,13 @@ class AuditProcessController extends Controller
         }
 
         $auditDate = Carbon::now();
+        $cycle = AuditCycle::find($request->cycle_id);
+        $finishDate = $cycle->finish_date->addDay();
+
+        if ($cycle->finish_date > $auditDate) {
+            return ['result' => 'error', 'msg' => 'Unable to continue audit process, the cycle period has ended.'];
+        }
+
         $publicPath = public_path('case_images');
 
         // Check if the audit is not started
@@ -83,9 +90,9 @@ class AuditProcessController extends Controller
         }
 
         $criteriaGroup = CriteriaGroup::find($request->cgroup_id);
-        $cycle = AuditCycle::select('id', 'cycle_id', 'total_findings')->find($request->cycle_id);
 
         // Reset findings count after a year.
+        // TODO: use dedicated date attribute.
         if (AppStateHelpers::getState()->updated_at->year < Carbon::now()->year) {
             try {
                 AppStateHelpers::resetFindingsCounter();
@@ -244,6 +251,7 @@ class AuditProcessController extends Controller
                        'audit_findings.status',
                        'audit_findings.status',
                        'audit_findings.cancel_reason',
+                       'audit_findings.created_at',
                        DB::raw('audit_findings.ca_weight * (audit_findings.weight_deduct / 100) as deducted_weight'));
 
         $query->addSelect([
@@ -276,7 +284,7 @@ class AuditProcessController extends Controller
 
         $query->withCount('images');
 
-        return $query->paginate($request->max);
+        return $request->max ? $query->paginate($request->max) : $query->get();
     }
 
     public function apiFetchImages($findingId)

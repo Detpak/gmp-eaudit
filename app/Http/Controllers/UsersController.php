@@ -56,7 +56,6 @@ class UsersController extends Controller
             'remarks' => $role->remarks,
             'auditee' => $role->auditee,
             'auditor' => $role->auditor,
-            'admin_access' => UserHelpers::canOpenAdminPage(),
             'access' => $accessInfo
         ];
     }
@@ -312,6 +311,22 @@ class UsersController extends Controller
         $result['auditee'] = $role->auditee;
         $result['auditor'] = $role->auditor;
         $result['access'] = $role->access_info;
+        $result['admin_access'] = false;
+
+        foreach ($role->access_info as $route => $value) {
+            switch (gettype($value)) {
+                case 'boolean':
+                    if ($value) {
+                        $result['admin_access'] = true;
+                    }
+                    break;
+                case 'array':
+                    if (collect($value)->some(true)) {
+                        $result['admin_access'] = true;
+                    }
+                    break;
+            }
+        }
 
         return ['result' => $result];
     }

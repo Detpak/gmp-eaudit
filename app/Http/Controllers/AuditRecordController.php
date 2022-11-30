@@ -61,8 +61,11 @@ class AuditRecordController extends Controller
         }
 
         if ($request->cycle) {
-            $query->where('audit_records.cycle_id', $request->cycle)
-                ->where('audit_records.status', 0);
+            $query->where('audit_records.cycle_id', $request->cycle);
+        }
+
+        if ($request->dept) {
+            $query->where('departments.id', $request->dept);
         }
 
         if ($request->sort && $request->dir) {

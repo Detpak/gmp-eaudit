@@ -1,9 +1,9 @@
-import { faEnvelopesBulk, faImage } from "@fortawesome/free-solid-svg-icons";
+import { faArrowRotateRight, faEnvelopesBulk, faImage, faXmark } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useState } from "react";
 import { useEffect } from "react";
-import { Button, Card, Form, Modal, ProgressBar, Spinner, Table } from "react-bootstrap";
-import { Route, Routes, useParams } from "react-router-dom";
+import { Button, Card, Form, InputGroup, ListGroup, Modal, ProgressBar, Spinner, Table } from "react-bootstrap";
+import { NavLink, Route, Routes, useNavigate, useParams } from "react-router-dom";
 import httpRequest from "../api";
 import FileInput from "../components/FileInput";
 import { RequiredSpan } from "../components/LabelSpan";
@@ -229,18 +229,90 @@ export function CorrectiveActionForm({ findingId, afterSubmit }) {
 
 function CorrectiveActionFormWrapper() {
     const params = useParams();
-    return <CorrectiveActionForm findingId={params.findingId} />;
-}
-
-export default function CorrectiveActionMain() {
     return (
         <Card className="audit-card mx-sm-auto mx-2 my-2 w-auto">
             <Card.Header className="p-3">
                 <h3 className="fw-bold display-spacing m-0">Create Corrective Action</h3>
             </Card.Header>
-            <Routes>
-                <Route path="/corrective-action/:findingId" element={<CorrectiveActionFormWrapper />} />
-            </Routes>
+            <CorrectiveActionForm findingId={params.findingId} />
         </Card>
+    );
+}
+
+function SelectCaseFinding() {
+    const [searchKeyword, setSearchKeyword] = useState('');
+    const [showCurrentCycle, setShowCurrentCycle] = useState(true);
+    const [isLoading, setLoading] = useState(false);
+    const [data, setData] = useState([]);
+    const navigate = useNavigate();
+
+    const refresh = async _ => {
+        let fetchUrl = "api/v1/fetch-findings";
+
+        setLoading(true);
+
+        if (showCurrentCycle) {
+            const currentCycle = await httpRequest.get('api/v1/get-active-cycle');
+            fetchUrl += `?cycle_id=${currentCycle.data.result.id}`;
+        }
+
+        const response = await httpRequest.get(fetchUrl);
+        setData(response.data);
+
+        setLoading(false);
+    };
+
+    useEffect(async () => {
+        refresh();
+    }, [showCurrentCycle]);
+
+    return (
+        <div className="audit-card mx-sm-auto w-auto vh-100 vstack">
+            <div className="p-2 bg-white">
+                <div className="hstack mb-3">
+                    <Button variant="outline-primary" onClick={refresh} className="me-2"><FontAwesomeIcon icon={faArrowRotateRight} /></Button>
+                    <InputGroup>
+                        <Form.Control
+                            type="text"
+                            placeholder="Search Case Finding"
+                            value={searchKeyword}
+                            onChange={ev => setSearchKeyword(ev.target.value)}
+                        />
+                        <Button variant="outline-secondary" onClick={() => setSearchKeyword('')}>
+                            <FontAwesomeIcon icon={faXmark} />
+                        </Button>
+                    </InputGroup>
+                </div>
+                <Form.Check
+                    type="checkbox"
+                    id="showCurrentCycle"
+                    label="Show Current Cycle"
+                    checked={showCurrentCycle}
+                    onChange={_ => setShowCurrentCycle(!showCurrentCycle)}
+                />
+            </div>
+            <hr className="my-0" />
+            <div className="flex-fill overflow-auto">
+                <ListGroup className="m-1">
+                    {data.map((value, key) => (
+                        <ListGroup.Item action key={key}>
+                            <div className="fw-bold">{value.code} - {value.ca_name}</div>
+                            <small>{new Date(value.created_at).toDateString()}</small>
+                            {value.area_name}
+                        </ListGroup.Item>
+                    ))}
+                </ListGroup>
+                <div style={{ height: 1000 }} />
+            </div>
+        </div>
+    );
+}
+
+export default function CorrectiveActionMain() {
+    return (
+        <Routes>
+            <Route path="/corrective-action" element={<SelectCaseFinding />} />
+            <Route path="/corrective-action/:findingId" element={<CorrectiveActionFormWrapper />} />
+        </Routes>
     );
 }

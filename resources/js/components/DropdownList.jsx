@@ -6,7 +6,7 @@ import { Dropdown, Form, Spinner } from "react-bootstrap";
 import httpRequest from "../api";
 import { useIsMounted } from "../utils";
 
-export default function DropdownList({ source, selectedItem, setSelectedItem, caption, title, children }) {
+export default function DropdownList({ source, selectedItem, setSelectedItem, caption, title, children, disableIf }) {
     const [show, setShow] = useState(false);
     const [isLoading, setLoading] = useState(false);
     const [canFetch, setCanFetch] = useState(true);
@@ -61,7 +61,7 @@ export default function DropdownList({ source, selectedItem, setSelectedItem, ca
     };
 
     const handleScroll = (ev) => {
-        const bottomTarget = ev.target.scrollHeight - Math.round(ev.target.scrollTop);
+        const bottomTarget = Math.round(ev.target.scrollHeight - ev.target.scrollTop);
         const height =  Math.round(ev.target.clientHeight);
         if (!isLoading && canFetch && bottomTarget == height) {
             const nextPage = currentPage + 1;
@@ -107,7 +107,7 @@ export default function DropdownList({ source, selectedItem, setSelectedItem, ca
 
                 <div className="overflow-auto" style={{ maxHeight: 200 }} onScroll={handleScroll}>
                     {listData.map((item, index) => (
-                        <Dropdown.Item key={index} eventKey={index} className="py-2">
+                        <Dropdown.Item key={index} eventKey={index} className="py-2" disabled={disableIf != null ? disableIf(item) : false}>
                             {React.createElement(children, { data: item })}
                         </Dropdown.Item>
                     ))}

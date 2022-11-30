@@ -162,6 +162,7 @@ function AuditProcessForm({ setAuditResult }) {
     const [criteriaPassed, setCriteriaPassed] = useState(0);
     const [criteriaFailed, setCriteriaFailed] = useState(0);
     const [cycle, setCycle] = useState(null);
+    const [department, setDepartment] = useState(null);
     const [record, setRecord] = useState(null);
     const [criteriaGroup, setCriteriaGroup] = useState(null);
     const [criterias, setCriterias] = useState([]);
@@ -189,13 +190,12 @@ function AuditProcessForm({ setAuditResult }) {
             throw { result: 'error', msg: "Unable to continue audit process, there is no active cycle. Please contact QC administrator." };
         }
 
-        const startDate = new Date(activeCycle.data.result.start_date);
-        const finishDate = new Date(activeCycle.data.result.finish_date);
-        const currentDate = new Date();
-
-        if (currentDate > finishDate) {
+        if (activeCycle.data.result.expired) {
             throw { result: 'error', msg: "Unable to continue audit process, the cycle period has ended." };
         }
+
+        const finishDate = new Date(activeCycle.data.result.finish_date);
+        const startDate = new Date(activeCycle.data.result.start_date);
 
         activeCycle.data.result.formatted_start_date = startDate.toDateString();
         activeCycle.data.result.formatted_finish_date = finishDate.toDateString();
@@ -327,7 +327,7 @@ function AuditProcessForm({ setAuditResult }) {
             console.log(ex);
         }
 
-        console.log(Object.fromEntries(formData));
+        //console.log(Object.fromEntries(formData));
 
         const config = {
             headers: { 'Content-Type': 'multipart/form-data' },
@@ -399,6 +399,7 @@ function AuditProcessForm({ setAuditResult }) {
                 return;
             }
 
+            console.log(reason);
             setMessage("An error occurred when starting audit process.");
         });
     }, []);
@@ -445,25 +446,37 @@ function AuditProcessForm({ setAuditResult }) {
                                 </tr>
                             </tbody>
                         </Table>
-                        <Form.Group id="record_id" className="mb-3">
-                            <Form.Label className="fw-bold">Area</Form.Label>
+                        <Form.Group id="dept_id" className="mb-3">
+                            <Form.Label className="fw-bold">Department</Form.Label>
                             <DropdownList
-                                source={`api/v1/fetch-records?list=1&cycle=${cycle.id}`}
-                                selectedItem={record}
-                                setSelectedItem={setRecord}
-                                caption={(data) => <>{data.area_name}</>}
-                                title="Please Select Area"
+                                source={`api/v1/fetch-depts`}
+                                selectedItem={department}
+                                setSelectedItem={setDepartment}
+                                caption={(data) => <>{data.name}</>}
+                                disableIf={(data) => data.areas_count == 0}
+                                title="Please Select Department"
                             >
                                 {({ data }) => (
-                                    <>
-                                        <div className="fw-bold text-wrap">{data.area_name}</div>
-                                        <small>{data.dept_name}</small>
-                                    </>
+                                    <div className="text-wrap">{data.name}</div>
                                 )}
                             </DropdownList>
-                            <input type="hidden" className={formError && formError.record_id ? 'is-invalid' : ''}/>
-                            <Form.Control.Feedback type="invalid">{formError && formError.record_id ? formError.record_id : ''}</Form.Control.Feedback>
                         </Form.Group>
+                        {department != null &&
+                            <Form.Group id="record_id" className="mb-3">
+                                <Form.Label className="fw-bold">Area</Form.Label>
+                                <DropdownList
+                                    source={`api/v1/fetch-records?list=1&cycle=${cycle.id}&dept=${department.id}`}
+                                    selectedItem={record}
+                                    setSelectedItem={setRecord}
+                                    caption={(data) => <>{data.area_name}</>}
+                                    title="Please Select Area"
+                                >
+                                    {({ data }) => <div className="text-wrap">{data.area_name}</div>}
+                                </DropdownList>
+                                <input type="hidden" className={formError && formError.record_id ? 'is-invalid' : ''}/>
+                                <Form.Control.Feedback type="invalid">{formError && formError.record_id ? formError.record_id : ''}</Form.Control.Feedback>
+                            </Form.Group>
+                        }
                         <Form.Group className="mb-3">
                             {isLoadingDeptPIC && (
                                 <div className="text-center p-4">
@@ -472,10 +485,6 @@ function AuditProcessForm({ setAuditResult }) {
                             )}
                             {deptPIC.length > 0 && (
                                 <>
-                                    <div className="mb-3">
-                                        <div className="fw-bold">Department</div>
-                                        <div>{record.dept_name}</div>
-                                    </div>
                                     <div className="fw-bold">Auditees</div>
                                     <ListGroup style={{ maxHeight: 200 }}>
                                         {deptPIC.map((value, index) => (
