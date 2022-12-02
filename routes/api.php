@@ -83,6 +83,7 @@ Route::prefix('/v1')->group(function() {
         Route::get('/fetch-findings', [AuditProcessController::class, 'apiFetch']);
         Route::get('/fetch-finding-images/{findingId}', [AuditProcessController::class, 'apiFetchImages']);
         Route::get('/get-finding/{id}', [AuditProcessController::class, 'apiGet']);
+        Route::get('/get-record-cases/{id}', [AuditProcessController::class, 'apiGetRecordCases']);
 
         // Criteria APIs
         Route::post('/add-criteria', [CriteriaController::class, 'apiAdd']);

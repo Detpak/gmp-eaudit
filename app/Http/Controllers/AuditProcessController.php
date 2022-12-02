@@ -16,6 +16,7 @@ use App\Models\FailedPhoto;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
@@ -25,6 +26,19 @@ use Illuminate\Validation\Rule;
 
 class AuditProcessController extends Controller
 {
+    private function getCaseFound($record)
+    {
+        return AuditFinding::select('audit_findings.ca_code')
+            ->join('audit_records', 'audit_records.id', '=', 'audit_findings.record_id')
+            ->join('areas', 'areas.id', '=', 'audit_records.area_id')
+            ->join('departments', 'departments.id', '=', 'areas.department_id')
+            ->where('audit_findings.record_id', $record)
+            ->get()
+            ->map(function ($value) {
+                return $value->ca_code;
+            });
+    }
+
     public function apiSubmitAudit(Request $request)
     {
         $wrap = [
@@ -60,18 +74,26 @@ class AuditProcessController extends Controller
         $cycle = AuditCycle::find($request->cycle_id);
         $finishDate = $cycle->finish_date->addDay();
 
-        if ($cycle->finish_date > $auditDate) {
+        if ($auditDate > $finishDate) {
             return ['result' => 'error', 'msg' => 'Unable to continue audit process, the cycle period has ended.'];
         }
 
         $publicPath = public_path('case_images');
 
-        // Check if the audit is not started
+        // Check if the area has been audited
+        $caseFound = $this->getCaseFound($request->record_id);
         $record = AuditRecord::select('id', 'code', 'status', 'area_id')->find($request->record_id);
-        if ($record->status > 0) {
+        $criterias = CriteriaGroup::query()
+            ->with('criterias', function ($query) use ($caseFound) {
+                $query->whereNotIn('code', $caseFound);
+            })
+            ->find($cycle->cgroup_id)
+            ->criterias;
+
+        if ($criterias->count() == 0) {
             return [
                 'formError' => [
-                    'record_id' => ['Cannot submit audit. The area has been auditted previously.']
+                    'record_id' => ['This area has been auditted.']
                 ],
             ];
         }
@@ -212,7 +234,7 @@ class AuditProcessController extends Controller
                 'area_name' => $record->area->name,
                 'dept_name' => $record->area->department->name,
                 'num_criterias' => $criteriaGroup->criterias->count(),
-                'findings' => $auditFindings,
+                'findings' => AuditFinding::where('record_id', $request->record_id)->get(),
                 'pics' => $record->area->department->pics,
                 'images' => $imageFiles
                     ->groupBy('case_id')
@@ -345,5 +367,22 @@ class AuditProcessController extends Controller
             ->send(new CaseFindingCancelled($finding));
 
         return ['result' => 'ok'];
+    }
+
+    public function apiGetRecordCases($record)
+    {
+        $caseFound = $this->getCaseFound($record);
+
+        $cycle = AuditRecord::find($record)->cycle;
+        $criterias = CriteriaGroup::query()
+            ->with('criterias')
+            ->find($cycle->cgroup_id)
+            ->criterias
+            ->map(function ($value) use ($caseFound) {
+                $value->audited = $caseFound->contains($value->code);
+                return $value;
+            });
+
+        return $criterias;
     }
 }

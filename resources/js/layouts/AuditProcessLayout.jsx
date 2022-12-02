@@ -4,7 +4,7 @@ import _ from "lodash";
 import React, { useState } from "react";
 import { useRef } from "react";
 import { useEffect } from "react";
-import { Accordion, Button, Card, Carousel, Form, ListGroup, Modal, ProgressBar, Spinner, Table } from "react-bootstrap";
+import { Accordion, Button, Card, Carousel, Form, ListGroup, Modal, ProgressBar, Spinner, Table, ToggleButton } from "react-bootstrap";
 import { Doughnut } from "react-chartjs-2";
 import DropdownList from "../components/DropdownList";
 import FileInput from "../components/FileInput";
@@ -165,16 +165,17 @@ function AuditProcessForm({ setAuditResult }) {
     const [department, setDepartment] = useState(null);
     const [record, setRecord] = useState(null);
     const [criteriaGroup, setCriteriaGroup] = useState(null);
-    const [criterias, setCriterias] = useState([]);
+    const [criterias, setCriterias] = useState(null);
     const [deptPIC, setDeptPIC] = useState([]);
     //const [isLoadingCriteria, setLoadingCriteria] = useState(false);
     const [isLoadingDeptPIC, setLoadingDeptPIC] = useState(false);
-    const [cases, setCases] = useState([]);
+    const [cases, setCases] = useState(null);
     const [formError, setFormError] = useState(null);
     const [isSubmitting, setSubmitting] = useState(false);
     const [submitMsg, setSubmitMsg] = useState('');
     const [maxProgress, setMaxProgress] = useState(0);
     const [submitProgress, setSubmitProgress] = useState(0);
+    const [isLoadingCases, setLoadingCases] = useState(false);
     const date = useRef(new Date().toLocaleDateString('en-UK', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }));
 
     const fetchData = async () => {
@@ -204,8 +205,8 @@ function AuditProcessForm({ setAuditResult }) {
         const cycleCriteriaGroup = await httpRequest.get(`api/v1/get-criteria-group/${activeCycle.data.result.cgroup_id}`);
         setCriteriaGroup(cycleCriteriaGroup.data);
 
-        const cycleCriterias = await httpRequest.get(`api/v1/get-criteria-group-params/${activeCycle.data.result.cgroup_id}`);
-        setCriterias(cycleCriterias.data);
+        // const cycleCriterias = await httpRequest.get(`api/v1/get-criteria-group-params/${activeCycle.data.result.cgroup_id}`);
+        // setCriterias(cycleCriterias.data);
     };
 
     // Recalculate summary values
@@ -247,7 +248,7 @@ function AuditProcessForm({ setAuditResult }) {
 
     const handlePassesBtn = (ev, index) => {
         const tmpCases = cases.slice();
-        tmpCases[index].need_action = ev.target.value !== 'true';
+        tmpCases[index].need_action = !tmpCases[index].need_action;
 
         if (tmpCases[index].need_action) {
             tmpCases[index].info = {
@@ -315,7 +316,7 @@ function AuditProcessForm({ setAuditResult }) {
                     .flat()
                     .forEach(image => formData.append('images[]', image));
 
-                // Make case index references for the image
+                // Make index references for the image
                 _.zip(findingImages, cases)
                     .map((finding, index) => finding[0] ? finding[0].map(() => index) : null)
                     .filter(data => data != null)
@@ -327,7 +328,7 @@ function AuditProcessForm({ setAuditResult }) {
             console.log(ex);
         }
 
-        //console.log(Object.fromEntries(formData));
+        // console.log(Object.fromEntries(formData));
 
         const config = {
             headers: { 'Content-Type': 'multipart/form-data' },
@@ -355,22 +356,13 @@ function AuditProcessForm({ setAuditResult }) {
     };
 
     useEffect(() => {
-        const passes = criterias.map((data) => ({
-            id: data.id,
-            need_action: false,
-            info: null
-        }));
-
-        setCases(passes);
-        recalculateSummary(passes);
-    }, [criterias]);
-
-    useEffect(() => {
-        if (record) {
+        if (department) {
+            setRecord(null);
+            setFormError(null);
             setLoadingDeptPIC(true);
 
             // Update PIC list
-            httpRequest.get(`api/v1/get-dept-pics/${record.dept_id}`)
+            httpRequest.get(`api/v1/get-dept-pics/${department.id}`)
                 .then((response) => {
                     httpRequest.post(`api/v1/get-users`,
                                      { ids: response.data },
@@ -387,7 +379,27 @@ function AuditProcessForm({ setAuditResult }) {
                     setLoadingDeptPIC(false);
                 });
         }
+    }, [department]);
+
+    useEffect(async () => {
+        if (!record) return;
+        const response = await httpRequest.get(`api/v1/get-record-cases/${record.id}`);
+        setCriterias(response.data);
     }, [record]);
+
+    useEffect(() => {
+        if (!criterias) return;
+        setLoadingCases(true);
+        const passes = criterias.map((data) => ({
+            id: data.id,
+            need_action: false,
+            info: null
+        }));
+
+        setCases(passes);
+        recalculateSummary(passes);
+        setLoadingCases(false);
+    }, [criterias]);
 
     useEffect(() => {
         fetchData().then(() => {
@@ -461,22 +473,6 @@ function AuditProcessForm({ setAuditResult }) {
                                 )}
                             </DropdownList>
                         </Form.Group>
-                        {department != null &&
-                            <Form.Group id="record_id" className="mb-3">
-                                <Form.Label className="fw-bold">Area</Form.Label>
-                                <DropdownList
-                                    source={`api/v1/fetch-records?list=1&cycle=${cycle.id}&dept=${department.id}`}
-                                    selectedItem={record}
-                                    setSelectedItem={setRecord}
-                                    caption={(data) => <>{data.area_name}</>}
-                                    title="Please Select Area"
-                                >
-                                    {({ data }) => <div className="text-wrap">{data.area_name}</div>}
-                                </DropdownList>
-                                <input type="hidden" className={formError && formError.record_id ? 'is-invalid' : ''}/>
-                                <Form.Control.Feedback type="invalid">{formError && formError.record_id ? formError.record_id : ''}</Form.Control.Feedback>
-                            </Form.Group>
-                        }
                         <Form.Group className="mb-3">
                             {isLoadingDeptPIC && (
                                 <div className="text-center p-4">
@@ -494,108 +490,118 @@ function AuditProcessForm({ setAuditResult }) {
                                 </>
                             )}
                         </Form.Group>
-                        <Form.Group>
-                            <Form.Label className="fw-bold">Case Found</Form.Label>
-                            <ListGroup>
-                                {criterias.map((data, index) => {
-                                    return (
-                                        <ListGroup.Item key={index}>
-                                            <div className="hstack gap-2">
-                                                <div className="text-truncate me-auto">
-                                                    <div className="fw-bold text-truncate">{data.name}</div>
-                                                    <small>{data.code} (Weight: +{data.weight}%)</small>
-                                                </div>
-                                                <div className="btn-group" role="group">
-                                                    <input
-                                                        type="radio"
-                                                        className="btn-check"
-                                                        name={data.id}
-                                                        value={true}
-                                                        checked={!cases[index].need_action}
-                                                        onChange={(ev) => handlePassesBtn(ev, index)}
-                                                        id={`${index}_0`}
-                                                        autoComplete="off" />
-                                                    <label className="btn btn-outline-success" htmlFor={`${index}_0`}><FontAwesomeIcon icon={faCheck} /></label>
-                                                    {/* TODO(native-m): Replace "fail" */}
-                                                    <input
-                                                        type="radio"
-                                                        className="btn-check"
-                                                        name={data.id}
-                                                        value={false}
-                                                        checked={cases[index].need_action}
-                                                        onChange={(ev) => handlePassesBtn(ev, index)}
-                                                        id={`${index}_1`}
-                                                        autoComplete="off"/>
-                                                    <label className="btn btn-outline-danger" htmlFor={`${index}_1`}><FontAwesomeIcon icon={faCircleExclamation} /></label>
-                                                </div>
-                                            </div>
-                                            {cases[index].need_action && (
-                                                <div>
-                                                    <hr/>
-                                                    <Form.Group id={`findings.${index}.desc`} className="mb-3">
-                                                        <Form.Label>Description <RequiredSpan /></Form.Label>
-                                                        <Form.Control
-                                                            as="textarea"
-                                                            rows={3}
-                                                            value={cases[index].info.desc}
-                                                            onChange={(ev) => {
-                                                                const tmpCases = cases.slice();
-                                                                tmpCases[index].info.desc = ev.target.value;
-                                                                setCases(tmpCases);
-                                                            }}
-                                                            isInvalid={formError && formError[`findings.${index}.desc`]}
+                        {department != null &&
+                            <Form.Group id="record_id" className="mb-3">
+                                <Form.Label className="fw-bold">Area</Form.Label>
+                                <DropdownList
+                                    source={`api/v1/fetch-records?list=1&cycle=${cycle.id}&dept=${department.id}`}
+                                    selectedItem={record}
+                                    setSelectedItem={setRecord}
+                                    caption={(data) => <>{data.area_name}</>}
+                                    title="Please Select Area"
+                                >
+                                    {({ data }) => <div className="text-wrap">{data.area_name}</div>}
+                                </DropdownList>
+                                <input type="hidden" className={formError && formError.record_id ? 'is-invalid' : ''}/>
+                                <Form.Control.Feedback type="invalid">{formError && formError.record_id ? formError.record_id : ''}</Form.Control.Feedback>
+                            </Form.Group>
+                        }
+                        {isLoadingCases &&
+                            <div className="text-center p-4">
+                                <Spinner animation="border" size="sm" /> Loading
+                            </div>
+                        }
+                        {record != null && criterias != null && cases != null &&
+                            <Form.Group>
+                                <Form.Label className="fw-bold">Case Found</Form.Label>
+                                <ListGroup>
+                                    {criterias.map((data, index) => {
+                                        return (
+                                            <ListGroup.Item key={index} disabled={data.audited}>
+                                                <div className="hstack gap-2">
+                                                    <div className="text-truncate me-auto">
+                                                        <div className="fw-bold text-truncate">{data.name} {data.audited && "(Done)"}</div>
+                                                        <small>{data.code} (Weight: +{data.weight}%)</small>
+                                                    </div>
+                                                    <Form.Check>
+                                                        <Form.Check.Input
+                                                            type="checkbox"
+                                                            checked={cases[index].need_action || data.audited}
+                                                            onChange={ev => handlePassesBtn(ev, index)}
+                                                            className="p-2"
+                                                            disabled={data.audited}
                                                         />
-                                                        <Form.Control.Feedback type="invalid">
-                                                            {formError && formError[`findings.${index}.desc`] ?
-                                                                formError[`findings.${index}.desc`] : ''
-                                                            }
-                                                        </Form.Control.Feedback>
-                                                    </Form.Group>
-                                                    <Form.Group className="mb-3">
-                                                        <Form.Label>Category</Form.Label>
-                                                        <div className="d-grid">
-                                                            <div className="btn-group" role="group">
-                                                                {["Observation", "Minor NC", "Major NC"].map((value, categoryIndex) => (
-                                                                    <React.Fragment key={categoryIndex}>
-                                                                        <input
-                                                                            type="radio"
-                                                                            className="btn-check"
-                                                                            name={`pass_catergory_${index}`}
-                                                                            value={categoryIndex}
-                                                                            checked={cases[index].info.category == categoryIndex}
-                                                                            onChange={(ev) => handleCategoryBtn(ev, index)}
-                                                                            id={`pass_catergory_${index}_${categoryIndex}`}
-                                                                            autoComplete="off" />
-                                                                        <label className="btn btn-outline-primary" htmlFor={`pass_catergory_${index}_${categoryIndex}`}>
-                                                                            {value}
-                                                                        </label>
-                                                                    </React.Fragment>
-                                                                ))}
-                                                            </div>
-                                                        </div>
-                                                    </Form.Group>
-                                                    <Form.Group className="mb-3">
-                                                        <Form.Label>Images</Form.Label>
-                                                        <FileInput
-                                                            accept="image/*"
-                                                            files={cases[index].info.photos}
-                                                            setFiles={(files) => {
-                                                                const tmpCases = cases.slice();
-                                                                tmpCases[index].info.photos = files;
-                                                                setCases(tmpCases);
-                                                            }}
-                                                        >
-                                                            <FontAwesomeIcon icon={faImage} /> Add Images
-                                                        </FileInput>
-                                                    </Form.Group>
+                                                    </Form.Check>
                                                 </div>
-                                            )}
-                                        </ListGroup.Item>
-                                    );
-                                })}
-                            </ListGroup>
-                        </Form.Group>
-                        {criterias.length > 0 &&
+                                                {cases[index].need_action && !data.audited && (
+                                                    <div>
+                                                        <hr/>
+                                                        <Form.Group id={`findings.${index}.desc`} className="mb-3">
+                                                            <Form.Label>Description <RequiredSpan /></Form.Label>
+                                                            <Form.Control
+                                                                as="textarea"
+                                                                rows={3}
+                                                                value={cases[index].info.desc}
+                                                                onChange={(ev) => {
+                                                                    const tmpCases = cases.slice();
+                                                                    tmpCases[index].info.desc = ev.target.value;
+                                                                    setCases(tmpCases);
+                                                                }}
+                                                                isInvalid={formError && formError[`findings.${index}.desc`]}
+                                                            />
+                                                            <Form.Control.Feedback type="invalid">
+                                                                {formError && formError[`findings.${index}.desc`] ?
+                                                                    formError[`findings.${index}.desc`] : ''
+                                                                }
+                                                            </Form.Control.Feedback>
+                                                        </Form.Group>
+                                                        <Form.Group className="mb-3">
+                                                            <Form.Label>Category</Form.Label>
+                                                            <div className="d-grid">
+                                                                <div className="btn-group" role="group">
+                                                                    {["Observation", "Minor NC", "Major NC"].map((value, categoryIndex) => (
+                                                                        <React.Fragment key={categoryIndex}>
+                                                                            <input
+                                                                                type="radio"
+                                                                                className="btn-check"
+                                                                                name={`pass_catergory_${index}`}
+                                                                                value={categoryIndex}
+                                                                                checked={cases[index].info.category == categoryIndex}
+                                                                                onChange={(ev) => handleCategoryBtn(ev, index)}
+                                                                                id={`pass_catergory_${index}_${categoryIndex}`}
+                                                                                autoComplete="off" />
+                                                                            <label className="btn btn-outline-primary" htmlFor={`pass_catergory_${index}_${categoryIndex}`}>
+                                                                                {value}
+                                                                            </label>
+                                                                        </React.Fragment>
+                                                                    ))}
+                                                                </div>
+                                                            </div>
+                                                        </Form.Group>
+                                                        <Form.Group className="mb-3">
+                                                            <Form.Label>Images</Form.Label>
+                                                            <FileInput
+                                                                accept="image/*"
+                                                                files={cases[index].info.photos}
+                                                                setFiles={(files) => {
+                                                                    const tmpCases = cases.slice();
+                                                                    tmpCases[index].info.photos = files;
+                                                                    setCases(tmpCases);
+                                                                }}
+                                                            >
+                                                                <FontAwesomeIcon icon={faImage} /> Add Images
+                                                            </FileInput>
+                                                        </Form.Group>
+                                                    </div>
+                                                )}
+                                            </ListGroup.Item>
+                                        );
+                                    })}
+                                </ListGroup>
+                            </Form.Group>
+                        }
+
+                        {criterias != null &&
                             <Form.Group className="mt-3">
                                 <Form.Label className="fw-bold">Summary</Form.Label>
                                 <Table className="align-middle">

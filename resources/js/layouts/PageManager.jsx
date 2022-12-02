@@ -1,4 +1,4 @@
-import { faChartLine, faIndustry, faListCheck, faPercent, faUser, faUsers } from "@fortawesome/free-solid-svg-icons";
+import { faChartLine, faCog, faIndustry, faListCheck, faPercent, faUser, faUsers } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import _, { runInContext } from "lodash";
 import React from "react";
@@ -21,6 +21,7 @@ import DivisionLayout from "./workplace/DivisionLayout";
 import EntityLayout from "./workplace/EntityLayout";
 import PlantLayout from "./workplace/PlantLayout";
 import WorkplaceAreaLayout from "./workplace/WorkplaceAreaLayout";
+import DevMenuLayout from "./DevMenuLayout";
 
 export const routes = [
     {
@@ -79,6 +80,13 @@ export const routes = [
         link: 'profile',
         icon: faUser,
         page: ProfileLayout,
+        noRestrict: true,
+    },
+    {
+        name: 'Dev',
+        link: 'dev',
+        icon: faCog,
+        page: DevMenuLayout,
         noRestrict: true,
     }
 ];

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Table, Row, Col } from 'react-bootstrap';
+import { Table, Row, Col, ToggleButton } from 'react-bootstrap';
 import LoadingButton from '../components/LoadingButton';
 import httpRequest from '../api';
 
@@ -34,6 +34,13 @@ export default function DevMenuLayout() {
         console.log(response.data);
     };
 
+    const [test, setTest] = useState(false);
+
+    const click = ev => {
+        setTest(ev.currentTarget.checked);
+        //ev.currentTarget.blur();
+    };
+
     return (
         <div className="p-4">
             <Row>
@@ -42,6 +49,16 @@ export default function DevMenuLayout() {
                         <LoadingButton isLoading={isLoading} onClick={handleClick}>Test Loading Button</LoadingButton>
                         <LoadingButton onClick={resetCurrentCycle}>Reset Current Cycle</LoadingButton>
                         <LoadingButton onClick={resetFindingsCounter}>Reset Findings Counter</LoadingButton>
+                        <ToggleButton
+                            id="test"
+                            type="checkbox"
+                            variant="outline-primary"
+                            value="1"
+                            checked={test}
+                            onChange={(ev) => click(ev)}
+                        >
+                            Test {/* <FontAwesomeIcon icon={faCheck} /> */}
+                        </ToggleButton>
                     </div>
                     <div>AppState</div>
 

@@ -18,6 +18,11 @@ class AuditRecord extends Model
         'total_findings',
     ];
 
+    public function cycle()
+    {
+        return $this->belongsTo(AuditCycle::class, 'cycle_id');
+    }
+
     public function area()
     {
         return $this->belongsTo(Area::class, 'area_id');
