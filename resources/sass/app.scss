@@ -72,6 +72,14 @@
     z-index: $zindex-dropdown;
 }
 
+.dropdown-toggle.no-caret::after {
+    display: none;
+}
+
+.dropdown-menu.sm-header {
+    min-width: 5rem
+}
+
 .shimmer {
     height: $font-size-base;
     background: $gray-400;

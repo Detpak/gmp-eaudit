@@ -2,18 +2,120 @@ import { faArrowRotateRight, faXmark } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useEffect } from "react";
 import { useState } from "react";
-import { Button, Form, InputGroup, OverlayTrigger, Tooltip } from "react-bootstrap";
-import httpRequest from "../../api";
-import DynamicTable from "../../components/DynamicTable";
-import { PageContent, PageContentTopbar, PageContentView } from "../../components/PageNav";
+import { OverlayTrigger, Tooltip } from "react-bootstrap";
+import BaseAuditPage from "./BaseAuditPage";
 
-const FETCH_URL = 'api/v1/fetch-records';
+export default function AuditRecordsLayout() {
+    return (
+        <BaseAuditPage
+            fetch="api/v1/fetch-records"
+            columns={[
+                {
+                    id: 'cycle_id',
+                    name: 'Cycle ID'
+                },
+                {
+                    id: 'code',
+                    name: 'ID'
+                },
+                {
+                    id: 'dept_name',
+                    name: 'Department'
+                },
+                {
+                    id: 'area_name',
+                    name: 'Area',
+                },
+                {
+                    sortable: false,
+                    filterable: false, // Should we de-filter auditee?
+                    id: 'auditee',
+                    name: 'Auditee (PIC)'
+                },
+                {
+                    id: 'auditor_name',
+                    name: 'Auditor'
+                },
+                {
+                    number: true,
+                    id: 'total_case_found',
+                    name: '# Case Found'
+                },
+                {
+                    number: true,
+                    id: 'observation',
+                    name: '# Observation'
+                },
+                {
+                    number: true,
+                    id: 'minor_nc',
+                    name: '# Minor NC'
+                },
+                {
+                    number: true,
+                    id: 'major_nc',
+                    name: '# Major NC'
+                },
+                {
+                    number: true,
+                    id: 'total_weight',
+                    name: 'Total Case Weight'
+                },
+                {
+                    number: true,
+                    id: 'score_deduction',
+                    name: 'Score Deduction'
+                },
+                {
+                    number: true,
+                    id: 'score',
+                    name: 'Score'
+                },
+                {
+                    id: 'status',
+                    name: 'Status'
+                }
+            ]}
+            produce={item => [
+                item.cycle_id,
+                item.code,
+                item.dept_name,
+                item.area_name,
+                <OverlayTrigger
+                    placement="bottom"
+                    overlay={(props) => (
+                        <Tooltip id="auditee-tooltip" {...props}>
+                            {item.area.department.pics.map((auditee, index) => (
+                                <div key={index}>{auditee.name}</div>
+                            ))}
+                        </Tooltip>
+                    )}
+                >
+                    <div className="user-select-none text-truncate" style={{ maxWidth: 300 }}>
+                        {item.area.department.pics.map(data => data.name).join(", ")}
+                    </div>
+                </OverlayTrigger>,
+                item.auditor_name ? item.auditor_name : '-',
+                item.total_case_found,
+                item.observation,
+                item.minor_nc,
+                item.major_nc,
+                item.total_weight ? `${item.total_weight}%` : '-',
+                item.score_deduction ? `${item.score_deduction}%` : '-',
+                item.score ? `${item.score}%` : '-',
+                ['Not Started', 'In-Progress', 'Done'][item.status]
+            ]}
+        />
+    )
+}
 
+/*
 export default function AuditRecordsLayout() {
     const [refreshTrigger, setRefreshTrigger] = useState(false);
     const [searchKeyword, setSearchKeyword] = useState('');
     const [showCurrentCycle, setShowCurrentCycle] = useState(false);
     const [fetchUrl, setFetchUrl] = useState(FETCH_URL);
+    const filter = useFilter();
 
     const refreshTable = () => {
         setRefreshTrigger(!refreshTrigger);
@@ -51,12 +153,15 @@ export default function AuditRecordsLayout() {
                     label="Show Current Cycle"
                     checked={showCurrentCycle}
                     onChange={_ => setShowCurrentCycle(!showCurrentCycle)}
+                    className="me-3"
                 />
+                <FilterTable filter={filter} />
             </PageContentTopbar>
             <PageContentView>
                 <DynamicTable
                     refreshTrigger={refreshTrigger}
                     searchKeyword={searchKeyword}
+                    filter={filter}
                     columns={[
                         {
                             id: 'cycle_id',
@@ -76,40 +181,47 @@ export default function AuditRecordsLayout() {
                         },
                         {
                             sortable: false,
-                            id: 'area.department.pics',
+                            filterable: false, // Should we de-filter auditee?
+                            id: 'auditee',
                             name: 'Auditee (PIC)'
                         },
                         {
-                            sortable: false,
-                            id: 'auditor.name',
+                            id: 'auditor_name',
                             name: 'Auditor'
                         },
                         {
+                            number: true,
                             id: 'total_case_found',
                             name: '# Case Found'
                         },
                         {
+                            number: true,
                             id: 'observation',
                             name: '# Observation'
                         },
                         {
+                            number: true,
                             id: 'minor_nc',
                             name: '# Minor NC'
                         },
                         {
+                            number: true,
                             id: 'major_nc',
                             name: '# Major NC'
                         },
                         {
+                            number: true,
                             id: 'total_weight',
                             name: 'Total Case Weight'
                         },
                         {
-                            id: 'total_weight',
+                            number: true,
+                            id: 'score_deduction',
                             name: 'Score Deduction'
                         },
                         {
-                            id: 'total_deducted_weight',
+                            number: true,
+                            id: 'score',
                             name: 'Score'
                         },
                         {
@@ -145,8 +257,8 @@ export default function AuditRecordsLayout() {
                             item.minor_nc,
                             item.major_nc,
                             item.total_weight ? `${item.total_weight}%` : '-',
-                            item.total_net_weight ? `${item.total_net_weight}%` : '-',
-                            item.total_score ? `${item.total_score}%` : '-',
+                            item.score_deduction ? `${item.score_deduction}%` : '-',
+                            item.score ? `${item.score}%` : '-',
                             ['Not Started', 'In-Progress', 'Done'][item.status]
                         ]
                     }}
@@ -155,3 +267,4 @@ export default function AuditRecordsLayout() {
         </PageContent>
     );
 }
+*/

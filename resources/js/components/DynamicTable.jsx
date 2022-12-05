@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { RowSelection } from "gridjs/plugins/selection";
 import { Grid } from "gridjs";
-import { Button, Form, Pagination, Spinner, Table } from "react-bootstrap";
+import { Button, Dropdown, Form, Pagination, Spinner, Table } from "react-bootstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTrash, faPenToSquare, faAngleLeft, faAngleRight, faSort, faSortUp, faSortDown, faCheck } from "@fortawesome/free-solid-svg-icons";
 import _ from "lodash";
@@ -9,10 +9,28 @@ import LoadingButton from "./LoadingButton";
 import { useInRouterContext } from "react-router-dom";
 import { useRef } from "react";
 import httpRequest from "../api";
+import { useMemo } from "react";
+import { Base64 } from "js-base64";
 
 const MAX_PAGES = 3;
+const NUMBER_CONDITION = {
+    '=' : '=',
+    '<' : '<',
+    '<=' : '\u2264',
+    '>' : '>',
+    '>=' : '\u2265',
+};
 
-export default function DynamicTable({ refreshTrigger, columns, selectedItems, onSelect, actionColumn, searchKeyword, source }) {
+export default function DynamicTable({
+    refreshTrigger,
+    columns,
+    selectedItems,
+    onSelect,
+    actionColumn,
+    searchKeyword,
+    source,
+    filter
+}) {
     const thClassName = "p-0 table-column sticky-top";
     const thFixedLeftClassName = "p-0 table-column table-header-fixed-left";
     const thFixedRightClassName = "p-0 table-column table-header-fixed-right";
@@ -28,15 +46,23 @@ export default function DynamicTable({ refreshTrigger, columns, selectedItems, o
     const [entries, setEntries] = useState(20);
     const [numPages, setNumPages] = useState(null);
     const [error, setError] = useState(false);
+    const [filterState, setFilterState] = filter ? filter.state : [null, null];
+    const [filterParams, setFilterParams] = filter ? filter.params : [null, null];
     const mounted = useRef(false);
 
-    const fetchData = async () => {
+    const fetchData = async (filtering) => {
+        setError(false);
         setLoading(true);
 
         const params = {
             page: currentPage,
             max: entries
         };
+
+        if (filter) {
+            params.filter = _.pickBy(filtering, filter => filter.value.length > 0);
+            params.filter_mode = filterState.mode;
+        }
 
         if (searchKeyword.length != 0) {
             params.search = searchKeyword;
@@ -55,17 +81,24 @@ export default function DynamicTable({ refreshTrigger, columns, selectedItems, o
             }
         }
 
-        const response = await httpRequest.get(source.url, { params: params });
+        try {
+            const response = await httpRequest.get(source.url, { params: params });
 
-        if (response.data.data && mounted.current) {
-            if (response.data.last_page < currentPage) {
-                setCurrentPage(response.data.last_page);
+            if (response.data.data && mounted.current) {
+                if (response.data.last_page < currentPage) {
+                    setCurrentPage(response.data.last_page);
+                }
+
+                setNumPages(response.data.last_page);
+                setListData(response.data.data);
             }
-
-            setNumPages(response.data.last_page);
-            setListData(response.data.data);
-            setLoading(false);
         }
+        catch (ex) {
+            console.log(ex);
+            setError(true);
+        }
+
+        setLoading(false);
     };
 
     const handleDeleteClick = async (itemId) => {
@@ -110,10 +143,55 @@ export default function DynamicTable({ refreshTrigger, columns, selectedItems, o
         }
     };
 
+    const handleFilter = (ev, column) => {
+        const old = { ...filterParams };
+        old[column.id].value = ev.target.value;
+        setFilterParams(old);
+    };
+
+    const handleFilterOp = (key, column) => {
+        const old = { ...filterParams };
+        old[column.id].op = key;
+        setFilterParams(old);
+    }
+
+    const processFilter = () => {
+        fetchData(filterParams);
+    };
+
     useEffect(() => {
         mounted.current = true;
         return () => { mounted.current = false; };
     }, [])
+
+    if (filter) {
+        useEffect(() => {
+            if (!filterState.shouldFilter) {
+                const initialFilteringValue = _.chain(columns)
+                    .filter(column => !('filterable' in column) ? true : column.filterable)
+                    .groupBy('id')
+                    .mapValues((value) => (value[0]))
+                    .mapValues((value, key, column) => {
+                        const defaultVal = { value: '' };
+
+                        if (column[key].number) {
+                            defaultVal.op = '=';
+                        }
+
+                        return defaultVal;
+                    })
+                    .value();
+
+                if (_.chain(filterParams).values().some((filter) => filter.value.length > 0).value()) {
+                    console.log('test');
+                    fetchData(initialFilteringValue);
+                }
+
+                setFilterParams(initialFilteringValue);
+                return;
+            }
+        }, [filterState]);
+    }
 
     useEffect(() => {
         if (search != searchKeyword) {
@@ -121,21 +199,13 @@ export default function DynamicTable({ refreshTrigger, columns, selectedItems, o
 
             const timeout = setTimeout(() => {
                 setError(false);
-                fetchData().catch(reason => {
-                    setError(true);
-                    setLoading(false);
-                });
+                fetchData(filtering);
             }, 500);
 
             return () => clearTimeout(timeout);
         }
 
-        setError(false);
-        fetchData().catch(reason => {
-            console.log(reason);
-            setError(true);
-            setLoading(false);
-        });
+        fetchData(filterParams);
     }, [refreshTrigger, searchKeyword, sort, entries, currentPage]);
 
     return (
@@ -160,11 +230,46 @@ export default function DynamicTable({ refreshTrigger, columns, selectedItems, o
                                 }
                                 {columns.map((column, index) => {
                                     const sortable = !('sortable' in column) ? true : column.sortable;
+                                    const filterable = !('filterable' in column) ? true : column.filterable;
+                                    const isNumber = !('number' in column) ? false : column.number;
                                     return (
-                                        <th key={index} className={thClassName} style={{ zIndex: 1 }} onClick={() => sortable && handleSort(column.id)}>
-                                            <div className={`hstack gap-3 px-3 py-2 border ${selectedItems || index != 0 ? 'border-start-0' : ''}`}>
-                                                <span className="user-select-none flex-fill">{column.name}</span>
-                                                {sortable && <FontAwesomeIcon icon={sort && sort.column == column.id ? (sort.dir == 1 ? faSortUp : faSortDown) : faSort} />}
+                                        <th key={index} className={thClassName} style={{ zIndex: 1 }}>
+                                            <div className={`px-3 py-2 border ${selectedItems || index != 0 ? 'border-start-0' : ''}`}>
+                                                <div className="hstack gap-3" style={{ minWidth: 100 }}>
+                                                    <div className="user-select-none flex-fill">{column.name}</div>
+                                                    {sortable &&
+                                                        <FontAwesomeIcon
+                                                            icon={sort && sort.column == column.id ? (sort.dir == 1 ? faSortUp : faSortDown) : faSort}
+                                                            onClick={() => sortable && handleSort(column.id)}
+                                                        />
+                                                    }
+                                                </div>
+                                                {filter && filterState.shouldFilter &&
+                                                    <div className="hstack gap-1 mt-2">
+                                                        {isNumber &&
+                                                            <Dropdown onSelect={key => handleFilterOp(key, column)}>
+                                                                <Dropdown.Toggle size="sm" className="no-caret">
+                                                                    {NUMBER_CONDITION[filterParams[column.id].op]}
+                                                                </Dropdown.Toggle>
+
+                                                                <Dropdown.Menu className="sm-header">
+                                                                    <Dropdown.Item eventKey="=">=</Dropdown.Item>
+                                                                    <Dropdown.Item eventKey="<">{'<'}</Dropdown.Item>
+                                                                    <Dropdown.Item eventKey="<=">{"\u2264"}</Dropdown.Item>
+                                                                    <Dropdown.Item eventKey=">">{">"}</Dropdown.Item>
+                                                                    <Dropdown.Item eventKey=">=">{"\u2265"}</Dropdown.Item>
+                                                                </Dropdown.Menu>
+                                                            </Dropdown>
+                                                        }
+                                                        <Form.Control
+                                                            size="sm"
+                                                            value={filterable ? filterParams[column.id].value : ''}
+                                                            onChange={filterable ? ev => handleFilter(ev, column) : null}
+                                                            onKeyUp={ev => ev.key == 'Enter' && processFilter()}
+                                                            disabled={!filterable}
+                                                        />
+                                                    </div>
+                                                }
                                             </div>
                                         </th>
                                     )

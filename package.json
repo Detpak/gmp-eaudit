@@ -40,11 +40,12 @@
         "gridjs-selection": "^4.0.0",
         "inter-ui": "^3.19.3",
         "jquery": "^3.6.0",
+        "js-base64": "^3.7.3",
         "react-bootstrap": "^2.5.0",
         "react-chartjs-2": "^4.3.1",
         "react-countup": "^6.3.1",
-        "react-router-dom": "^6.3.0",
         "react-hooks-global-state": "^2.0.0",
+        "react-router-dom": "^6.3.0",
         "uuid": "^8.3.2"
     }
 }
