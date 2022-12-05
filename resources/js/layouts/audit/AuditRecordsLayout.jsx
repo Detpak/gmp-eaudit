@@ -1,81 +1,84 @@
 import { faArrowRotateRight, faXmark } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { useMemo } from "react";
 import { useEffect } from "react";
 import { useState } from "react";
 import { OverlayTrigger, Tooltip } from "react-bootstrap";
 import BaseAuditPage from "./BaseAuditPage";
 
 export default function AuditRecordsLayout() {
+    const columns = useMemo(() => [
+        {
+            id: 'cycle_id',
+            name: 'Cycle ID'
+        },
+        {
+            id: 'code',
+            name: 'ID'
+        },
+        {
+            id: 'dept_name',
+            name: 'Department'
+        },
+        {
+            id: 'area_name',
+            name: 'Area',
+        },
+        {
+            sortable: false,
+            filterable: false, // Should we de-filter auditee?
+            id: 'auditee',
+            name: 'Auditee (PIC)'
+        },
+        {
+            id: 'auditor_name',
+            name: 'Auditor'
+        },
+        {
+            number: true,
+            id: 'total_case_found',
+            name: '# Case Found'
+        },
+        {
+            number: true,
+            id: 'observation',
+            name: '# Observation'
+        },
+        {
+            number: true,
+            id: 'minor_nc',
+            name: '# Minor NC'
+        },
+        {
+            number: true,
+            id: 'major_nc',
+            name: '# Major NC'
+        },
+        {
+            number: true,
+            id: 'total_weight',
+            name: 'Total Case Weight'
+        },
+        {
+            number: true,
+            id: 'score_deduction',
+            name: 'Score Deduction'
+        },
+        {
+            number: true,
+            id: 'score',
+            name: 'Score'
+        },
+        {
+            id: 'status',
+            name: 'Status'
+        }
+    ], []);
+
     return (
         <BaseAuditPage
             fetch="api/v1/fetch-records"
-            columns={[
-                {
-                    id: 'cycle_id',
-                    name: 'Cycle ID'
-                },
-                {
-                    id: 'code',
-                    name: 'ID'
-                },
-                {
-                    id: 'dept_name',
-                    name: 'Department'
-                },
-                {
-                    id: 'area_name',
-                    name: 'Area',
-                },
-                {
-                    sortable: false,
-                    filterable: false, // Should we de-filter auditee?
-                    id: 'auditee',
-                    name: 'Auditee (PIC)'
-                },
-                {
-                    id: 'auditor_name',
-                    name: 'Auditor'
-                },
-                {
-                    number: true,
-                    id: 'total_case_found',
-                    name: '# Case Found'
-                },
-                {
-                    number: true,
-                    id: 'observation',
-                    name: '# Observation'
-                },
-                {
-                    number: true,
-                    id: 'minor_nc',
-                    name: '# Minor NC'
-                },
-                {
-                    number: true,
-                    id: 'major_nc',
-                    name: '# Major NC'
-                },
-                {
-                    number: true,
-                    id: 'total_weight',
-                    name: 'Total Case Weight'
-                },
-                {
-                    number: true,
-                    id: 'score_deduction',
-                    name: 'Score Deduction'
-                },
-                {
-                    number: true,
-                    id: 'score',
-                    name: 'Score'
-                },
-                {
-                    id: 'status',
-                    name: 'Status'
-                }
-            ]}
+            columns={columns}
             produce={item => [
                 item.cycle_id,
                 item.code,
@@ -95,6 +98,22 @@ export default function AuditRecordsLayout() {
                         {item.area.department.pics.map(data => data.name).join(", ")}
                     </div>
                 </OverlayTrigger>,
+                item.auditor_name ? item.auditor_name : '-',
+                item.total_case_found,
+                item.observation,
+                item.minor_nc,
+                item.major_nc,
+                item.total_weight ? `${item.total_weight}%` : '-',
+                item.score_deduction ? `${item.score_deduction}%` : '-',
+                item.score ? `${item.score}%` : '-',
+                ['Not Started', 'In-Progress', 'Done'][item.status]
+            ]}
+            produceExport={item => [
+                item.cycle_id,
+                item.code,
+                item.dept_name,
+                item.area_name,
+                item.area.department.pics.map(data => data.name).join(", "),
                 item.auditor_name ? item.auditor_name : '-',
                 item.total_case_found,
                 item.observation,

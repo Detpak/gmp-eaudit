@@ -3,7 +3,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useState } from "react";
 import { Button, Card, Form, InputGroup, Modal } from "react-bootstrap";
 import { PageContent, PageContentTopbar, PageContentView } from "../../components/PageNav";
-import DynamicTable from "../../components/DynamicTable";
+import DynamicTable, { useRefreshTable } from "../../components/DynamicTable";
 import { ImageModal } from "../../components/ImageModal";
 import { getCategoryString, rootUrl, showToastMsg, waitForMs } from "../../utils";
 import LoadingButton from "../../components/LoadingButton";
@@ -12,8 +12,7 @@ import DescriptionModal from "../../components/DescriptionModal";
 import ModalForm from "../../components/ModalForm";
 import { CorrectiveActionForm } from "../CorrectiveActionMain";
 import { useEffect } from "react";
-
-const FETCH_URL = 'api/v1/fetch-findings';
+import BaseAuditPage from "./BaseAuditPage";
 
 function getCaseStatus(status)
 {
@@ -25,7 +24,7 @@ function getCaseStatus(status)
     ][status];
 }
 
-function CancelFinding({ id, setId, refreshTable }) {
+function CancelFinding({ id, setId, triggerRefresh }) {
     const [isCancelling, setCancelling] = useState(false);
     const [reason, setReason] = useState('');
     const [formError, setFormError] = useState({});
@@ -52,7 +51,7 @@ function CancelFinding({ id, setId, refreshTable }) {
 
         setCancelling(false);
         setId(null);
-        refreshTable();
+        triggerRefresh();
     };
 
     useEffect(_ => {
@@ -84,6 +83,175 @@ function CancelFinding({ id, setId, refreshTable }) {
     );
 }
 
+export default function AuditFindingsLayout() {
+    const [findingId, setFindingId] = useState(null);
+    const [cancelFindingId, setCancelFindingId] = useState(null);
+    const refreshTable = useRefreshTable();
+
+    const resetCA = async (id) => {
+        await httpRequest.get(`api/v1/dev/reset-ca/${id}`);
+        refreshTable.triggerRefresh();
+    };
+
+    const uncancel = async id => {
+        await httpRequest.get(`api/v1/dev/uncancel-ca/${id}`);
+        refreshTable.triggerRefresh();
+    };
+
+    return (
+        <>
+            <BaseAuditPage
+                refreshTable={refreshTable}
+                fetch="api/v1/fetch-findings"
+                columns={[
+                    {
+                        id: 'record_code',
+                        name: 'Record ID',
+                    },
+                    {
+                        id: 'code',
+                        name: 'ID',
+                    },
+                    {
+                        id: 'department_name',
+                        name: 'Department',
+                    },
+                    {
+                        id: 'area_name',
+                        name: 'Area',
+                    },
+                    {
+                        id: 'status',
+                        name: 'Status'
+                    },
+                    {
+                        id: 'desc',
+                        name: 'Description',
+                    },
+                    {
+                        id: 'category',
+                        name: 'Category'
+                    },
+                    // {
+                    //     id: 'approved',
+                    //     name: 'Approved'
+                    // },
+                    {
+                        id: 'cg_name',
+                        name: 'Criteria Group'
+                    },
+                    {
+                        id: 'ca_name',
+                        name: 'Criteria'
+                    },
+                    {
+                        number: true,
+                        id: 'ca_weight',
+                        name: 'Criteria Weight'
+                    },
+                    {
+                        number: true,
+                        id: 'deducted_weight',
+                        name: 'Deducted Weight'
+                    },
+                    {
+                        filterable: false,
+                        sortable: false,
+                        name: 'Images'
+                    },
+                    {
+                        filterable: false,
+                        sortable: false,
+                        name: 'Corrective Action'
+                    },
+                    {
+                        filterable: false,
+                        sortable: false,
+                        name: 'Cancellation'
+                    },
+                    {
+                        id: 'cancel_reason',
+                        name: 'Cancellation Reason'
+                    }
+                ]}
+                produce={item => [
+                    item.record_code,
+                    item.code,
+                    item.department_name,
+                    item.area_name,
+                    getCaseStatus(item.status),
+                    <DescriptionModal msg={item.desc} />,
+                    getCategoryString(item.category),
+                    `${item.cg_name} (${item.cg_code})`,
+                    `${item.ca_name} (${item.ca_code})`,
+                    `${item.ca_weight}%`,
+                    `${item.deducted_weight}%`,
+                    <ImageModal buttonSize="sm" src={`api/v1/fetch-finding-images/${item.id}`} disabled={item.images_count == 0} />,
+                    <>
+                        <Button
+                            onClick={_ => setFindingId(item.id)}
+                            variant="success"
+                            size="sm"
+                            disabled={item.auditee_id == null || item.status != 0}
+                        >
+                            Create
+                        </Button>
+                        {process.env.MIX_APP_DEBUG &&
+                            <LoadingButton
+                                size="sm"
+                                variant="danger"
+                                onClick={async () => await resetCA(item.id)}
+                                disabled={item.auditee_id == null}
+                            >
+                                Reset CA
+                            </LoadingButton>
+                        }
+                    </>,
+                    <>
+                        <Button
+                            onClick={_ => setCancelFindingId(item.id)}
+                            size="sm"
+                            variant="danger"
+                            disabled={item.auditee_id == null || item.status != 0}
+                        >
+                            Create
+                        </Button>
+                        {process.env.MIX_APP_DEBUG &&
+                            <LoadingButton
+                                size="sm"
+                                variant="danger"
+                                onClick={async () => await uncancel(item.id)}
+                                disabled={item.auditee_id == null}
+                            >
+                                Uncancel
+                            </LoadingButton>
+                        }
+                    </>,
+                    item.cancel_reason ? item.cancel_reason : '-',
+                ]}
+            />
+
+            <Modal show={findingId != null} onHide={_ => setFindingId(null)}>
+                <Modal.Header closeButton>
+                    <h3 className="fw-bold display-spacing m-0">Create Corrective Action</h3>
+                </Modal.Header>
+                <Card className="border-0">
+                    <CorrectiveActionForm
+                        findingId={findingId}
+                        afterSubmit={_ => {
+                            setFindingId(null);
+                            refreshTable.triggerRefresh();
+                        }}
+                    />
+                </Card>
+            </Modal>
+
+            <CancelFinding id={cancelFindingId} setId={setCancelFindingId} triggerRefresh={refreshTable.triggerRefresh} />
+        </>
+    )
+}
+
+/*
 export default function AuditFindingsLayout() {
     const [refreshTrigger, setRefreshTrigger] = useState(false);
     const [searchKeyword, setSearchKeyword] = useState('');
@@ -291,3 +459,4 @@ export default function AuditFindingsLayout() {
         </PageContent>
     );
 }
+ */

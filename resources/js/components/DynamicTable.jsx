@@ -3,7 +3,7 @@ import { RowSelection } from "gridjs/plugins/selection";
 import { Grid } from "gridjs";
 import { Button, Dropdown, Form, Pagination, Spinner, Table } from "react-bootstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faTrash, faPenToSquare, faAngleLeft, faAngleRight, faSort, faSortUp, faSortDown, faCheck } from "@fortawesome/free-solid-svg-icons";
+import { faTrash, faPenToSquare, faAngleLeft, faAngleRight, faSort, faSortUp, faSortDown, faCheck, faArrowRightFromBracket } from "@fortawesome/free-solid-svg-icons";
 import _ from "lodash";
 import LoadingButton from "./LoadingButton";
 import { useInRouterContext } from "react-router-dom";
@@ -20,6 +20,30 @@ const NUMBER_CONDITION = {
     '>' : '>',
     '>=' : '\u2265',
 };
+
+export function useRefreshTable() {
+    const [refresh, setRefresh] = useState(false);
+    return { refresher: refresh, triggerRefresh: () => setRefresh(!refresh) };
+}
+
+export function ExportTable({ className, columns, produce }) {
+    const exportTable = () => {
+        const columnSchema = columns.map(column => ({
+
+        }))
+    };
+
+    return (
+        <>
+            <Button variant="outline-success" className={className}>
+                <FontAwesomeIcon icon={faArrowRightFromBracket} className="me-1" />
+                Export
+            </Button>
+
+
+        </>
+    )
+}
 
 export default function DynamicTable({
     refreshTrigger,
@@ -183,7 +207,6 @@ export default function DynamicTable({
                     .value();
 
                 if (_.chain(filterParams).values().some((filter) => filter.value.length > 0).value()) {
-                    console.log('test');
                     fetchData(initialFilteringValue);
                 }
 
@@ -252,12 +275,12 @@ export default function DynamicTable({
                                                                     {NUMBER_CONDITION[filterParams[column.id].op]}
                                                                 </Dropdown.Toggle>
 
-                                                                <Dropdown.Menu className="sm-header">
-                                                                    <Dropdown.Item eventKey="=">=</Dropdown.Item>
-                                                                    <Dropdown.Item eventKey="<">{'<'}</Dropdown.Item>
-                                                                    <Dropdown.Item eventKey="<=">{"\u2264"}</Dropdown.Item>
-                                                                    <Dropdown.Item eventKey=">">{">"}</Dropdown.Item>
-                                                                    <Dropdown.Item eventKey=">=">{"\u2265"}</Dropdown.Item>
+                                                                <Dropdown.Menu className="sm-header mt-2">
+                                                                    <Dropdown.Item eventKey="=">Equal (=)</Dropdown.Item>
+                                                                    <Dropdown.Item eventKey="<">Less-than ({'<'})</Dropdown.Item>
+                                                                    <Dropdown.Item eventKey="<=">Less-than or equal ({"\u2264"})</Dropdown.Item>
+                                                                    <Dropdown.Item eventKey=">">Greater-than ({">"})</Dropdown.Item>
+                                                                    <Dropdown.Item eventKey=">=">Greater-than or equal ({"\u2265"})</Dropdown.Item>
                                                                 </Dropdown.Menu>
                                                             </Dropdown>
                                                         }

@@ -1,23 +1,19 @@
-import { faArrowRotateRight, faXmark } from "@fortawesome/free-solid-svg-icons";
+import { faArrowRight, faArrowRightFromBracket, faArrowRightToBracket, faArrowRotateRight, faFileExcel, faXmark } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useEffect } from "react";
 import { useState } from "react";
 import { Button, Form, InputGroup, OverlayTrigger, Tooltip } from "react-bootstrap";
 import httpRequest from "../../api";
-import DynamicTable from "../../components/DynamicTable";
+import DynamicTable, { ExportTable, useRefreshTable } from "../../components/DynamicTable";
 import FilterTable, { useFilter } from "../../components/FilterTable";
 import { PageContent, PageContentTopbar, PageContentView } from "../../components/PageNav";
 
-export default function BaseAuditPage({ fetch, columns, produce }) {
-    const [refreshTrigger, setRefreshTrigger] = useState(false);
+export default function BaseAuditPage({ fetch, refreshTable, columns, produce, produceExport }) {
     const [searchKeyword, setSearchKeyword] = useState('');
     const [showCurrentCycle, setShowCurrentCycle] = useState(false);
     const [fetchUrl, setFetchUrl] = useState(fetch);
+    const { refresher, triggerRefresh } = refreshTable ? refreshTable : useRefreshTable();
     const filter = useFilter();
-
-    const refreshTable = () => {
-        setRefreshTrigger(!refreshTrigger);
-    };
 
     const handleSearch = ev => {
         setSearchKeyword(ev.target.value);
@@ -32,13 +28,14 @@ export default function BaseAuditPage({ fetch, columns, produce }) {
             setFetchUrl(fetch);
         }
 
-        refreshTable();
+        triggerRefresh();
     }, [showCurrentCycle]);
 
     return (
         <PageContent>
             <PageContentTopbar>
-                <Button variant="outline-primary" onClick={refreshTable} className="me-2"><FontAwesomeIcon icon={faArrowRotateRight} /></Button>
+                <Button variant="outline-primary" onClick={triggerRefresh} className="me-2"><FontAwesomeIcon icon={faArrowRotateRight} /></Button>
+                <ExportTable fetch={fetchUrl} colums={columns} produce={produceExport} />
                 <Form.Group className="me-3">
                     <InputGroup>
                         <Form.Control type="text" value={searchKeyword} onChange={handleSearch} placeholder="Search" />
@@ -57,7 +54,7 @@ export default function BaseAuditPage({ fetch, columns, produce }) {
             </PageContentTopbar>
             <PageContentView>
                 <DynamicTable
-                    refreshTrigger={refreshTrigger}
+                    refreshTrigger={refresher}
                     searchKeyword={searchKeyword}
                     filter={filter}
                     columns={columns}

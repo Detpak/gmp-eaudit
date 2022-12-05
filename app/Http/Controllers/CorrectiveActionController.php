@@ -166,6 +166,7 @@ class CorrectiveActionController extends Controller
                        'corrective_actions.closing_remarks',
                        'areas.name as area_name',
                        'users.name as auditee',
+                       'audit_records.code as record_code',
                        'audit_findings.ca_name',
                        'audit_findings.ca_code',
                        'audit_findings.ca_weight',
@@ -188,6 +189,66 @@ class CorrectiveActionController extends Controller
         }
         else {
             $query->orderBy('corrective_actions.id', 'asc');
+        }
+
+        if ($request->filter) {
+            $filter = json_decode($request->filter);
+            $mode = $request->filter_mode == 'any' ? 'or' : 'and';
+
+            if (isset($filter->record_code->value)) {
+                $query->where('audit_records.code', 'LIKE', "%{$filter->record_code->value}%", $mode);
+            }
+
+            if (isset($filter->code->value)) {
+                $query->where('audit_findings.code', 'LIKE', "%{$filter->code->value}%", $mode);
+            }
+
+            if (isset($filter->department_name->value)) {
+                $query->where('departments.name', 'LIKE', "%{$filter->department_name->value}%", $mode);
+            }
+
+            if (isset($filter->area_name->value)) {
+                $query->where('areas.name', 'LIKE', "%{$filter->area_name->value}%", $mode);
+            }
+
+            if (isset($filter->status->value)) {
+                $statusId = collect([
+                    "new" => 1,
+                    "closed" => 3,
+                ])->filter(function ($value, $key) use ($filter) { return Str::contains($key, Str::lower($filter->status->value)); });
+
+                $query->whereIn('audit_findings.status', $statusId, $mode);
+            }
+
+            if (isset($filter->desc->value)) {
+                $query->where('corrective_actions.desc', 'LIKE', "%{$filter->desc->value}%", $mode);
+            }
+
+            if (isset($filter->category->value)) {
+                $categoryId = collect([
+                    "observation" => 0,
+                    "minor nc" => 1,
+                    "major nc" => 2,
+                ])->filter(function ($value, $key) use ($filter) { return Str::contains($key, Str::lower($filter->category->value)); });
+
+                $query->whereIn('audit_findings.category', $categoryId, $mode);
+            }
+
+            if (isset($filter->ca_name->value)) {
+                $query->where('audit_findings.ca_name', 'LIKE', "%{$filter->ca_name->value}%", $mode);
+            }
+
+            if (isset($filter->ca_weight->value)) {
+                $query->where('audit_findings.ca_weight', $filter->ca_weight->op, $filter->ca_weight->value, $mode);
+            }
+
+            if (isset($filter->deducted_weight->value)) {
+                $query->having('deducted_weight', $filter->deducted_weight->op, $filter->deducted_weight->value, $mode);
+            }
+
+            if (isset($filter->closing_remarks->value)) {
+                $query->where('closing_remarks', 'LIKE', "%{$filter->closing_remarks->value}%");
+            }
         }
 
         $query->withCount('images');

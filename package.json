@@ -46,6 +46,7 @@
         "react-countup": "^6.3.1",
         "react-hooks-global-state": "^2.0.0",
         "react-router-dom": "^6.3.0",
-        "uuid": "^8.3.2"
+        "uuid": "^8.3.2",
+        "write-excel-file": "^1.4.15"
     }
 }

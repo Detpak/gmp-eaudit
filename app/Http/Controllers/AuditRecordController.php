@@ -85,7 +85,7 @@ class AuditRecordController extends Controller
             }
 
             if (isset($filter->auditor_name->value)) {
-                $query->where('users.name', 'LIKE', "%{$filter->auditor_name->value}%", null, null, $mode);
+                $query->where('users.name', 'LIKE', "%{$filter->auditor_name->value}%", $mode);
             }
 
             if (isset($filter->total_case_found->value)) {

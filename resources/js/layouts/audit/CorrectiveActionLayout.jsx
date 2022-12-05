@@ -3,7 +3,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useState } from "react";
 import { Button, Form, InputGroup, Modal } from "react-bootstrap";
 import { PageContent, PageContentTopbar, PageContentView } from "../../components/PageNav";
-import DynamicTable from "../../components/DynamicTable";
+import DynamicTable, { useRefreshTable } from "../../components/DynamicTable";
 import { ImageModal } from "../../components/ImageModal";
 import { getCategoryString, rootUrl, showToastMsg, transformErrors, waitForMs } from "../../utils";
 import LoadingButton from "../../components/LoadingButton";
@@ -11,8 +11,7 @@ import httpRequest from "../../api";
 import DescriptionModal from "../../components/DescriptionModal";
 import ModalForm from "../../components/ModalForm";
 import { useEffect } from "react";
-
-const FETCH_URL = 'api/v1/fetch-corrective-actions';
+import BaseAuditPage from "./BaseAuditPage";
 
 function ApproveCorrectiveActionForm({ id, disabled, refreshTable }) {
     const [shown, setShown] = useState(false);
@@ -78,7 +77,8 @@ function ApproveCorrectiveActionForm({ id, disabled, refreshTable }) {
 
                             setSubmitting(false);
                             setShown(false);
-                            refreshTable();
+                            console.log(refreshTable);
+                            refreshTable.triggerRefresh();
                         }}
                     >
                         Done
@@ -89,6 +89,97 @@ function ApproveCorrectiveActionForm({ id, disabled, refreshTable }) {
     )
 }
 
+export default function CorrectiveActionLayout() {
+    const refreshTable = useRefreshTable();
+
+    return (
+        <BaseAuditPage
+            refreshTable={refreshTable}
+            fetch="api/v1/fetch-corrective-actions"
+            columns={[
+                {
+                    id: 'record_code',
+                    name: 'Record ID',
+                },
+                {
+                    id: 'code',
+                    name: 'Case ID',
+                },
+                {
+                    id: 'area_name',
+                    name: 'Area Name',
+                },
+                {
+                    id: 'auditee',
+                    name: 'Auditee',
+                },
+                {
+                    id: 'status',
+                    name: 'Status',
+                },
+                {
+                    id: 'category',
+                    name: 'Category',
+                },
+                {
+                    id: 'ca_name',
+                    name: 'Criteria Name',
+                },
+                {
+                    number: true,
+                    id: 'ca_weight',
+                    name: 'Criteria Weight',
+                },
+                {
+                    number: true,
+                    id: 'deducted_weight',
+                    name: 'Deducted Weight',
+                },
+                {
+                    id: 'desc',
+                    name: 'Description',
+                },
+                {
+                    id: 'closing_remarks',
+                    name: 'Closing Remarks'
+                },
+                {
+                    filterable: false,
+                    sortable: false,
+                    name: 'Images'
+                },
+                {
+                    filterable: false,
+                    sortable: false,
+                    name: 'Action'
+                },
+                {
+                    filterable: false,
+                    sortable: false,
+                    name: 'Debug'
+                }
+            ]}
+            produce={item => [
+                item.record_code,
+                item.code,
+                item.area_name,
+                item.auditee,
+                item.status == 1 ? 'New' : 'Closed',
+                getCategoryString(item.category),
+                `${item.ca_name} (${item.ca_code})`,
+                `${item.ca_weight}%`,
+                `${item.deducted_weight}%`,
+                <DescriptionModal msg={item.desc} />,
+                <DescriptionModal msg={item.closing_remarks} />,
+                <ImageModal buttonSize="sm" src={`api/v1/fetch-corrective-action-images/${item.id}`} disabled={item.images_count == 0} />,
+                <ApproveCorrectiveActionForm id={item.id} disabled={item.status == 3} refreshTable={refreshTable} />,
+                <LoadingButton size="sm" onClick={async () => resetApproval(item.id)}>Reset Approval</LoadingButton>
+            ]}
+        />
+    )
+}
+
+/*
 export default function CorrectiveActionLayout() {
     const [refreshTrigger, setRefreshTrigger] = useState(false);
     const [searchKeyword, setSearchKeyword] = useState('');
@@ -220,3 +311,4 @@ export default function CorrectiveActionLayout() {
         </PageContent>
     );
 }
+*/
