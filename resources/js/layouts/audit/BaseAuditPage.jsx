@@ -35,7 +35,14 @@ export default function BaseAuditPage({ fetch, refreshTable, columns, produce, p
         <PageContent>
             <PageContentTopbar>
                 <Button variant="outline-primary" onClick={triggerRefresh} className="me-2"><FontAwesomeIcon icon={faArrowRotateRight} /></Button>
-                <ExportTable fetch={fetchUrl} colums={columns} produce={produceExport} />
+                <ExportTable
+                    fetch={fetchUrl}
+                    searchKeyword={searchKeyword}
+                    filter={filter}
+                    columns={columns}
+                    produce={produceExport}
+                    className="me-2"
+                />
                 <Form.Group className="me-3">
                     <InputGroup>
                         <Form.Control type="text" value={searchKeyword} onChange={handleSearch} placeholder="Search" />

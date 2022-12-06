@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { RowSelection } from "gridjs/plugins/selection";
 import { Grid } from "gridjs";
-import { Button, Dropdown, Form, Pagination, Spinner, Table } from "react-bootstrap";
+import { Button, Dropdown, Form, Modal, Pagination, Spinner, Table } from "react-bootstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faTrash, faPenToSquare, faAngleLeft, faAngleRight, faSort, faSortUp, faSortDown, faCheck, faArrowRightFromBracket } from "@fortawesome/free-solid-svg-icons";
+import { faTrash, faPenToSquare, faAngleLeft, faAngleRight, faSort, faSortUp, faSortDown, faCheck, faArrowRightFromBracket, faDownload } from "@fortawesome/free-solid-svg-icons";
 import _ from "lodash";
 import LoadingButton from "./LoadingButton";
 import { useInRouterContext } from "react-router-dom";
@@ -11,6 +11,7 @@ import { useRef } from "react";
 import httpRequest from "../api";
 import { useMemo } from "react";
 import { Base64 } from "js-base64";
+import writeXlsxFile from "write-excel-file";
 
 const MAX_PAGES = 3;
 const NUMBER_CONDITION = {
@@ -26,21 +27,120 @@ export function useRefreshTable() {
     return { refresher: refresh, triggerRefresh: () => setRefresh(!refresh) };
 }
 
-export function ExportTable({ className, columns, produce }) {
-    const exportTable = () => {
-        const columnSchema = columns.map(column => ({
+export function ExportTable({ className, fetch, searchKeyword, filter, columns, produce }) {
+    const [show, setShow] = useState(false);
+    const [mode, setMode] = useState("current");
+    const [filterState, setFilterState] = filter ? filter.state : [null, null];
+    const [filterParams, setFilterParams] = filter ? filter.params : [null, null];
+    const [sort, setSort] = filter ? filter.sort : useState(null);
+    const [numEntries, setNumEntries] = filter ? filter.entries : useState(20);
+    const [currentPage, setCurrentPage] = filter ? filter.page : useState(1);
 
-        }))
+    const exportTable = async () => {
+        const columnsRow = columns
+            .filter(column => !('export' in column) ? true : column.export)
+            .map(column => ({
+                value: column.name,
+                fontWeight: 'bold',
+                number: column.number,
+                exportFormat: column.exportFormat,
+            }));
+
+        const columnProps = columnsRow.map(column => ({ width: `${column.value}`.length }));
+
+        const rows = [
+            columnsRow
+        ];
+
+        const params = { };
+
+        if (mode == 'current') {
+            params.max = numEntries;
+            params.page = currentPage;
+        }
+
+        if (filter) {
+            params.filter = _.pickBy(filterParams, filter => filter.value.length > 0);
+            params.filter_mode = filterState.mode;
+        }
+
+        if (searchKeyword.length != 0) {
+            params.search = searchKeyword;
+        }
+
+        if (sort) {
+            switch (sort.dir) {
+                case 1:
+                    params.sort = sort.column;
+                    params.dir = 'asc';
+                    break;
+                case 2:
+                    params.sort = sort.column;
+                    params.dir = 'desc';
+                    break;
+            }
+        }
+
+        try {
+            const response = await httpRequest.get(fetch, { params: params });
+
+            if (response.data.data) {
+                for (const row of response.data.data) {
+                    const formattedRow = produce(row)
+                        .map((column, index) => {
+                            const data = {
+                                value: column,
+                                type: columnsRow[index].number ? Number : String
+                            };
+
+                            if (columnsRow[index].exportFormat) {
+                                data.format = columnsRow[index].exportFormat;
+                            }
+
+                            return data;
+                        });
+
+                    // Adjust column width
+                    formattedRow.forEach((column, index) => {
+                        const currentWidth = columnProps[index].width;
+                        columnProps[index].width = Math.min(Math.max(`${column.value}`.length + 1, currentWidth), 100);
+                    });
+                    rows.push(formattedRow);
+                }
+            }
+
+            //console.log(rows);
+            await writeXlsxFile(rows, { columns: columnProps, fileName: `table-export-${new Date().getTime()}.xlsx` });
+        }
+        catch (ex) {
+            console.log(ex);
+        }
     };
 
     return (
         <>
-            <Button variant="outline-success" className={className}>
+            <Button variant="outline-success" onClick={() => setShow(true)} className={className}>
                 <FontAwesomeIcon icon={faArrowRightFromBracket} className="me-1" />
                 Export
             </Button>
 
-
+            <Modal show={show} onHide={() => setShow(false)}>
+                <Modal.Header closeButton>
+                    <Modal.Title>Export</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    <Form.Group>
+                        <Form.Label>Mode</Form.Label>
+                        <Form.Select value={mode} onChange={(ev) => setMode(ev.target.value)}>
+                            <option value="current">Current entries</option>
+                            <option value="all">All entries</option>
+                        </Form.Select>
+                    </Form.Group>
+                </Modal.Body>
+                <Modal.Footer>
+                    <LoadingButton onClick={exportTable} icon={faDownload}>Download</LoadingButton>
+                </Modal.Footer>
+            </Modal>
         </>
     )
 }
@@ -63,15 +163,15 @@ export default function DynamicTable({
     const tdFixedRightClassName = "px-3 table-column-fixed-right py-2";
     const entriesList = _.range(1, 11).map((value) => value * 10); // 5, 10, 15, 20, ...
     const [search, setSearch] = useState('');
-    const [sort, setSort] = useState(null);
     const [listData, setListData] = useState([]);
-    const [currentPage, setCurrentPage] = useState(1);
     const [isLoading, setLoading] = useState(false);
-    const [entries, setEntries] = useState(20);
     const [numPages, setNumPages] = useState(null);
     const [error, setError] = useState(false);
     const [filterState, setFilterState] = filter ? filter.state : [null, null];
     const [filterParams, setFilterParams] = filter ? filter.params : [null, null];
+    const [sort, setSort] = filter ? filter.sort : useState(null);
+    const [entries, setEntries] = filter ? filter.entries : useState(20);
+    const [currentPage, setCurrentPage] = filter ? filter.page : useState(1);
     const mounted = useRef(false);
 
     const fetchData = async (filtering) => {
@@ -222,7 +322,7 @@ export default function DynamicTable({
 
             const timeout = setTimeout(() => {
                 setError(false);
-                fetchData(filtering);
+                fetchData(filterParams);
             }, 500);
 
             return () => clearTimeout(timeout);

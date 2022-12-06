@@ -132,10 +132,6 @@ export default function AuditFindingsLayout() {
                         id: 'category',
                         name: 'Category'
                     },
-                    // {
-                    //     id: 'approved',
-                    //     name: 'Approved'
-                    // },
                     {
                         id: 'cg_name',
                         name: 'Criteria Group'
@@ -147,24 +143,29 @@ export default function AuditFindingsLayout() {
                     {
                         number: true,
                         id: 'ca_weight',
-                        name: 'Criteria Weight'
+                        name: 'Criteria Weight',
+                        exportFormat: '0.00%'
                     },
                     {
                         number: true,
                         id: 'deducted_weight',
-                        name: 'Deducted Weight'
+                        name: 'Deducted Weight',
+                        exportFormat: '0.00%'
                     },
                     {
+                        export: false,
                         filterable: false,
                         sortable: false,
                         name: 'Images'
                     },
                     {
+                        export: false,
                         filterable: false,
                         sortable: false,
                         name: 'Corrective Action'
                     },
                     {
+                        export: false,
                         filterable: false,
                         sortable: false,
                         name: 'Cancellation'
@@ -228,6 +229,20 @@ export default function AuditFindingsLayout() {
                         }
                     </>,
                     item.cancel_reason ? item.cancel_reason : '-',
+                ]}
+                produceExport={item => [
+                    item.record_code,
+                    item.code,
+                    item.department_name,
+                    item.area_name,
+                    getCaseStatus(item.status),
+                    item.desc,
+                    getCategoryString(item.category),
+                    `${item.cg_name} (${item.cg_code})`,
+                    `${item.ca_name} (${item.ca_code})`,
+                    item.ca_weight / 100,
+                    item.deducted_weight / 100,
+                    item.cancel_reason,
                 ]}
             />
 

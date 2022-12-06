@@ -18,7 +18,7 @@ export default function AuditRecordsLayout() {
         },
         {
             id: 'dept_name',
-            name: 'Department'
+            name: 'Department',
         },
         {
             id: 'area_name',
@@ -57,17 +57,20 @@ export default function AuditRecordsLayout() {
         {
             number: true,
             id: 'total_weight',
-            name: 'Total Case Weight'
+            name: 'Total Case Weight',
+            exportFormat: '0.00%'
         },
         {
             number: true,
             id: 'score_deduction',
-            name: 'Score Deduction'
+            name: 'Score Deduction',
+            exportFormat: '0.00%'
         },
         {
             number: true,
             id: 'score',
-            name: 'Score'
+            name: 'Score',
+            exportFormat: '0.00%'
         },
         {
             id: 'status',
@@ -116,12 +119,12 @@ export default function AuditRecordsLayout() {
                 item.area.department.pics.map(data => data.name).join(", "),
                 item.auditor_name ? item.auditor_name : '-',
                 item.total_case_found,
-                item.observation,
-                item.minor_nc,
-                item.major_nc,
-                item.total_weight ? `${item.total_weight}%` : '-',
-                item.score_deduction ? `${item.score_deduction}%` : '-',
-                item.score ? `${item.score}%` : '-',
+                Number(item.observation),
+                Number(item.minor_nc),
+                Number(item.major_nc),
+                item.total_weight / 100,
+                item.score_deduction / 100,
+                item.score / 100,
                 ['Not Started', 'In-Progress', 'Done'][item.status]
             ]}
         />

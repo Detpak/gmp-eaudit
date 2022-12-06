@@ -129,11 +129,13 @@ export default function CorrectiveActionLayout() {
                     number: true,
                     id: 'ca_weight',
                     name: 'Criteria Weight',
+                    exportFormat: '0.00%'
                 },
                 {
                     number: true,
                     id: 'deducted_weight',
                     name: 'Deducted Weight',
+                    exportFormat: '0.00%'
                 },
                 {
                     id: 'desc',
@@ -144,16 +146,19 @@ export default function CorrectiveActionLayout() {
                     name: 'Closing Remarks'
                 },
                 {
+                    export: false,
                     filterable: false,
                     sortable: false,
                     name: 'Images'
                 },
                 {
+                    export: false,
                     filterable: false,
                     sortable: false,
                     name: 'Action'
                 },
                 {
+                    export: false,
                     filterable: false,
                     sortable: false,
                     name: 'Debug'
@@ -174,6 +179,19 @@ export default function CorrectiveActionLayout() {
                 <ImageModal buttonSize="sm" src={`api/v1/fetch-corrective-action-images/${item.id}`} disabled={item.images_count == 0} />,
                 <ApproveCorrectiveActionForm id={item.id} disabled={item.status == 3} refreshTable={refreshTable} />,
                 <LoadingButton size="sm" onClick={async () => resetApproval(item.id)}>Reset Approval</LoadingButton>
+            ]}
+            produceExport={item => [
+                item.record_code,
+                item.code,
+                item.area_name,
+                item.auditee,
+                item.status == 1 ? 'New' : 'Closed',
+                getCategoryString(item.category),
+                `${item.ca_name} (${item.ca_code})`,
+                item.ca_weight / 100,
+                item.deducted_weight / 100,
+                item.desc,
+                item.closing_remarks,
             ]}
         />
     )

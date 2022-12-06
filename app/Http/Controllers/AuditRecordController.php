@@ -144,6 +144,6 @@ class AuditRecordController extends Controller
             $query->orderBy('id', 'desc');
         }
 
-        return $query->paginate($request->max);
+        return $request->has('max') ? $query->paginate($request->max) : $query->get();
     }
 }

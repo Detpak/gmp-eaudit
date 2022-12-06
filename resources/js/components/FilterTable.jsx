@@ -5,16 +5,15 @@ import { Form } from "react-bootstrap";
 export function useFilter() {
     return {
         state: useState({ shouldFilter: false, mode: 'any' }),
-        params: useState({})
+        params: useState({}),
+        sort: useState(null),
+        entries: useState(20),
+        page: useState(1),
     };
 }
 
 export default function FilterTable({ filter }) {
     const [state, setState] = filter.state;
-
-    useEffect(() => {
-        console.log(state);
-    }, [state]);
 
     return (
         <>

@@ -42,6 +42,7 @@ export default class LoadingButton extends React.Component {
                     });
 
                     showToastMsg(reason.message);
+                    console.log(reason);
                 });
             }
         }
