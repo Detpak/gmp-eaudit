@@ -62,6 +62,16 @@ export function ProfileForm({ onSuccess }) {
         setLoading(false);
     }, [userData]);
 
+    useEffect(async () => {
+        setLoading(true);
+        await updateUserData();
+        setName(userData.name);
+        setEmployeeId(userData.employee_id);
+        setLoginId(userData.login_id);
+        setEmail(userData.email);
+        setLoading(false);
+    }, []);
+
     return (
         <>
             <fieldset style={{ maxWidth: 500 }} disabled={isLoading}>
