@@ -7,7 +7,7 @@ import LoadingButton from "../components/LoadingButton";
 import { PageContent, PageContentView, PageNavbar } from "../components/PageNav";
 import { showToastMsg, updateUserData, waitForMs } from "../utils";
 
-export function ProfileForm() {
+export function ProfileForm({ onSuccess }) {
     const [name, setName] = useState("");
     const [employeeId, setEmployeeId] = useState("");
     const [loginId, setLoginId] = useState("");
@@ -20,6 +20,8 @@ export function ProfileForm() {
     const [userData, setUserData] = globalState.useGlobalState('userData');
 
     const submit = async _ => {
+        setLoading(true);
+
         const formData = {
             id: userData.id,
             name: name,
@@ -41,7 +43,15 @@ export function ProfileForm() {
         setChangePassword(false);
         setPassword('');
         setConfirmPassword('');
-        showToastMsg('Profile successfully saved!');
+
+        if (onSuccess) {
+            onSuccess();
+        }
+        else {
+            showToastMsg('Profile successfully saved!');
+        }
+
+        setLoading(false);
     };
 
     useEffect(async () => {
@@ -54,8 +64,6 @@ export function ProfileForm() {
 
     return (
         <>
-            <h3 className="display-spacing fw-bold">Edit Profile</h3>
-            <hr />
             <fieldset style={{ maxWidth: 500 }} disabled={isLoading}>
                 <Form.Group className="mb-3">
                     <Form.Label>Name <RequiredSpan /></Form.Label>
@@ -125,6 +133,8 @@ export default function ProfileLayout() {
 
             <PageContent>
                 <PageContentView className="py-4">
+                    <h3 className="display-spacing fw-bold">Edit Profile</h3>
+                    <hr />
                     <ProfileForm />
                 </PageContentView>
             </PageContent>

@@ -105,6 +105,7 @@ export function ExportTable({ className, fetch, searchKeyword, filter, columns, 
                         const currentWidth = columnProps[index].width;
                         columnProps[index].width = Math.min(Math.max(`${column.value}`.length + 1, currentWidth), 100);
                     });
+
                     rows.push(formattedRow);
                 }
             }

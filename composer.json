@@ -12,6 +12,7 @@
         "laravel/sanctum": "^2.14.1",
         "laravel/tinker": "^2.7",
         "laravel/ui": "4.0.0",
+        "mobiledetect/mobiledetectlib": "^3.74",
         "phpoffice/phpspreadsheet": "dev-NumberFormatMask-Helpers"
     },
     "require-dev": {
