@@ -20,7 +20,7 @@ class DepartmentController extends Controller
             [
                 'name'              => 'required|string|max:255',
                 'code'              => 'required|numeric|unique:departments,code',
-                'division_id'       => 'required|exist:divisions,id',
+                'division_id'       => 'required|exists:divisions,id',
                 'pic_ids'           => 'required'
             ],
             [

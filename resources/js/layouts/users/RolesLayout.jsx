@@ -116,7 +116,7 @@ function RolesForm({ editId, closeModal, refreshTable }) {
                     {routes.filter((route) => !route.noRestrict).map((route, index) => (
                         <Form.Group key={index} className="mb-3">
                             <Form.Label>{route.name} access privilege</Form.Label>
-                            <div className="hstack gap-3">
+                            <div className="hstack gap-3 flex-wrap">
                                 {route.page ?
                                     <Form.Check
                                         type="checkbox"

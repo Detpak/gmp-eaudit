@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Helpers\CommonHelpers;
 use App\Models\AuditFinding;
 use App\Models\AuditRecord;
+use App\Models\Department;
 use App\Models\DepartmentPIC;
 use Closure;
 use Illuminate\Database\Eloquent\Builder;
@@ -14,6 +15,89 @@ use Illuminate\Support\Facades\DB;
 
 class AuditRecordController extends Controller
 {
+    public function apiDeptFetch(Request $request)
+    {
+        $query = Department::query();
+
+        if ($request->search) {
+            $query->where('audit_records.code', 'LIKE', "%{$request->search}%")
+                ->orWhere('departments.name', 'LIKE', "%{$request->search}%")
+                ->orWhere('audit_cycles.cycle_id', "%{$request->search}%");
+        }
+
+        if ($request->cycle_id) {
+            $query->orWhere('audit_records.cycle_id', 'LIKE', "%{$request->cycle_id}%");
+        }
+
+        $query->join('areas', 'areas.department_id', '=', 'departments.id')
+              ->join('audit_records', 'audit_records.area_id', '=', 'areas.id')
+              ->join('audit_cycles', 'audit_cycles.id', '=', 'audit_records.cycle_id')
+              ->leftJoin('audit_findings', 'audit_findings.record_id', '=', 'audit_records.id')
+              ->groupBy('departments.id', 'audit_cycles.id');
+
+        $query->select('audit_cycles.cycle_id as cycle_id',
+                       'departments.name as dept_name',
+                       'departments.id',
+                       DB::raw('COUNT(audit_findings.id) as total_case_found'),
+                       DB::raw('SUM(CASE WHEN audit_findings.category = 0 THEN 1 ELSE 0 END) as observation'),
+                       DB::raw('SUM(CASE WHEN audit_findings.category = 1 THEN 1 ELSE 0 END) as minor_nc'),
+                       DB::raw('SUM(CASE WHEN audit_findings.category = 2 THEN 1 ELSE 0 END) as major_nc'),
+                       DB::raw('ROUND(AVG(audit_findings.ca_weight * (audit_findings.weight_deduct / 100)), 2) as score_deduction'),
+                       DB::raw('ROUND(100 - AVG(audit_findings.ca_weight * (audit_findings.weight_deduct / 100)), 2) as score'));
+
+        $query->with('pics', function ($query) {
+            $query->select('name');
+        });
+
+        $query->withCount('areas');
+
+        if ($request->filter) {
+            $filter = json_decode($request->filter);
+            $mode = $request->filter_mode == 'any' ? 'or' : 'and';
+
+            if (isset($filter->cycle_id->value)) {
+                $query->where('audit_cycles.cycle_id', 'LIKE', "%{$filter->cycle_id->value}%", $mode);
+            }
+
+            if (isset($filter->dept_name->value)) {
+                $query->where('departments.name', 'LIKE', "%{$filter->dept_name->value}%", $mode);
+            }
+
+            if (isset($filter->total_case_found->value)) {
+                $query->having('total_case_found', $filter->total_case_found->op, $filter->total_case_found->value, $mode);
+            }
+
+            if (isset($filter->observation->value)) {
+                $query->having('observation', $filter->observation->op, $filter->observation->value, $mode);
+            }
+
+            if (isset($filter->minor_nc->value)) {
+                $query->having("minor_nc", $filter->minor_nc->op, $filter->minor_nc->value, $mode);
+            }
+
+            if (isset($filter->major_nc->value)) {
+                $query->having("major_nc", $filter->major_nc->op, $filter->major_nc->value, $mode);
+            }
+
+            if (isset($filter->score_deduction->value)) {
+                $query->having("score_deduction", $filter->score_deduction->op, $filter->score_deduction->value, $mode);
+            }
+
+            if (isset($filter->score->value)) {
+                $query->having("score", $filter->score->op, $filter->score->value, $mode);
+            }
+        }
+
+        if ($request->sort && $request->dir) {
+            $query->orderBy($request->sort, $request->dir);
+        }
+        else {
+            $query->orderBy('audit_cycles.id', 'desc');
+        }
+
+        return $request->has('max') ? $query->paginate($request->max) : $query->get();
+    }
+
     public function apiFetch(Request $request)
     {
         $query = AuditRecord::query();

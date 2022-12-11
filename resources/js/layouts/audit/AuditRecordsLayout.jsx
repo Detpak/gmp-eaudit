@@ -106,9 +106,9 @@ export default function AuditRecordsLayout() {
                 item.observation,
                 item.minor_nc,
                 item.major_nc,
-                item.total_weight ? `${item.total_weight}%` : '-',
-                item.score_deduction ? `${item.score_deduction}%` : '-',
-                item.score ? `${item.score}%` : '-',
+                item.total_weight ? `${item.total_weight.toPrecision(4)}%` : '-',
+                item.score_deduction ? `${item.score_deduction.toPrecision(4)}%` : '-',
+                item.score ? `${item.score.toPrecision(4)}%` : '-',
                 ['Not Started', 'In-Progress', 'Done'][item.status]
             ]}
             produceExport={item => [
@@ -128,7 +128,7 @@ export default function AuditRecordsLayout() {
                 ['Not Started', 'In-Progress', 'Done'][item.status]
             ]}
         />
-    )
+    );
 }
 
 /*

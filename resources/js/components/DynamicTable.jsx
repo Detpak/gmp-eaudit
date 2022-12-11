@@ -146,6 +146,17 @@ export function ExportTable({ className, fetch, searchKeyword, filter, columns, 
     )
 }
 
+const popperOffset = {
+    modifiers: [
+        {
+            name: 'offset',
+            options: {
+                offset: [0, 10]
+            }
+        }
+    ]
+};
+
 export default function DynamicTable({
     refreshTrigger,
     columns,
@@ -376,7 +387,7 @@ export default function DynamicTable({
                                                                     {NUMBER_CONDITION[filterParams[column.id].op]}
                                                                 </Dropdown.Toggle>
 
-                                                                <Dropdown.Menu className="sm-header mt-2">
+                                                                <Dropdown.Menu className="sm-header" popperConfig={popperOffset}>
                                                                     <Dropdown.Item eventKey="=">Equal (=)</Dropdown.Item>
                                                                     <Dropdown.Item eventKey="<">Less-than ({'<'})</Dropdown.Item>
                                                                     <Dropdown.Item eventKey="<=">Less-than or equal ({"\u2264"})</Dropdown.Item>

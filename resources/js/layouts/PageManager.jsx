@@ -22,6 +22,7 @@ import EntityLayout from "./workplace/EntityLayout";
 import PlantLayout from "./workplace/PlantLayout";
 import WorkplaceAreaLayout from "./workplace/WorkplaceAreaLayout";
 import DevMenuLayout from "./DevMenuLayout";
+import AuditDeptRecordsLayout from "./audit/AuditDeptRecordsLayout";
 
 export const routes = [
     {
@@ -37,7 +38,8 @@ export const routes = [
         index: 'cycles',
         pages: {
             cycles: { name: 'Cycles', element: AuditCyclesLayout },
-            records: { name: 'Records', element: AuditRecordsLayout },
+            dept_records: { name: 'Department Records', element: AuditDeptRecordsLayout },
+            records: { name: 'Area Records', element: AuditRecordsLayout },
             findings: { name: 'Case Findings', element: AuditFindingsLayout},
             corrective: { name: 'Corrective Actions', element: CorrectiveActionLayout },
         },
@@ -124,7 +126,8 @@ export function PageRoutes() {
                                             .filter((page) => userData.access[route.link][page])
                                             .map((pageLink, key) => (
                                                 <PageLink key={key} to={pageLink}>{route.pages[pageLink].name}</PageLink>
-                                            ))}
+                                            ))
+                                        }
                                     </PageNavbar>
 
                                     <Outlet />

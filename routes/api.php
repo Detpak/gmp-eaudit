@@ -78,6 +78,7 @@ Route::prefix('/v1')->group(function() {
 
         // Audit records APIs
         Route::get('/fetch-records', [AuditRecordController::class, 'apiFetch']);
+        Route::get('/fetch-dept-records', [AuditRecordController::class, 'apiDeptFetch']);
 
         // Audit findings APIs
         Route::get('/fetch-findings', [AuditProcessController::class, 'apiFetch']);
