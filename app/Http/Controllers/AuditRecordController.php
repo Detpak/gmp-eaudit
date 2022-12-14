@@ -42,8 +42,8 @@ class AuditRecordController extends Controller
                        DB::raw('SUM(CASE WHEN audit_findings.category = 0 THEN 1 ELSE 0 END) as observation'),
                        DB::raw('SUM(CASE WHEN audit_findings.category = 1 THEN 1 ELSE 0 END) as minor_nc'),
                        DB::raw('SUM(CASE WHEN audit_findings.category = 2 THEN 1 ELSE 0 END) as major_nc'),
-                       DB::raw('ROUND(AVG(audit_findings.ca_weight * (audit_findings.weight_deduct / 100)), 2) as score_deduction'),
-                       DB::raw('ROUND(100 - AVG(audit_findings.ca_weight * (audit_findings.weight_deduct / 100)), 2) as score'));
+                       DB::raw('ROUND(AVG(audit_findings.ca_weight * audit_findings.weight_deduct) / 100, 2) as score_deduction'),
+                       DB::raw('ROUND(100 - AVG(audit_findings.ca_weight * audit_findings.weight_deduct) / 100, 2) as score'));
 
         $query->with('pics', function ($query) {
             $query->select('name');
@@ -119,7 +119,6 @@ class AuditRecordController extends Controller
               ->join('audit_cycles', 'audit_cycles.id', '=', 'audit_records.cycle_id')
               ->leftJoin('users', 'users.id', '=', 'audit_records.auditor_id')
               ->leftJoin('audit_findings', 'audit_findings.record_id', '=', 'audit_records.id')
-              //->join('departments_pics', 'department_pics.dept_id', '=', '');
               ->select('audit_records.id',
                        'audit_records.area_id',
                        'audit_records.code',
@@ -134,8 +133,8 @@ class AuditRecordController extends Controller
                        DB::raw('SUM(CASE WHEN audit_findings.category = 1 THEN 1 ELSE 0 END) as minor_nc'),
                        DB::raw('SUM(CASE WHEN audit_findings.category = 2 THEN 1 ELSE 0 END) as major_nc'),
                        DB::raw('SUM(audit_findings.ca_weight) as total_weight'),
-                       DB::raw('SUM(audit_findings.ca_weight * (audit_findings.weight_deduct / 100)) as score_deduction'),
-                       DB::raw('100 - SUM(audit_findings.ca_weight * (audit_findings.weight_deduct / 100)) as score'))
+                       DB::raw('ROUND(SUM(audit_findings.ca_weight * audit_findings.weight_deduct) / 100, 2) as score_deduction'),
+                       DB::raw('ROUND(100 - SUM(audit_findings.ca_weight * audit_findings.weight_deduct) / 100, 2) as score'))
               ->groupBy('audit_records.id');
 
         if ($request->filter) {
