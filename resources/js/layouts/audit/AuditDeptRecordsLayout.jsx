@@ -41,13 +41,13 @@ export default function AuditDeptRecordsLayout() {
         {
             number: true,
             id: 'score_deduction',
-            name: 'Score Deduction',
+            name: 'Avg. Score Deduction',
             exportFormat: '0.00%'
         },
         {
             number: true,
             id: 'score',
-            name: 'Score',
+            name: 'Avg. Score',
             exportFormat: '0.00%'
         }
     ], []);
