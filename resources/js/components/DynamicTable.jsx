@@ -13,14 +13,25 @@ import { useMemo } from "react";
 import { Base64 } from "js-base64";
 import writeXlsxFile from "write-excel-file";
 
+const FILTER_OP_EQ = 0;
+const FILTER_OP_NE = 1;
+const FILTER_OP_LT = 2;
+const FILTER_OP_LE = 3;
+const FILTER_OP_GT = 4;
+const FILTER_OP_GE = 5;
+const FILTER_OP_BETWEEN = 6;
+
 const MAX_PAGES = 3;
-const NUMBER_CONDITION = {
-    '=' : '=',
-    '<' : '<',
-    '<=' : '\u2264',
-    '>' : '>',
-    '>=' : '\u2265',
-};
+
+const NUMBER_CONDITION = [
+    '=',
+    '\u2260',
+    '<',
+    '\u2264',
+    '>',
+    '\u2265',
+    '\u21C6'
+];
 
 export function useRefreshTable() {
     const [refresh, setRefresh] = useState(false);
@@ -279,9 +290,15 @@ export default function DynamicTable({
         }
     };
 
-    const handleFilter = (ev, column) => {
+    const handleFilterValue0 = (ev, column) => {
         const old = { ...filterParams };
         old[column.id].value = ev.target.value;
+        setFilterParams(old);
+    };
+
+    const handleFilterValue1 = (ev, column) => {
+        const old = { ...filterParams };
+        old[column.id].value1 = ev.target.value;
         setFilterParams(old);
     };
 
@@ -310,8 +327,9 @@ export default function DynamicTable({
                     .mapValues((value, key, column) => {
                         const defaultVal = { value: '' };
 
-                        if (column[key].number) {
-                            defaultVal.op = '=';
+                        if (column[key].type == 'number' || column[key].type == 'date') {
+                            defaultVal.value1 = '';
+                            defaultVal.op = FILTER_OP_EQ;
                         }
 
                         return defaultVal;
@@ -366,11 +384,16 @@ export default function DynamicTable({
                                 {columns.map((column, index) => {
                                     const sortable = !('sortable' in column) ? true : column.sortable;
                                     const filterable = !('filterable' in column) ? true : column.filterable;
-                                    const isNumber = !('number' in column) ? false : column.number;
+                                    const hasType = 'type' in column;
+                                    const isString = !hasType || hasType && column.type == 'string';
+                                    const isNumber = hasType && column.type == 'number';
+                                    const isDate = hasType && column.type == 'date';
+                                    const isBetween = filter && filterState.shouldFilter && !isString && filterParams[column.id].op == FILTER_OP_BETWEEN;
+
                                     return (
                                         <th key={index} className={thClassName} style={{ zIndex: 1 }}>
                                             <div className={`px-3 py-2 border ${selectedItems || index != 0 ? 'border-start-0' : ''}`}>
-                                                <div className="hstack gap-3" style={{ minWidth: 100 }}>
+                                                <div className="hstack gap-3" style={{ minWidth: isBetween && isDate ? 210 : (isBetween && isNumber ? 130 : 100 ) }}>
                                                     <div className="user-select-none flex-fill">{column.name}</div>
                                                     {sortable &&
                                                         <FontAwesomeIcon
@@ -381,28 +404,42 @@ export default function DynamicTable({
                                                 </div>
                                                 {filter && filterState.shouldFilter &&
                                                     <div className="hstack gap-1 mt-2">
-                                                        {isNumber &&
+                                                        {/* {React.createElement(columnElement, { column: column })} */}
+                                                        {(isNumber || isDate) &&
                                                             <Dropdown onSelect={key => handleFilterOp(key, column)}>
                                                                 <Dropdown.Toggle size="sm" className="no-caret">
                                                                     {NUMBER_CONDITION[filterParams[column.id].op]}
                                                                 </Dropdown.Toggle>
 
                                                                 <Dropdown.Menu className="sm-header" popperConfig={popperOffset}>
-                                                                    <Dropdown.Item eventKey="=">Equal (=)</Dropdown.Item>
-                                                                    <Dropdown.Item eventKey="<">Less-than ({'<'})</Dropdown.Item>
-                                                                    <Dropdown.Item eventKey="<=">Less-than or equal ({"\u2264"})</Dropdown.Item>
-                                                                    <Dropdown.Item eventKey=">">Greater-than ({">"})</Dropdown.Item>
-                                                                    <Dropdown.Item eventKey=">=">Greater-than or equal ({"\u2265"})</Dropdown.Item>
+                                                                    <Dropdown.Item eventKey={FILTER_OP_EQ}>Equal (=)</Dropdown.Item>
+                                                                    <Dropdown.Item eventKey={FILTER_OP_NE}>Not equal ({"\u2260"})</Dropdown.Item>
+                                                                    <Dropdown.Item eventKey={FILTER_OP_LT}>Less-than ({'<'})</Dropdown.Item>
+                                                                    <Dropdown.Item eventKey={FILTER_OP_LE}>Less-than or equal ({"\u2264"})</Dropdown.Item>
+                                                                    <Dropdown.Item eventKey={FILTER_OP_GT}>Greater-than ({">"})</Dropdown.Item>
+                                                                    <Dropdown.Item eventKey={FILTER_OP_GE}>Greater-than or equal ({"\u2265"})</Dropdown.Item>
+                                                                    <Dropdown.Item eventKey={FILTER_OP_BETWEEN}>Between ({'\u21C6'})</Dropdown.Item>
                                                                 </Dropdown.Menu>
                                                             </Dropdown>
                                                         }
                                                         <Form.Control
                                                             size="sm"
                                                             value={filterable ? filterParams[column.id].value : ''}
-                                                            onChange={filterable ? ev => handleFilter(ev, column) : null}
+                                                            onChange={filterable ? ev => handleFilterValue0(ev, column) : null}
                                                             onKeyUp={ev => ev.key == 'Enter' && processFilter()}
                                                             disabled={!filterable}
+                                                            placeholder={isBetween ? 'From' : ''}
                                                         />
+                                                        {isBetween &&
+                                                            <Form.Control
+                                                                size="sm"
+                                                                value={filterable ? filterParams[column.id].value1 : ''}
+                                                                onChange={filterable ? ev => handleFilterValue1(ev, column) : null}
+                                                                onKeyUp={ev => ev.key == 'Enter' && processFilter()}
+                                                                disabled={!filterable}
+                                                                placeholder={isBetween ? 'To' : ''}
+                                                            />
+                                                        }
                                                     </div>
                                                 }
                                             </div>

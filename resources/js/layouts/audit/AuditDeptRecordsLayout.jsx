@@ -19,36 +19,41 @@ export default function AuditDeptRecordsLayout() {
             name: 'Auditee (PIC)'
         },
         {
-            number: true,
+            type: 'number',
             id: 'total_case_found',
             name: '# Case Found'
         },
         {
-            number: true,
+            type: 'number',
             id: 'observation',
             name: '# Observation'
         },
         {
-            number: true,
+            type: 'number',
             id: 'minor_nc',
             name: '# Minor NC'
         },
         {
-            number: true,
+            type: 'number',
             id: 'major_nc',
             name: '# Major NC'
         },
         {
-            number: true,
+            type: 'number',
             id: 'score_deduction',
             name: 'Avg. Score Deduction',
             exportFormat: '0.00%'
         },
         {
-            number: true,
+            type: 'number',
             id: 'score',
             name: 'Avg. Score',
             exportFormat: '0.00%'
+        },
+        {
+            type: 'date',
+            id: 'date',
+            name: 'Date'
         }
     ], []);
 
@@ -78,7 +83,8 @@ export default function AuditDeptRecordsLayout() {
                 item.minor_nc,
                 item.major_nc,
                 item.score_deduction ? `${item.score_deduction}%` : '-',
-                item.score ? `${item.score}%` : '-'
+                item.score ? `${item.score}%` : '-',
+                item.date,
             ]}
             produceExport={item => [
                 item.cycle_id,
@@ -89,7 +95,8 @@ export default function AuditDeptRecordsLayout() {
                 Number(item.minor_nc),
                 Number(item.major_nc),
                 item.score_deduction / 100,
-                item.score / 100
+                item.score / 100,
+                item.date,
             ]}
         />
     )

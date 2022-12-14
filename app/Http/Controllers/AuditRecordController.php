@@ -3,10 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Helpers\CommonHelpers;
+use App\Helpers\Filtering;
 use App\Models\AuditFinding;
 use App\Models\AuditRecord;
 use App\Models\Department;
 use App\Models\DepartmentPIC;
+use ArrayObject;
 use Closure;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
@@ -38,6 +40,7 @@ class AuditRecordController extends Controller
         $query->select('audit_cycles.cycle_id as cycle_id',
                        'departments.name as dept_name',
                        'departments.id',
+                       'audit_cycles.start_date as date',
                        DB::raw('COUNT(audit_findings.id) as total_case_found'),
                        DB::raw('SUM(CASE WHEN audit_findings.category = 0 THEN 1 ELSE 0 END) as observation'),
                        DB::raw('SUM(CASE WHEN audit_findings.category = 1 THEN 1 ELSE 0 END) as minor_nc'),
@@ -53,9 +56,19 @@ class AuditRecordController extends Controller
 
         if ($request->filter) {
             $filter = json_decode($request->filter);
-            $mode = $request->filter_mode == 'any' ? 'or' : 'and';
+            $query = Filtering::build($query, $request->filter_mode)
+                ->whereString('audit_cycles.cycle_id', isset($filter->cycle_id) ? $filter->cycle_id : null)
+                ->whereString('departments.name', isset($filter->dept_name) ? $filter->dept_name : null)
+                ->having('total_case_found', isset($filter->total_case_found) ? $filter->total_case_found : null)
+                ->having('observation', isset($filter->observation) ? $filter->observation : null)
+                ->having('minor_nc', isset($filter->minor_nc) ? $filter->minor_nc : null)
+                ->having('major_nc', isset($filter->major_nc) ? $filter->major_nc : null)
+                ->having('score_deduction', isset($filter->score_deduction) ? $filter->score_deduction : null)
+                ->having('score', isset($filter->score) ? $filter->score : null)
+                ->having('date', isset($filter->date) ? $filter->date : null)
+                ->done();
 
-            if (isset($filter->cycle_id->value)) {
+            /* if (isset($filter->cycle_id->value)) {
                 $query->where('audit_cycles.cycle_id', 'LIKE', "%{$filter->cycle_id->value}%", $mode);
             }
 
@@ -85,7 +98,7 @@ class AuditRecordController extends Controller
 
             if (isset($filter->score->value)) {
                 $query->having("score", $filter->score->op, $filter->score->value, $mode);
-            }
+            } */
         }
 
         if ($request->sort && $request->dir) {
@@ -140,22 +153,20 @@ class AuditRecordController extends Controller
         if ($request->filter) {
             $filter = json_decode($request->filter);
             $mode = $request->filter_mode == 'any' ? 'or' : 'and';
-
-            if (isset($filter->cycle_id->value)) {
-                $query->where('audit_cycles.cycle_id', 'LIKE', "%{$filter->cycle_id->value}%", $mode);
-            }
-
-            if (isset($filter->code->value)) {
-                $query->where('audit_records.code', 'LIKE', "%{$filter->code->value}%", $mode);
-            }
-
-            if (isset($filter->dept_name->value)) {
-                $query->where('departments.name', 'LIKE', "%{$filter->dept_name->value}%", $mode);
-            }
-
-            if (isset($filter->area_name->value)) {
-                $query->where('areas.name', 'LIKE', "%{$filter->area_name->value}%", $mode);
-            }
+            $query = Filtering::build($query, $request->filter_mode)
+                ->whereString('audit_cycles.cycle_id', isset($filter->cycle_id) ? $filter->cycle_id : null)
+                ->whereString('audit_records.code', isset($filter->code) ? $filter->code : null)
+                ->whereString('departments.name', isset($filter->dept_name) ? $filter->dept_name : null)
+                ->whereString('areas.name', isset($filter->area_name) ? $filter->area_name : null)
+                ->whereString('users.name', isset($filter->auditor_name) ? $filter->auditor_name : null)
+                ->having('total_case_found', isset($filter->total_case_found) ? $filter->total_case_found : null)
+                ->having('observation', isset($filter->observation) ? $filter->observation : null)
+                ->having('minor_nc', isset($filter->minor_nc) ? $filter->minor_nc : null)
+                ->having('major_nc', isset($filter->major_nc) ? $filter->major_nc : null)
+                ->having('total_weight', isset($filter->total_weight) ? $filter->total_weight : null)
+                ->having('score_deduction', isset($filter->score_deduction) ? $filter->score_deduction : null)
+                ->having('score', isset($filter->score) ? $filter->score : null)
+                ->done();
 
             if (isset($filter->status->value)) {
                 $statusId = collect([
@@ -167,7 +178,7 @@ class AuditRecordController extends Controller
                 $query->whereIn('audit_records.status', $statusId, $mode);
             }
 
-            if (isset($filter->auditor_name->value)) {
+            /* if (isset($filter->auditor_name->value)) {
                 $query->where('users.name', 'LIKE', "%{$filter->auditor_name->value}%", $mode);
             }
 
@@ -197,7 +208,7 @@ class AuditRecordController extends Controller
 
             if (isset($filter->score->value)) {
                 $query->having("score", $filter->score->op, $filter->score->value, $mode);
-            }
+            } */
         }
 
         if (!$request->list) {

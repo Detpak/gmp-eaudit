@@ -35,39 +35,39 @@ export default function AuditRecordsLayout() {
             name: 'Auditor'
         },
         {
-            number: true,
+            type: 'number',
             id: 'total_case_found',
             name: '# Case Found'
         },
         {
-            number: true,
+            type: 'number',
             id: 'observation',
             name: '# Observation'
         },
         {
-            number: true,
+            type: 'number',
             id: 'minor_nc',
             name: '# Minor NC'
         },
         {
-            number: true,
+            type: 'number',
             id: 'major_nc',
             name: '# Major NC'
         },
         {
-            number: true,
+            type: 'number',
             id: 'total_weight',
             name: 'Total Case Weight',
             exportFormat: '0.00%'
         },
         {
-            number: true,
+            type: 'number',
             id: 'score_deduction',
             name: 'Score Deduction',
             exportFormat: '0.00%'
         },
         {
-            number: true,
+            type: 'number',
             id: 'score',
             name: 'Score',
             exportFormat: '0.00%'
@@ -212,37 +212,37 @@ export default function AuditRecordsLayout() {
                             name: 'Auditor'
                         },
                         {
-                            number: true,
+                            type: 'number',
                             id: 'total_case_found',
                             name: '# Case Found'
                         },
                         {
-                            number: true,
+                            type: 'number',
                             id: 'observation',
                             name: '# Observation'
                         },
                         {
-                            number: true,
+                            type: 'number',
                             id: 'minor_nc',
                             name: '# Minor NC'
                         },
                         {
-                            number: true,
+                            type: 'number',
                             id: 'major_nc',
                             name: '# Major NC'
                         },
                         {
-                            number: true,
+                            type: 'number',
                             id: 'total_weight',
                             name: 'Total Case Weight'
                         },
                         {
-                            number: true,
+                            type: 'number',
                             id: 'score_deduction',
                             name: 'Score Deduction'
                         },
                         {
-                            number: true,
+                            type: 'number',
                             id: 'score',
                             name: 'Score'
                         },
