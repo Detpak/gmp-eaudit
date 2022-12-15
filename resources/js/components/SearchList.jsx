@@ -74,7 +74,7 @@ export default function SearchList({ source, height, placeholder, onDone, childr
 
     const handleScroll = (ev) => {
         const height =  ev.target.clientHeight;
-        const reachesBottom = Math.abs(ev.target.scrollHeight - height - ev.target.scrollTop) < 1;
+        const reachesBottom = Math.abs(ev.target.scrollHeight - height - ev.target.scrollTop) < 2;
         if (!isLoading && canFetch && reachesBottom) {
             const nextPage = currentPage + 1;
             fetchData(search, nextPage, true);
