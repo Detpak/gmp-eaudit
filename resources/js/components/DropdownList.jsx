@@ -61,8 +61,8 @@ export default function DropdownList({ source, selectedItem, setSelectedItem, ca
     };
 
     const handleScroll = (ev) => {
-        const bottomTarget = Math.round(ev.target.scrollHeight - ev.target.scrollTop);
-        const height =  Math.round(ev.target.clientHeight);
+        const bottomTarget = ev.target.scrollHeight - ev.target.scrollTop;
+        const height =  ev.target.clientHeight;
         if (!isLoading && canFetch && bottomTarget <= height) {
             const nextPage = currentPage + 1;
             fetchData(search, nextPage, true);

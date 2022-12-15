@@ -125,7 +125,7 @@ class DepartmentController extends Controller
         $query = Department::query();
 
         if ($request->search) {
-            $query->where('name', 'LIKE', "%{$request->search}%")
+            $query->where('departments.name', 'LIKE', "%{$request->search}%")
                 ->orWhere('code', 'LIKE', "%{$request->search}%");
         }
 
