@@ -4,6 +4,7 @@ import $ from 'jquery';
 import httpRequest from './api';
 import _ from 'lodash';
 import { globalState } from './app_state';
+import { useState } from 'preact/hooks';
 
 export const menus = [
     {
@@ -86,6 +87,19 @@ export function useIsMounted() {
     }, []);
 
     return isMounted;
+}
+
+export function useStatus() {
+    const [processing, setProcessing] = React.useState(false);
+    const [message, setMessage] = React.useState('');
+
+    return {
+        isProcessing: processing,
+        message: message,
+        setProcessing: (shouldProcess) => setProcessing(shouldProcess),
+        setMessage: (newMsg) => setMessage(newMsg),
+        resetMessage: () => setMessage('')
+    }
 }
 
 export async function waitForMs(time) {

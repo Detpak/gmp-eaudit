@@ -12,6 +12,7 @@ import httpRequest from "../api";
 import { useMemo } from "react";
 import { Base64 } from "js-base64";
 import writeXlsxFile from "write-excel-file";
+import { useStatus, waitForMs } from "../utils";
 
 const FILTER_OP_EQ = 0;
 const FILTER_OP_NE = 1;
@@ -46,24 +47,11 @@ export function ExportTable({ className, fetch, searchKeyword, filter, columns, 
     const [sort, setSort] = filter ? filter.sort : useState(null);
     const [numEntries, setNumEntries] = filter ? filter.entries : useState(20);
     const [currentPage, setCurrentPage] = filter ? filter.page : useState(1);
+    const exportStatus = useStatus();
 
     const exportTable = async () => {
-        const columnsRow = columns
-            .filter(column => !('export' in column) ? true : column.export)
-            .map(column => ({
-                value: column.name,
-                fontWeight: 'bold',
-                dataType: column.type,
-                exportFormat: column.exportFormat,
-            }));
-
-        console.log(columnsRow);
-
-        const columnProps = columnsRow.map(column => ({ width: `${column.value}`.length }));
-
-        const rows = [
-            columnsRow
-        ];
+        exportStatus.setProcessing(true);
+        exportStatus.setMessage('Applying parameters...');
 
         const params = { };
 
@@ -72,13 +60,20 @@ export function ExportTable({ className, fetch, searchKeyword, filter, columns, 
             params.page = currentPage;
         }
 
-        if (filter) {
+        if (filter && filterState.shouldFilter) {
             params.filter = _.pickBy(filterParams, filter => filter.value.length > 0);
             params.filter_mode = filterState.mode;
+
+            console.log(params.filter);
         }
 
         if (searchKeyword.length != 0) {
             params.search = searchKeyword;
+        }
+
+        if (mode == 'all' && searchKeyword.length == 0 && filter && (!filterState.shouldFilter || _.isEmpty(params.filter))) {
+            if (!confirm('This will export all unfiltered entries to a Microsoft Excel file. Are you sure you want to continue?'))
+                return;
         }
 
         if (sort) {
@@ -94,11 +89,33 @@ export function ExportTable({ className, fetch, searchKeyword, filter, columns, 
             }
         }
 
+        const columnsRow = columns
+            .filter(column => !('export' in column) ? true : column.export)
+            .map(column => ({
+                value: column.name,
+                fontWeight: 'bold',
+                dataType: column.type,
+                exportFormat: column.exportFormat,
+            }));
+
+        const columnProps = columnsRow.map(column => ({ width: `${column.value}`.length + 1 }));
+
+        const rows = [
+            columnsRow
+        ];
+
         try {
+            exportStatus.setMessage('Retrieving data...');
+
             const response = await httpRequest.get(fetch, { params: params });
 
-            if (response.data.data) {
-                for (const row of response.data.data) {
+            if (response.data) {
+                const rawDataRows = mode == 'current' ? response.data.data : response.data;
+                let currentIndex = 0;
+
+                for (const row of rawDataRows) {
+                    exportStatus.setMessage(`Processing row ${currentIndex++ + 1}/${rawDataRows.length}`);
+
                     const formattedRow = produce(row)
                         .map((column, index) => {
                             const data = {
@@ -142,15 +159,21 @@ export function ExportTable({ className, fetch, searchKeyword, filter, columns, 
                     rows.push(formattedRow);
                 }
 
-                console.log(rows);
+                exportStatus.setMessage('Processing file...');
+
                 await writeXlsxFile(rows, {
                     columns: columnProps,
                     dateFormat: 'mm/dd/yyyy',
                     fileName: `table-export-${new Date().getTime()}.xlsx`
                 });
             }
+
+            exportStatus.resetMessage();
+            exportStatus.setProcessing(false);
         }
         catch (ex) {
+            exportStatus.setProcessing(false);
+            exportStatus.setMessage('Export failed. An unknown error occurred.');
             console.log(ex);
         }
     };
@@ -176,6 +199,7 @@ export function ExportTable({ className, fetch, searchKeyword, filter, columns, 
                     </Form.Group>
                 </Modal.Body>
                 <Modal.Footer>
+                    <div className="me-2">{exportStatus.message}</div>
                     <LoadingButton onClick={exportTable} icon={faDownload}>Download</LoadingButton>
                 </Modal.Footer>
             </Modal>
