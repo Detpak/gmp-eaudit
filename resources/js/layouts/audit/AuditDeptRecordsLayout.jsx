@@ -53,7 +53,7 @@ export default function AuditDeptRecordsLayout() {
         {
             type: 'date',
             id: 'date',
-            name: 'Date'
+            name: 'Date',
         }
     ], []);
 
@@ -96,7 +96,7 @@ export default function AuditDeptRecordsLayout() {
                 Number(item.major_nc),
                 item.score_deduction / 100,
                 item.score / 100,
-                item.date,
+                new Date(item.date),
             ]}
         />
     )

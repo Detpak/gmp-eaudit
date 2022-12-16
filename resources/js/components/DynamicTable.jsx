@@ -53,9 +53,11 @@ export function ExportTable({ className, fetch, searchKeyword, filter, columns, 
             .map(column => ({
                 value: column.name,
                 fontWeight: 'bold',
-                number: column.number,
+                dataType: column.type,
                 exportFormat: column.exportFormat,
             }));
+
+        console.log(columnsRow);
 
         const columnProps = columnsRow.map(column => ({ width: `${column.value}`.length }));
 
@@ -101,8 +103,24 @@ export function ExportTable({ className, fetch, searchKeyword, filter, columns, 
                         .map((column, index) => {
                             const data = {
                                 value: column,
-                                type: columnsRow[index].number ? Number : String
                             };
+
+                            if (columnsRow[index].dataType != null) {
+                                switch (columnsRow[index].dataType) {
+                                    case 'number':
+                                        data.type = Number;
+                                        break;
+                                    case 'date':
+                                        data.type = Date;
+                                        break;
+                                    default:
+                                        data.type = String;
+                                        break;
+                                }
+                            }
+                            else {
+                                data.type = String;
+                            }
 
                             if (columnsRow[index].exportFormat) {
                                 data.format = columnsRow[index].exportFormat;
@@ -114,15 +132,23 @@ export function ExportTable({ className, fetch, searchKeyword, filter, columns, 
                     // Adjust column width
                     formattedRow.forEach((column, index) => {
                         const currentWidth = columnProps[index].width;
-                        columnProps[index].width = Math.min(Math.max(`${column.value}`.length + 1, currentWidth), 100);
+                        const str = column.type == Date ?
+                            `${column.value.getMonth() + 1}/${column.value.getDate() + 1}/${column.value.getFullYear()}` :
+                            `${column.value}`;
+
+                        columnProps[index].width = Math.min(Math.max(str.length + 2, currentWidth), 100);
                     });
 
                     rows.push(formattedRow);
                 }
-            }
 
-            //console.log(rows);
-            await writeXlsxFile(rows, { columns: columnProps, fileName: `table-export-${new Date().getTime()}.xlsx` });
+                console.log(rows);
+                await writeXlsxFile(rows, {
+                    columns: columnProps,
+                    dateFormat: 'mm/dd/yyyy',
+                    fileName: `table-export-${new Date().getTime()}.xlsx`
+                });
+            }
         }
         catch (ex) {
             console.log(ex);
