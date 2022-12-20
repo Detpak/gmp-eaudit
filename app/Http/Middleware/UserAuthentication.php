@@ -3,11 +3,9 @@
 namespace App\Http\Middleware;
 
 use App\Helpers\UserHelpers;
-use App\Models\User;
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Redirect;
-use Illuminate\Support\Facades\Session;
 
 class UserAuthentication
 {
@@ -21,7 +19,7 @@ class UserAuthentication
     public function handle(Request $request, Closure $next)
     {
         if (!UserHelpers::isLoggedIn()) {
-            abort(404);
+            return Redirect::intended('/');
         }
 
         return $next($request);
