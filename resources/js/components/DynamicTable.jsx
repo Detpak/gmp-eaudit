@@ -99,10 +99,7 @@ export function ExportTable({ className, fetch, searchKeyword, filter, columns, 
             }));
 
         const columnProps = columnsRow.map(column => ({ width: `${column.value}`.length + 1 }));
-
-        const rows = [
-            columnsRow
-        ];
+        const rows = [columnsRow];
 
         try {
             exportStatus.setMessage('Retrieving data...');

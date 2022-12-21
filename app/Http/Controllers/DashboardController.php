@@ -11,6 +11,7 @@ use App\Models\MtCheckGroup;
 use App\Models\TrAudit;
 use App\Models\TrAuditItem;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Response;
 
 class DashboardController extends Controller
@@ -36,11 +37,23 @@ class DashboardController extends Controller
 
         switch ($request->type) {
             case 'area_status':
+                $cycle = AuditCycle::whereNull('close_date')->first();
                 return [
-                    'not_started' => AuditRecord::where('status', 0)->count(),
-                    'in_progress' => AuditRecord::where('status', 1)->count(),
-                    'done' => AuditRecord::where('status', 2)->count(),
+                    'not_started' => AuditRecord::where('cycle_id', $cycle->id)->where('status', 0)->count(),
+                    'in_progress' => AuditRecord::where('cycle_id', $cycle->id)->where('status', 1)->count(),
+                    'done' => AuditRecord::where('cycle_id', $cycle->id)->where('status', 2)->count(),
                 ];
+
+            case 'top10_criteria':
+                $cycle = AuditCycle::whereNull('close_date')->first();
+                //return $cycle;
+                return AuditFinding::join('audit_records', 'audit_findings.record_id', '=', 'audit_records.id')
+                    ->select(DB::raw('any_value(audit_findings.ca_name) as name'), DB::raw('count(audit_findings.ca_code) as count'))
+                    ->where('audit_records.cycle_id', $cycle->id)
+                    ->groupBy('audit_findings.ca_code')
+                    ->orderBy('count')
+                    ->limit(10)
+                    ->get();
 
             default:
 

@@ -92,6 +92,11 @@ function ApproveCorrectiveActionForm({ id, disabled, refreshTable }) {
 export default function CorrectiveActionLayout() {
     const refreshTable = useRefreshTable();
 
+    const resetApproval = async (id) => {
+        const response = await httpRequest.get(`api/v1/dev/reset-ca-approval/${id}`);
+        console.log(response.data);
+    };
+
     return (
         <BaseAuditPage
             refreshTable={refreshTable}

@@ -1,11 +1,13 @@
 import { faCheckToSlot, faListCheck, faRecycle, faRotateRight, faThumbsUp } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useState, useEffect } from "react";
-import { Button, Card, Col, Row, Spinner } from "react-bootstrap";
+import { Button, Card, Col, Container, Row, Spinner } from "react-bootstrap";
 import httpRequest from "../api";
 import { PageContent, PageContentView, PageNavbar } from "../components/PageNav";
-import { Pie } from "react-chartjs-2"
+import { Pie, Bar } from "react-chartjs-2"
 import { useIsMounted } from "../utils";
+import chroma from "chroma-js";
+import { useMemo } from "react";
 
 function SummaryButton({ href, caption, value, icon }) {
     return (
@@ -27,12 +29,10 @@ function SummaryButton({ href, caption, value, icon }) {
 
 function ChartColumn({ caption, children }) {
     return (
-        <Col className="h-100">
-            <Card className="p-3 h-100">
-                <h4 className="fw-bold display-spacing">{caption}</h4>
-                {children}
-            </Card>
-        </Col>
+        <Card className="col m-2 p-3" style={{ minWidth: 550 }}>
+            <h4 className="fw-bold display-spacing">{caption}</h4>
+            {children}
+        </Card>
     );
 }
 
@@ -40,25 +40,42 @@ export default function DashboardLayout() {
     const [summary, setSummary] = useState({});
     const [refreshTrigger, setRefreshTrigger] = useState(false);
     const [areaStatus, setAreaStatus] = useState(null);
+    const [top10criteria, setTop10Criteria] = useState(null);
     const mounted = useIsMounted();
+    const colorPalette = useMemo(() =>
+        chroma.bezier([
+            chroma.hsv(0,   0.60,    1.0),
+            chroma.hsv(30,  0.60,    1.0),
+            chroma.hsv(60,  0.60,    1.0),
+            chroma.hsv(90,  0.60,    1.0),
+            chroma.hsv(120, 0.60,    1.0),
+            chroma.hsv(150, 0.60,    1.0),
+            chroma.hsv(180, 0.60,    1.0),
+            chroma.hsv(210, 0.60,    1.0),
+            chroma.hsv(240, 0.60,    1.0),
+            chroma.hsv(270, 0.60,    1.0),
+            chroma.hsv(300, 0.60,    1.0),
+            chroma.hsv(330, 0.60,    1.0),
+        ])
+        .scale(), []);
 
     const refresh = _ => {
         setRefreshTrigger(!refreshTrigger);
     };
 
     useEffect(async () => {
-        setSummary({});
-        const summary = await httpRequest.get('api/v1/get-summary');
+        if (!mounted.current) return;
 
-        if (mounted.current) {
-            setSummary(summary.data);
-        }
+        setSummary({});
+
+        const summary = await httpRequest.get('api/v1/get-summary');
+        setSummary(summary.data);
 
         const areaStatusData = await httpRequest.post('api/v1/get-chart', { type: 'area_status' });
+        setAreaStatus(areaStatusData.data);
 
-        if (mounted.current) {
-            setAreaStatus(areaStatusData.data);
-        }
+        const top10CriteriaData = await httpRequest.post('api/v1/get-chart', { type: 'top10_criteria' });
+        setTop10Criteria(top10CriteriaData.data);
     }, [refreshTrigger]);
 
     return (
@@ -101,19 +118,17 @@ export default function DashboardLayout() {
                                 value={summary.approved_ca}
                                 icon={faThumbsUp}
                             />
-
                         </Col>
                     </Row>
                     <Row>
                         <ChartColumn caption="Area Status for Current Cycle">
                             {areaStatus != null &&
                                 <Pie
-                                    style={{ maxHeight: 250 }}
+                                    style={{ minHeight: 250, maxHeight: 250 }}
                                     data={{
                                         labels: ['Not Started', 'In-Progress', 'Done'],
                                         datasets: [
                                             {
-                                                label: '# of Votes',
                                                 data: [
                                                     areaStatus.not_started,
                                                     areaStatus.in_progress,
@@ -123,7 +138,6 @@ export default function DashboardLayout() {
                                                     'rgba(255, 99, 132, 0.2)',
                                                     'rgba(255, 206, 86, 0.2)',
                                                     'rgba(75, 192, 192, 0.2)',
-
                                                 ],
                                                 borderColor: [
                                                     'rgba(255, 99, 132, 1)',
@@ -135,7 +149,13 @@ export default function DashboardLayout() {
                                         ],
                                     }}
                                     options={{
+                                        responsive: true,
                                         maintainAspectRatio: true,
+                                        scales: {
+                                            y: {
+                                                beginAtZero: true
+                                            }
+                                        },
                                         plugins: {
                                             legend: {
                                                 position: 'right'
@@ -145,7 +165,31 @@ export default function DashboardLayout() {
                                 />
                             }
                         </ChartColumn>
-                        <ChartColumn caption="Top 10 Case Criteria For Current Cycle" />
+                        <ChartColumn caption="Top 10 Criteria For Current Cycle">
+                            {top10criteria &&
+                                <Bar
+                                    style={{ minHeight: 250, maxHeight: 250 }}
+                                    data={{
+                                        labels: top10criteria.map((data) => data.name),
+                                        datasets: [
+                                            {
+                                                data: top10criteria.map((data) => data.count),
+                                                backgroundColor: colorPalette.colors(top10criteria.length)
+                                            }
+                                        ]
+                                    }}
+                                    options={{
+                                        responsive: true,
+                                        maintainAspectRatio: true,
+                                        plugins: {
+                                            legend: {
+                                                display: false
+                                            }
+                                        }
+                                    }}
+                                />
+                            }
+                        </ChartColumn>
                     </Row>
                     <Row>
                         <ChartColumn caption="Test" />
