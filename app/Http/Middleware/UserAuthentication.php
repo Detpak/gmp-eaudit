@@ -19,7 +19,6 @@ class UserAuthentication
     public function handle(Request $request, Closure $next)
     {
         if (!UserHelpers::isLoggedIn()) {
-            //return Redirect::intended('/');
             return Redirect::intended('/')->with('redirect', $request->url());
         }
 

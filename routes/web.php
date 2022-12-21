@@ -23,9 +23,9 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/', [LoginController::class, 'show']);
 Route::post('/auth', [LoginController::class, 'auth']);
+Route::get('/deauth', [LoginController::class, 'deauth']);
 
 Route::middleware('user')->group(function() {
-    Route::get('/deauth', [LoginController::class, 'deauth']);
     //Route::get('/app', function() { return redirect()->intended('/app/dashboard'); });
     Route::view('/portal', 'secondary_page', ['page' => 'portal']);
     Route::redirect('/app', '/app/dashboard');

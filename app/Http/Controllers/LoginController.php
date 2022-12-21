@@ -128,6 +128,10 @@ class LoginController extends Controller
 
     public function deauth()
     {
+        if (!UserHelpers::isLoggedIn()) {
+            return Redirect::intended('/');
+        }
+
         $currentToken = UserHelpers::getUserToken();
         $accessTokens = ApiAccessToken::where('user_id', $currentToken->id)->get();
 
