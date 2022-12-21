@@ -42,22 +42,11 @@ export default function DashboardLayout() {
     const [areaStatus, setAreaStatus] = useState(null);
     const [top10criteria, setTop10Criteria] = useState(null);
     const mounted = useIsMounted();
-    const colorPalette = useMemo(() =>
-        chroma.bezier([
-            chroma.hsv(0,   0.60, 1.0).desaturate(1),
-            chroma.hsv(30,  0.60, 1.0).desaturate(1),
-            chroma.hsv(60,  0.60, 1.0).desaturate(1),
-            chroma.hsv(90,  0.60, 1.0).desaturate(1),
-            chroma.hsv(120, 0.60, 1.0).desaturate(1),
-            chroma.hsv(150, 0.60, 1.0).desaturate(1),
-            chroma.hsv(180, 0.60, 1.0).desaturate(1),
-            chroma.hsv(210, 0.60, 1.0).desaturate(1),
-            chroma.hsv(240, 0.60, 1.0).desaturate(1),
-            chroma.hsv(270, 0.60, 1.0).desaturate(1),
-            chroma.hsv(300, 0.60, 1.0).desaturate(1),
-            chroma.hsv(330, 0.60, 1.0).desaturate(1),
-        ])
-        .scale(), []);
+    const colorPalette = useMemo(() => {
+        return chroma
+            .bezier(_.chain().range(12).map((value) => chroma.hsv(value / 12 * 360,   0.60, 1.0).desaturate(1)).value())
+            .scale()
+    }, []);
 
     const refresh = _ => {
         setRefreshTrigger(!refreshTrigger);
