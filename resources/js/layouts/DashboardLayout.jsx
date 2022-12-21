@@ -44,18 +44,18 @@ export default function DashboardLayout() {
     const mounted = useIsMounted();
     const colorPalette = useMemo(() =>
         chroma.bezier([
-            chroma.hsv(0,   0.60,    1.0),
-            chroma.hsv(30,  0.60,    1.0),
-            chroma.hsv(60,  0.60,    1.0),
-            chroma.hsv(90,  0.60,    1.0),
-            chroma.hsv(120, 0.60,    1.0),
-            chroma.hsv(150, 0.60,    1.0),
-            chroma.hsv(180, 0.60,    1.0),
-            chroma.hsv(210, 0.60,    1.0),
-            chroma.hsv(240, 0.60,    1.0),
-            chroma.hsv(270, 0.60,    1.0),
-            chroma.hsv(300, 0.60,    1.0),
-            chroma.hsv(330, 0.60,    1.0),
+            chroma.hsv(0,   0.60, 1.0).desaturate(1),
+            chroma.hsv(30,  0.60, 1.0).desaturate(1),
+            chroma.hsv(60,  0.60, 1.0).desaturate(1),
+            chroma.hsv(90,  0.60, 1.0).desaturate(1),
+            chroma.hsv(120, 0.60, 1.0).desaturate(1),
+            chroma.hsv(150, 0.60, 1.0).desaturate(1),
+            chroma.hsv(180, 0.60, 1.0).desaturate(1),
+            chroma.hsv(210, 0.60, 1.0).desaturate(1),
+            chroma.hsv(240, 0.60, 1.0).desaturate(1),
+            chroma.hsv(270, 0.60, 1.0).desaturate(1),
+            chroma.hsv(300, 0.60, 1.0).desaturate(1),
+            chroma.hsv(330, 0.60, 1.0).desaturate(1),
         ])
         .scale(), []);
 

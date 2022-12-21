@@ -51,7 +51,7 @@ class DashboardController extends Controller
                     ->select(DB::raw('any_value(audit_findings.ca_name) as name'), DB::raw('count(audit_findings.ca_code) as count'))
                     ->where('audit_records.cycle_id', $cycle->id)
                     ->groupBy('audit_findings.ca_code')
-                    ->orderBy('count')
+                    ->orderBy('count', 'desc')
                     ->limit(10)
                     ->get();
 
