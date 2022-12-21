@@ -34,13 +34,13 @@ class LoginController extends Controller
         return Redirect::intended('app');
     }
 
-    public function show()
+    public function show(Request $request)
     {
         if (UserHelpers::isLoggedIn()) {
             return $this->openView();
         }
 
-        return view('login');
+        return view('login', ['redirect' => Session::get('redirect')]);
     }
 
     public function auth(Request $request)
@@ -65,9 +65,12 @@ class LoginController extends Controller
             ]);
 
         if ($validator->fails()) {
-            return redirect('/')
+            $redirect = redirect('/')
+                ->with('redirect', $request->redirect)
                 ->withErrors($validator)
                 ->withInput();
+
+            return $redirect;
         }
 
         // This only applies on production
@@ -86,10 +89,12 @@ class LoginController extends Controller
 
         $user = User::where('login_id', $request->loginID)->first();
 
-        if (!Hash::check($request->loginPassword, $user->password)) {
+        if (!Hash::check($request->loginPassword, $user->password))
+        {
             return redirect('/')
                 ->withErrors(['loginPassword' => 'Wrong Password'])
-                ->withInput();
+                ->withInput()
+                ->with('redirect', $request->redirect);
         }
 
         $token = Str::random(32);
@@ -113,6 +118,10 @@ class LoginController extends Controller
         Session::put('eaudit_name', $user->name);
         Session::put('eaudit_role', $user->role_id);
         Session::put('eaudit_token', "{$user->id}|{$token}");
+
+        if ($request->redirect) {
+            return redirect($request->redirect);
+        }
 
         return $this->openView();
     }

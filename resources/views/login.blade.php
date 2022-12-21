@@ -4,7 +4,7 @@
             <div class="col-lg"></div>
             <div class="col mt-4">
                 <div class="card">
-                    <form class="card-body p-4" action="{{ url('auth') }}" method="POST">
+                    <form class="card-body p-4" action="{{ url("auth?redirect={$redirect}") }}" method="POST">
                         @csrf
                         <h3 class="card-title mb-3 fw-bold text-center">MyAudit+</h3>
                         <h5 class="card-title mb-3 fw-bold text-center">GMP Audit Tools</h5>
