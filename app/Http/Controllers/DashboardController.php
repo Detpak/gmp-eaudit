@@ -64,6 +64,12 @@ class DashboardController extends Controller
                     ->where('audit_records.cycle_id', $cycle->id)
                     ->first();
 
+            case 'case_found_per_cycle':
+                return AuditCycle::select('cycle_id', 'total_findings')
+                    ->orderBy('id')
+                    ->limit(10)
+                    ->get();
+
             default:
 
             // case 'totalAuditSubmitted':

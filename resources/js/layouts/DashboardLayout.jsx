@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { Button, Card, Col, Container, Row, Spinner } from "react-bootstrap";
 import httpRequest from "../api";
 import { PageContent, PageContentView, PageNavbar } from "../components/PageNav";
-import { Pie, Bar } from "react-chartjs-2"
+import { Pie, Bar, Line } from "react-chartjs-2"
 import { useIsMounted } from "../utils";
 import chroma from "chroma-js";
 import { useMemo } from "react";
@@ -36,12 +36,29 @@ function ChartColumn({ caption, children }) {
     );
 }
 
+const barOptions = {
+    responsive: true,
+    maintainAspectRatio: true,
+    scales: {
+        y: {
+            beginAtZero: true,
+            ticks: { stepSize: 1 }
+        }
+    },
+    plugins: {
+        legend: {
+            display: false
+        }
+    }
+};
+
 export default function DashboardLayout() {
     const [summary, setSummary] = useState({});
     const [refreshTrigger, setRefreshTrigger] = useState(false);
     const [areaStatus, setAreaStatus] = useState(null);
     const [top10criteria, setTop10Criteria] = useState(null);
     const [caseStatistics, setCaseStatistics] = useState(null);
+    const [caseFound, setCaseFound] = useState(null);
     const mounted = useIsMounted();
     const colorPalette = useMemo(() => {
         const bezierPoints = _.chain()
@@ -74,6 +91,9 @@ export default function DashboardLayout() {
 
         const caseStatisticsData = await httpRequest.post('api/v1/get-chart', { type: 'case_statistics' });
         setCaseStatistics(caseStatisticsData.data);
+
+        const totalCaseFoundData = await httpRequest.post('api/v1/get-chart', { type: 'case_found_per_cycle' });
+        setCaseFound(totalCaseFoundData.data);
     }, [refreshTrigger]);
 
     return (
@@ -171,21 +191,7 @@ export default function DashboardLayout() {
                                             }
                                         ]
                                     }}
-                                    options={{
-                                        responsive: true,
-                                        maintainAspectRatio: true,
-                                        scales: {
-                                            y: {
-                                                beginAtZero: true,
-                                                ticks: { stepSize: 1 }
-                                            }
-                                        },
-                                        plugins: {
-                                            legend: {
-                                                display: false
-                                            }
-                                        }
-                                    }}
+                                    options={barOptions}
                                 />
                             }
                         </ChartColumn>
@@ -218,25 +224,28 @@ export default function DashboardLayout() {
                                             }
                                         ]
                                     }}
-                                    options={{
-                                        responsive: true,
-                                        maintainAspectRatio: true,
-                                        scales: {
-                                            y: {
-                                                beginAtZero: true,
-                                                ticks: { stepSize: 1 }
-                                            }
-                                        },
-                                        plugins: {
-                                            legend: {
-                                                display: false
-                                            }
-                                        }
-                                    }}
+                                    options={barOptions}
                                 />
                             }
                         </ChartColumn>
-                        <ChartColumn caption="Test" />
+                        <ChartColumn caption="Total Case Found per Cycle">
+                            {caseFound &&
+                                <Line
+                                    style={{ minHeight: 250, maxHeight: 250 }}
+                                    data={{
+                                        labels: caseFound.map((cycle) => cycle.cycle_id),
+                                        datasets: [
+                                            {
+                                                data: caseFound.map((cycle) => cycle.total_findings),
+                                                borderColor: 'rgb(75, 192, 192)',
+                                                tension: 0.25
+                                            }
+                                        ]
+                                    }}
+                                    options={barOptions}
+                                />
+                            }
+                        </ChartColumn>
                     </Row>
                 </PageContentView>
             </PageContent>
