@@ -55,6 +55,15 @@ class DashboardController extends Controller
                     ->limit(10)
                     ->get();
 
+            case 'case_statistics':
+                $cycle = AuditCycle::whereNull('close_date')->first();
+                return AuditFinding::join('audit_records', 'audit_findings.record_id', '=', 'audit_records.id')
+                    ->select(DB::raw('SUM(CASE WHEN audit_findings.category = 0 THEN 1 ELSE 0 END) as observation'),
+                             DB::raw('SUM(CASE WHEN audit_findings.category = 1 THEN 1 ELSE 0 END) as minor_nc'),
+                             DB::raw('SUM(CASE WHEN audit_findings.category = 2 THEN 1 ELSE 0 END) as major_nc'))
+                    ->where('audit_records.cycle_id', $cycle->id)
+                    ->first();
+
             default:
 
             // case 'totalAuditSubmitted':

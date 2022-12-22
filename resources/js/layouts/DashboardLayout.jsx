@@ -41,10 +41,16 @@ export default function DashboardLayout() {
     const [refreshTrigger, setRefreshTrigger] = useState(false);
     const [areaStatus, setAreaStatus] = useState(null);
     const [top10criteria, setTop10Criteria] = useState(null);
+    const [caseStatistics, setCaseStatistics] = useState(null);
     const mounted = useIsMounted();
     const colorPalette = useMemo(() => {
+        const bezierPoints = _.chain()
+            .range(12)
+            .map((value) => chroma.hsv(value / 12 * 360,   0.60, 1.0).desaturate(1))
+            .value();
+
         return chroma
-            .bezier(_.chain().range(12).map((value) => chroma.hsv(value / 12 * 360,   0.60, 1.0).desaturate(1)).value())
+            .bezier(bezierPoints)
             .scale()
     }, []);
 
@@ -65,6 +71,9 @@ export default function DashboardLayout() {
 
         const top10CriteriaData = await httpRequest.post('api/v1/get-chart', { type: 'top10_criteria' });
         setTop10Criteria(top10CriteriaData.data);
+
+        const caseStatisticsData = await httpRequest.post('api/v1/get-chart', { type: 'case_statistics' });
+        setCaseStatistics(caseStatisticsData.data);
     }, [refreshTrigger]);
 
     return (
@@ -110,7 +119,7 @@ export default function DashboardLayout() {
                         </Col>
                     </Row>
                     <Row>
-                        <ChartColumn caption="Area Status for Current Cycle">
+                        <ChartColumn caption="Area Status">
                             {areaStatus != null &&
                                 <Pie
                                     style={{ minHeight: 250, maxHeight: 250 }}
@@ -140,11 +149,6 @@ export default function DashboardLayout() {
                                     options={{
                                         responsive: true,
                                         maintainAspectRatio: true,
-                                        scales: {
-                                            y: {
-                                                beginAtZero: true
-                                            }
-                                        },
                                         plugins: {
                                             legend: {
                                                 position: 'right'
@@ -154,7 +158,7 @@ export default function DashboardLayout() {
                                 />
                             }
                         </ChartColumn>
-                        <ChartColumn caption="Top 10 Criteria For Current Cycle">
+                        <ChartColumn caption="Top 10 Criteria">
                             {top10criteria &&
                                 <Bar
                                     style={{ minHeight: 250, maxHeight: 250 }}
@@ -170,6 +174,12 @@ export default function DashboardLayout() {
                                     options={{
                                         responsive: true,
                                         maintainAspectRatio: true,
+                                        scales: {
+                                            y: {
+                                                beginAtZero: true,
+                                                ticks: { stepSize: 1 }
+                                            }
+                                        },
                                         plugins: {
                                             legend: {
                                                 display: false
@@ -181,7 +191,51 @@ export default function DashboardLayout() {
                         </ChartColumn>
                     </Row>
                     <Row>
-                        <ChartColumn caption="Test" />
+                        <ChartColumn caption="Case Statistic">
+                            {caseStatistics &&
+                                <Bar
+                                    style={{ minHeight: 250, maxHeight: 250 }}
+                                    data={{
+                                        labels: ['Observation', 'Minor NC', 'Major NC'],
+                                        datasets: [
+                                            {
+                                                data: [
+                                                    caseStatistics.observation,
+                                                    caseStatistics.minor_nc,
+                                                    caseStatistics.major_nc,
+                                                ],
+                                                backgroundColor: [
+                                                    'rgba(75, 192, 192, 0.2)',
+                                                    'rgba(255, 206, 86, 0.2)',
+                                                    'rgba(255, 99, 132, 0.2)',
+                                                ],
+                                                borderColor: [
+                                                    'rgba(75, 192, 192, 1)',
+                                                    'rgba(255, 206, 86, 1)',
+                                                    'rgba(255, 99, 132, 1)',
+                                                ],
+                                                borderWidth: 1,
+                                            }
+                                        ]
+                                    }}
+                                    options={{
+                                        responsive: true,
+                                        maintainAspectRatio: true,
+                                        scales: {
+                                            y: {
+                                                beginAtZero: true,
+                                                ticks: { stepSize: 1 }
+                                            }
+                                        },
+                                        plugins: {
+                                            legend: {
+                                                display: false
+                                            }
+                                        }
+                                    }}
+                                />
+                            }
+                        </ChartColumn>
                         <ChartColumn caption="Test" />
                     </Row>
                 </PageContentView>
