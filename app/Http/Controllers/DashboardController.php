@@ -23,21 +23,24 @@ class DashboardController extends Controller
 
     public function apiGetSummary(Request $request)
     {
+        $cycle = AuditCycle::whereNull('close_date')->first();
+
         return [
             'cycles' => AuditCycle::count(),
             'case_submitted' => AuditFinding::count(),
             'corrective_actions' => CorrectiveAction::count(),
-            'approved_ca' => AuditFinding::where('status', '3')->count()
+            'approved_ca' => AuditFinding::where('status', '3')->count(),
+            'current_cycle' => $cycle
+
         ];
     }
 
     public function apiGetChart(Request $request)
     {
-        // return ['error' => 'Work in progress'];
+        $cycle = AuditCycle::whereNull('close_date')->first();
 
         switch ($request->type) {
             case 'area_status':
-                $cycle = AuditCycle::whereNull('close_date')->first();
                 return [
                     'not_started' => AuditRecord::where('cycle_id', $cycle->id)->where('status', 0)->count(),
                     'in_progress' => AuditRecord::where('cycle_id', $cycle->id)->where('status', 1)->count(),
@@ -45,7 +48,6 @@ class DashboardController extends Controller
                 ];
 
             case 'top10_criteria':
-                $cycle = AuditCycle::whereNull('close_date')->first();
                 //return $cycle;
                 return AuditFinding::join('audit_records', 'audit_findings.record_id', '=', 'audit_records.id')
                     ->select(DB::raw('any_value(audit_findings.ca_name) as name'), DB::raw('count(audit_findings.ca_code) as count'))
@@ -56,7 +58,6 @@ class DashboardController extends Controller
                     ->get();
 
             case 'case_statistics':
-                $cycle = AuditCycle::whereNull('close_date')->first();
                 return AuditFinding::join('audit_records', 'audit_findings.record_id', '=', 'audit_records.id')
                     ->select(DB::raw('SUM(CASE WHEN audit_findings.category = 0 THEN 1 ELSE 0 END) as observation'),
                              DB::raw('SUM(CASE WHEN audit_findings.category = 1 THEN 1 ELSE 0 END) as minor_nc'),

@@ -27,10 +27,16 @@ function SummaryButton({ href, caption, value, icon }) {
     )
 }
 
-function ChartColumn({ caption, children }) {
+function ChartColumn({ caption, children, summary }) {
     return (
         <Card className="col m-2 p-3" style={{ minWidth: 550 }}>
-            <h4 className="fw-bold display-spacing">{caption}</h4>
+            <h4 className="fw-bold display-spacing">
+                {summary != null ?
+                    <>{caption} - {('current_cycle' in summary) ? summary.current_cycle.cycle_id : <Spinner animation="border" />}</>
+                    :
+                    caption
+                }
+            </h4>
             {children}
         </Card>
     );
@@ -139,7 +145,25 @@ export default function DashboardLayout() {
                         </Col>
                     </Row>
                     <Row>
-                        <ChartColumn caption="Area Status">
+                        <ChartColumn summary={null} caption="Total Case Found per Cycle">
+                            {caseFound &&
+                                <Line
+                                    style={{ minHeight: 250, maxHeight: 250 }}
+                                    data={{
+                                        labels: caseFound.map((cycle) => cycle.cycle_id),
+                                        datasets: [
+                                            {
+                                                data: caseFound.map((cycle) => cycle.total_findings),
+                                                borderColor: 'rgb(75, 192, 192)',
+                                                tension: 0.25
+                                            }
+                                        ]
+                                    }}
+                                    options={barOptions}
+                                />
+                            }
+                        </ChartColumn>
+                        <ChartColumn summary={summary} caption="Area Status">
                             {areaStatus != null &&
                                 <Pie
                                     style={{ minHeight: 250, maxHeight: 250 }}
@@ -178,7 +202,9 @@ export default function DashboardLayout() {
                                 />
                             }
                         </ChartColumn>
-                        <ChartColumn caption="Top 10 Criteria">
+                    </Row>
+                    <Row>
+                        <ChartColumn summary={summary} caption="Top 10 Criteria">
                             {top10criteria &&
                                 <Bar
                                     style={{ minHeight: 250, maxHeight: 250 }}
@@ -195,9 +221,7 @@ export default function DashboardLayout() {
                                 />
                             }
                         </ChartColumn>
-                    </Row>
-                    <Row>
-                        <ChartColumn caption="Case Statistic">
+                        <ChartColumn summary={summary} caption="Case Statistic">
                             {caseStatistics &&
                                 <Bar
                                     style={{ minHeight: 250, maxHeight: 250 }}
@@ -221,24 +245,6 @@ export default function DashboardLayout() {
                                                     'rgba(255, 99, 132, 1)',
                                                 ],
                                                 borderWidth: 1,
-                                            }
-                                        ]
-                                    }}
-                                    options={barOptions}
-                                />
-                            }
-                        </ChartColumn>
-                        <ChartColumn caption="Total Case Found per Cycle">
-                            {caseFound &&
-                                <Line
-                                    style={{ minHeight: 250, maxHeight: 250 }}
-                                    data={{
-                                        labels: caseFound.map((cycle) => cycle.cycle_id),
-                                        datasets: [
-                                            {
-                                                data: caseFound.map((cycle) => cycle.total_findings),
-                                                borderColor: 'rgb(75, 192, 192)',
-                                                tension: 0.25
                                             }
                                         ]
                                     }}
