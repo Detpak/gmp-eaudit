@@ -17,6 +17,10 @@ class LoginController extends Controller
 {
     private function openView()
     {
+        if (UserHelpers::isSuperAdmin()) {
+            return Redirect::intended('portal');
+        }
+
         $isAuditor = UserHelpers::isAuditor();
         $isAuditee = UserHelpers::isAuditee();
         $adminAccess =  UserHelpers::canOpenAdminPage();

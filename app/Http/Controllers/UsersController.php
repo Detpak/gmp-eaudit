@@ -304,28 +304,35 @@ class UsersController extends Controller
     public function apiGetCurrentUser(Request $request)
     {
         $tokenSplit = explode('|', $request->bearerToken()); // [0] = user id, [1] = token
-
         $result = User::find($tokenSplit[0])->toArray();
-        $role = Role::find($result['role_id']);
 
-        $result['auditee'] = $role->auditee;
-        $result['auditor'] = $role->auditor;
-        $result['access'] = $role->access_info;
-        $result['admin_access'] = false;
+        if (!$result['superadmin']) {
+            $role = Role::find($result['role_id']);
 
-        foreach ($role->access_info as $route => $value) {
-            switch (gettype($value)) {
-                case 'boolean':
-                    if ($value) {
-                        $result['admin_access'] = true;
-                    }
-                    break;
-                case 'array':
-                    if (collect($value)->some(true)) {
-                        $result['admin_access'] = true;
-                    }
-                    break;
+            $result['auditee'] = $role->auditee;
+            $result['auditor'] = $role->auditor;
+            $result['access'] = $role->access_info;
+            $result['admin_access'] = false;
+
+            foreach ($role->access_info as $route => $value) {
+                switch (gettype($value)) {
+                    case 'boolean':
+                        if ($value) {
+                            $result['admin_access'] = true;
+                        }
+                        break;
+                    case 'array':
+                        if (collect($value)->some(true)) {
+                            $result['admin_access'] = true;
+                        }
+                        break;
+                }
             }
+        }
+        else {
+            $result['auditee'] = false;
+            $result['auditor'] = false;
+            $result['admin_access'] = true;
         }
 
         return ['result' => $result];

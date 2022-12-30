@@ -23,6 +23,8 @@ import PlantLayout from "./workplace/PlantLayout";
 import WorkplaceAreaLayout from "./workplace/WorkplaceAreaLayout";
 import DevMenuLayout from "./DevMenuLayout";
 import AuditDeptRecordsLayout from "./audit/AuditDeptRecordsLayout";
+import { useEffect } from "react";
+import { useState } from "react";
 
 export const routes = [
     {
@@ -89,16 +91,103 @@ export const routes = [
         link: 'dev',
         icon: faCog,
         page: DevMenuLayout,
-        noRestrict: true,
     }
 ];
+
+export function SuperAdminRoutes() {
+    return (
+        <Routes>
+            {routes.map((route, routeKey) => {
+                const routeLink = `/app/${route.link}`;
+
+                if (route.page) {
+                    return <Route key={routeKey} path={routeLink} element={React.createElement(route.page)} />
+                }
+
+                const outlet = () => (
+                    <>
+                        <PageNavbar>
+                            {Object
+                                .keys(route.pages)
+                                .map((pageLink, key) => (<PageLink key={key} to={pageLink}>{route.pages[pageLink].name}</PageLink>))}
+                        </PageNavbar>
+
+                        <Outlet />
+                    </>
+                );
+
+                return (
+                    <Route key={routeKey} path={routeLink} element={React.createElement(outlet)}>
+                        {Object.keys(route.pages)
+                            .map((pageLink, pageKey) => (
+                                <React.Fragment key={pageKey}>
+                                    {pageKey == 0 && <Route index element={<Navigate to={`${routeLink}/${pageLink}`} replace />} />}
+                                    <Route path={pageLink} element={React.createElement(route.pages[pageLink].element)} />
+                                </React.Fragment>
+                            ))
+                        }
+                    </Route>
+                )
+            })}
+        </Routes>
+    )
+}
+
+export function UserRoutes({ userData }) {
+    return (
+        <Routes>
+            {routes
+                .filter(route =>
+                    route.noRestrict || userData.access[route.link] != null &&
+                    (_.isBoolean(userData.access[route.link]) && userData.access[route.link] ||
+                    _.some(Object.values(userData.access[route.link]), value => _.isBoolean(value) && value)))
+                .map((route, routeKey) => {
+                    const routeLink = `/app/${route.link}`;
+
+                    if (route.page) {
+                        return <Route key={routeKey} path={routeLink} element={React.createElement(route.page)} />
+                    }
+
+                    const outlet = () => (
+                        <>
+                            <PageNavbar>
+                                {Object.keys(route.pages)
+                                    .filter((page) => userData.access[route.link][page])
+                                    .map((pageLink, key) => (
+                                        <PageLink key={key} to={pageLink}>{route.pages[pageLink].name}</PageLink>
+                                    ))
+                                }
+                            </PageNavbar>
+
+                            <Outlet />
+                        </>
+                    );
+
+                    return (
+                        <Route key={routeKey} path={routeLink} element={React.createElement(outlet)}>
+                            {Object.keys(route.pages)
+                                .filter((page) => userData.access[route.link] != null && userData.access[route.link][page])
+                                .map((pageLink, pageKey) => (
+                                    <React.Fragment key={pageKey}>
+                                        {pageKey == 0 && <Route index element={<Navigate to={`${routeLink}/${pageLink}`} replace />} />}
+                                        <Route path={pageLink} element={React.createElement(route.pages[pageLink].element)} />
+                                    </React.Fragment>
+                                ))
+                            }
+                        </Route>
+                    )
+                })
+            }
+        </Routes>
+    )
+}
 
 export function PageRoutes() {
     const [userData, setUserData] = globalState.useGlobalState('userData');
 
     return (
         <>
-            {!userData ?
+            {userData == null ?
                 <div className="vstack justify-content-center w-100 h-100 text-center p-2">
                     <div>
                         <Spinner animation="border" />
@@ -106,50 +195,7 @@ export function PageRoutes() {
                     <h5>Please Wait</h5>
                 </div>
                 :
-                <Routes>
-                    {routes
-                        .filter(route =>
-                            route.noRestrict || userData.access[route.link] != null &&
-                            (_.isBoolean(userData.access[route.link]) && userData.access[route.link] ||
-                            _.some(Object.values(userData.access[route.link]), value => _.isBoolean(value) && value)))
-                        .map((route, routeKey) => {
-                            const routeLink = `/app/${route.link}`;
-
-                            if (route.page) {
-                                return <Route key={routeKey} path={routeLink} element={React.createElement(route.page)} />
-                            }
-
-                            const outlet = () => (
-                                <>
-                                    <PageNavbar>
-                                        {Object.keys(route.pages)
-                                            .filter((page) => userData.access[route.link][page])
-                                            .map((pageLink, key) => (
-                                                <PageLink key={key} to={pageLink}>{route.pages[pageLink].name}</PageLink>
-                                            ))
-                                        }
-                                    </PageNavbar>
-
-                                    <Outlet />
-                                </>
-                            );
-
-                            return (
-                                <Route key={routeKey} path={routeLink} element={React.createElement(outlet)}>
-                                    {Object.keys(route.pages)
-                                        .filter((page) => userData.access[route.link] != null && userData.access[route.link][page])
-                                        .map((pageLink, pageKey) => (
-                                            <React.Fragment key={pageKey}>
-                                                {pageKey == 0 && <Route index element={<Navigate to={`${routeLink}/${pageLink}`} replace />} />}
-                                                <Route path={pageLink} element={React.createElement(route.pages[pageLink].element)} />
-                                            </React.Fragment>
-                                        ))
-                                    }
-                                </Route>
-                            )
-                        })
-                    }
-                </Routes>
+                userData.superadmin ? <SuperAdminRoutes /> : <UserRoutes userData={userData} />
             }
         </>
     )
@@ -157,19 +203,30 @@ export function PageRoutes() {
 
 export function PageButtons() {
     const [userData, setUserData] = globalState.useGlobalState('userData');
+    const [allowedRoutes, setAllowedRoutes] = useState([]);
+
+    useEffect(() => {
+        if (userData == null) return;
+        if (!userData.superadmin) {
+            setAllowedRoutes(routes
+                .filter(route =>
+                    route.noRestrict || userData.access[route.link] != null &&
+                    (_.isBoolean(userData.access[route.link]) && userData.access[route.link] ||
+                    _.some(Object.values(userData.access[route.link]), value => _.isBoolean(value) && value))));
+        }
+        else {
+            setAllowedRoutes(routes);
+        }
+    }, [userData]);
 
     return (
         <ul className="nav nav-pills flex-column mb-auto">
-            {!userData &&
+            {userData == null &&
                 <div className="w-100 text-center p-2">
                     <Spinner animation="border" />
                 </div>
             }
-            {userData && routes
-                .filter(route =>
-                    route.noRestrict || userData.access[route.link] != null &&
-                    (_.isBoolean(userData.access[route.link]) && userData.access[route.link] ||
-                    _.some(Object.values(userData.access[route.link]), value => _.isBoolean(value) && value)))
+            {userData != null && allowedRoutes
                 .map((route, key) => {
                     return (
                         <li key={key} className="nav-item">

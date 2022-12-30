@@ -13,6 +13,7 @@ import ModalForm from "../../components/ModalForm";
 import { CorrectiveActionForm } from "../CorrectiveActionMain";
 import { useEffect } from "react";
 import BaseAuditPage from "./BaseAuditPage";
+import { globalState } from "../../app_state";
 
 function getCaseStatus(status)
 {
@@ -86,6 +87,7 @@ function CancelFinding({ id, setId, triggerRefresh }) {
 export default function AuditFindingsLayout() {
     const [findingId, setFindingId] = useState(null);
     const [cancelFindingId, setCancelFindingId] = useState(null);
+    const [userData, setUserData] = globalState.useGlobalState('userData');
     const refreshTable = useRefreshTable();
 
     const resetCA = async (id) => {
@@ -197,7 +199,7 @@ export default function AuditFindingsLayout() {
                         >
                             Create
                         </Button>
-                        {process.env.MIX_APP_DEBUG &&
+                        {userData.superuser &&
                             <LoadingButton
                                 size="sm"
                                 variant="danger"
@@ -217,7 +219,7 @@ export default function AuditFindingsLayout() {
                         >
                             Create
                         </Button>
-                        {process.env.MIX_APP_DEBUG &&
+                        {userData.superuser &&
                             <LoadingButton
                                 size="sm"
                                 variant="danger"

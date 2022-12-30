@@ -23,7 +23,9 @@ class User extends Authenticatable
         'login_id',
         'email',
         'password',
-        'role_id'
+        'role_id',
+        'expire_time',
+        'superadmin',
     ];
 
     /**
@@ -34,6 +36,10 @@ class User extends Authenticatable
     protected $hidden = [
         'password',
         'remember_token',
+    ];
+
+    protected $casts = [
+        'superadmin' => 'boolean'
     ];
 
     public function role()

@@ -40,6 +40,11 @@ class UserHelpers
         return Role::find(Session::get('eaudit_role'));
     }
 
+    public static function isSuperAdmin()
+    {
+        return UserHelpers::getUserData()->superadmin;
+    }
+
     public static function isAuditee()
     {
         return UserHelpers::getRole()->auditee;

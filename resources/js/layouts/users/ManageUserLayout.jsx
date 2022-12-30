@@ -124,7 +124,7 @@ export default function ManageUserLayout() {
         login_id: '',
         email: '',
         password: '',
-        confirm_password: '',
+        password_confirmation: '',
         role_id: '',
     };
 
