@@ -199,12 +199,13 @@ export default function AuditFindingsLayout() {
                         >
                             Create
                         </Button>
-                        {userData.superuser &&
+                        {userData.superadmin &&
                             <LoadingButton
                                 size="sm"
                                 variant="danger"
                                 onClick={async () => await resetCA(item.id)}
-                                disabled={item.auditee_id == null}
+                                //disabled={item.auditee_id == null}
+                                className="ms-1"
                             >
                                 Reset CA
                             </LoadingButton>
@@ -219,12 +220,13 @@ export default function AuditFindingsLayout() {
                         >
                             Create
                         </Button>
-                        {userData.superuser &&
+                        {userData.superadmin &&
                             <LoadingButton
                                 size="sm"
                                 variant="danger"
                                 onClick={async () => await uncancel(item.id)}
-                                disabled={item.auditee_id == null}
+                                //disabled={item.auditee_id == null}
+                                className="ms-1"
                             >
                                 Uncancel
                             </LoadingButton>

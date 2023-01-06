@@ -161,12 +161,6 @@ export default function CorrectiveActionLayout() {
                     filterable: false,
                     sortable: false,
                     name: 'Action'
-                },
-                {
-                    export: false,
-                    filterable: false,
-                    sortable: false,
-                    name: 'Debug'
                 }
             ]}
             produce={item => [
@@ -182,8 +176,10 @@ export default function CorrectiveActionLayout() {
                 <DescriptionModal msg={item.desc} />,
                 <DescriptionModal msg={item.closing_remarks} />,
                 <ImageModal buttonSize="sm" src={`api/v1/fetch-corrective-action-images/${item.id}`} disabled={item.images_count == 0} />,
-                <ApproveCorrectiveActionForm id={item.id} disabled={item.status == 3} refreshTable={refreshTable} />,
-                <LoadingButton size="sm" onClick={async () => resetApproval(item.id)}>Reset Approval</LoadingButton>
+                <>
+                    <ApproveCorrectiveActionForm id={item.id} disabled={item.status == 3} refreshTable={refreshTable} />
+                    <LoadingButton size="sm" onClick={async () => resetApproval(item.id)}>Reset Approval</LoadingButton>
+                </>,
             ]}
             produceExport={item => [
                 item.record_code,

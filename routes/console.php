@@ -24,17 +24,6 @@ Artisan::command('inspire', function () {
 })->purpose('Display an inspiring quote');
 
 Artisan::command('gmp:superadmin', function () {
-    // 1. Check existing superadmin user timeout.
-    // 2. If the time is out, delete the superadmin user.
-
-    $superadmins = User::where('superadmin', true);
-
-    foreach ($superadmins->get() as $su) {
-        ApiAccessToken::where('user_id', $su->id)->delete();
-    }
-
-    $superadmins->delete();
-
     $loginId = "su-" . Str::random(8);
     $pw = Str::random(16);
 
@@ -43,12 +32,12 @@ Artisan::command('gmp:superadmin', function () {
         'employee_id' => $loginId,
         'login_id' => $loginId,
         'password' => Hash::make($pw),
-        'expire_time' => Carbon::now()->addHour(),
         'superadmin' => true,
     ];
 
     User::create($superadmin);
 
+    $this->comment("Note: Superadmin account can only log in once.");
     $this->comment("Username: {$loginId}");
     $this->comment("Password: {$pw}");
 });

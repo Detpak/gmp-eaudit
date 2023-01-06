@@ -14,7 +14,6 @@ return new class extends Migration
     public function up()
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->dateTime('expire_time')->nullable();
             $table->boolean('superadmin')->default(false);
         });
     }
@@ -27,7 +26,7 @@ return new class extends Migration
     public function down()
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->dropColumn(['expire_time', 'superadmin']);
+            $table->dropColumn('superadmin');
         });
     }
 };

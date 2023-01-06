@@ -18,7 +18,7 @@ class LoginController extends Controller
     private function openView()
     {
         if (UserHelpers::isSuperAdmin()) {
-            return Redirect::intended('portal');
+            return Redirect::intended('app');
         }
 
         $isAuditor = UserHelpers::isAuditor();
@@ -144,6 +144,12 @@ class LoginController extends Controller
                 $accessToken->delete();
                 break;
             }
+        }
+
+        $user = UserHelpers::getUserData();
+
+        if ($user->superadmin) {
+            UserHelpers::getUserData()->delete();
         }
 
         Session::regenerate();
