@@ -46,8 +46,14 @@
 <body>
     <main id="main-container">{{ $slot }}</main>
 
+    @if(App::environment(['local', 'staging']))
     <script src="{{ asset('js/manifest.js') }}?id={{ Str::random(16) }}"></script>
     <script src="{{ asset('js/vendor.js') }}?id={{ Str::random(16) }}"></script>
     <script src="{{ asset('js/app.js') }}?id={{ Str::random(16) }}"></script>
+    @elseif(App::environment('production'))
+    <script src="{{ asset('js/manifest.js') }}"></script>
+    <script src="{{ asset('js/vendor.js') }}"></script>
+    <script src="{{ asset('js/app.js') }}"></script>
+    @endif
 </body>
 </html>
