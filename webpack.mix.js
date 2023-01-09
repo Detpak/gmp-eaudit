@@ -13,23 +13,4 @@ mix.react()
 
 if (mix.inProduction()) {
     mix.compress({ productionOnly: true });
-    // plugins.push(
-    //     new CompressionPlugin({
-    //         filename: "[file].compressed[query]",
-    //         algorithm: 'gzip',
-    //         test: /\.js$|\.css$/,
-    //         threshold: 10240,
-    //         minRatio: 0.8,
-    //     })
-    // );
 }
-
-mix.webpackConfig({
-    plugins: plugins
-});
-
-// if (!mix.inProduction()) {
-//     mix.sourceMaps();
-// }
-
-//mix.sass('resources/sass/app.scss', 'public/css');

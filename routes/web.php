@@ -49,5 +49,3 @@ Route::middleware('user')->group(function() {
     //     Route::get('/testbed', [TestbedController::class, 'show']);
     // });
 });
-
-
