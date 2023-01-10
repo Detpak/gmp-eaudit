@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\Filtering;
 use App\Mail\CorrectiveActionApproved;
 use App\Mail\CorrectiveActionTaken;
 use App\Models\AuditFinding;
@@ -194,22 +195,18 @@ class CorrectiveActionController extends Controller
         if ($request->filter) {
             $filter = json_decode($request->filter);
             $mode = $request->filter_mode == 'any' ? 'or' : 'and';
-
-            if (isset($filter->record_code->value)) {
-                $query->where('audit_records.code', 'LIKE', "%{$filter->record_code->value}%", $mode);
-            }
-
-            if (isset($filter->code->value)) {
-                $query->where('audit_findings.code', 'LIKE', "%{$filter->code->value}%", $mode);
-            }
-
-            if (isset($filter->department_name->value)) {
-                $query->where('departments.name', 'LIKE', "%{$filter->department_name->value}%", $mode);
-            }
-
-            if (isset($filter->area_name->value)) {
-                $query->where('areas.name', 'LIKE', "%{$filter->area_name->value}%", $mode);
-            }
+            $query = Filtering::build($query, $request->filter_mode)
+                ->whereString('audit_records.code', isset($filter->record_code) ? $filter->record_code : null)
+                ->whereString('audit_findings.code', isset($filter->code) ? $filter->code : null)
+                ->whereString('areas.name', isset($filter->area_name) ? $filter->area_name : null)
+                ->whereString('users.name', isset($filter->auditee) ? $filter->auditee : null)
+                ->whereString('corrective_actions.desc', isset($filter->desc) ? $filter->desc : null)
+                ->whereString('audit_findings.cg_name', isset($filter->cg_name) ? $filter->cg_name : null)
+                ->whereString('audit_findings.ca_name', isset($filter->ca_name) ? $filter->ca_name : null)
+                ->where('audit_findings.ca_weight', isset($filter->ca_weight) ? $filter->ca_weight : null)
+                ->having('deducted_weight', isset($filter->deducted_weight) ? $filter->deducted_weight : null)
+                ->whereString('closing_remarks', isset($filter->closing_remarks) ? $filter->closing_remarks : null)
+                ->done();
 
             if (isset($filter->status->value)) {
                 $statusId = collect([
@@ -220,10 +217,6 @@ class CorrectiveActionController extends Controller
                 $query->whereIn('audit_findings.status', $statusId, $mode);
             }
 
-            if (isset($filter->desc->value)) {
-                $query->where('corrective_actions.desc', 'LIKE', "%{$filter->desc->value}%", $mode);
-            }
-
             if (isset($filter->category->value)) {
                 $categoryId = collect([
                     "observation" => 0,
@@ -232,22 +225,6 @@ class CorrectiveActionController extends Controller
                 ])->filter(function ($value, $key) use ($filter) { return Str::contains($key, Str::lower($filter->category->value)); });
 
                 $query->whereIn('audit_findings.category', $categoryId, $mode);
-            }
-
-            if (isset($filter->ca_name->value)) {
-                $query->where('audit_findings.ca_name', 'LIKE', "%{$filter->ca_name->value}%", $mode);
-            }
-
-            if (isset($filter->ca_weight->value)) {
-                $query->where('audit_findings.ca_weight', $filter->ca_weight->op, $filter->ca_weight->value, $mode);
-            }
-
-            if (isset($filter->deducted_weight->value)) {
-                $query->having('deducted_weight', $filter->deducted_weight->op, $filter->deducted_weight->value, $mode);
-            }
-
-            if (isset($filter->closing_remarks->value)) {
-                $query->where('closing_remarks', 'LIKE', "%{$filter->closing_remarks->value}%");
             }
         }
 

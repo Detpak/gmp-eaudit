@@ -1,4 +1,5 @@
 import { Form, InputGroup } from "react-bootstrap";
+import { useFilter } from "../../components/FilterTable";
 import { RequiredSpan } from "../../components/LabelSpan";
 import CommonView from "../CommonView";
 
@@ -28,6 +29,7 @@ function CriteriaForm({ shown, handleChange, values, errors }) {
 }
 
 export default function CriteriaLayout() {
+    const filter = useFilter();
     const initialValues = {
         code: '',
         name: '',
@@ -54,6 +56,7 @@ export default function CriteriaLayout() {
                 action: 'api/v1/delete-criteria'
             }}
             deleteSelectedItemAction={'api/v1/delete-criterias'}
+            filter={filter}
             table={{
                 canSelect: true,
                 columns: [
@@ -66,10 +69,12 @@ export default function CriteriaLayout() {
                         name: 'Name'
                     },
                     {
+                        type: 'number',
                         id: 'weight',
                         name: 'Weight (%)'
                     },
                     {
+                        type: 'number',
                         id: 'groups_count',
                         name: '# Registered Groups'
                     }

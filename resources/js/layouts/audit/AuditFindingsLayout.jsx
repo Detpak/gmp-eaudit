@@ -143,13 +143,13 @@ export default function AuditFindingsLayout() {
                         name: 'Criteria'
                     },
                     {
-                        number: true,
+                        type: 'number',
                         id: 'ca_weight',
                         name: 'Criteria Weight',
                         exportFormat: '0.00%'
                     },
                     {
-                        number: true,
+                        type: 'number',
                         id: 'deducted_weight',
                         name: 'Deducted Weight',
                         exportFormat: '0.00%'
@@ -195,7 +195,7 @@ export default function AuditFindingsLayout() {
                             onClick={_ => setFindingId(item.id)}
                             variant="success"
                             size="sm"
-                            disabled={item.auditee_id == null || item.status != 0}
+                            disabled={item.has_auditee_id == null || item.status != 0 || !userData.auditee}
                         >
                             Create
                         </Button>
@@ -216,7 +216,7 @@ export default function AuditFindingsLayout() {
                             onClick={_ => setCancelFindingId(item.id)}
                             size="sm"
                             variant="danger"
-                            disabled={item.auditee_id == null || item.status != 0}
+                            disabled={item.status != 0 || !userData.auditor}
                         >
                             Create
                         </Button>

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\Filtering;
 use App\Models\Area;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Response;
@@ -102,6 +103,14 @@ class AreaController extends Controller
                      'plants.name as plant_name',
                      'plants.code as plant_code',
                      'departments.name as dept_name');
+
+        $filter = json_decode($request->filter);
+        $query = Filtering::build($query, $request->filter_mode)
+            ->whereString('areas.name', isset($filter->name) ? $filter->name : null)
+            ->whereString('plant_name', isset($filter->plant_name) ? $filter->plant_name : null)
+            ->whereString('dept_name', isset($filter->dept_name) ? $filter->dept_name : null)
+            ->whereString('areas.desc', isset($filter->desc) ? $filter->desc : null)
+            ->done();
 
         return $query->paginate($request->max);
     }

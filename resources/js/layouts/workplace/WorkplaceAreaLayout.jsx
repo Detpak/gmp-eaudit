@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useEffect } from "react";
 import { OptionalSpan, RequiredSpan } from "../../components/LabelSpan";
 import httpRequest from "../../api";
+import { useFilter } from "../../components/FilterTable";
 
 function WorkplaceAreaForm({ shown, handleChange, values, setValues, errors }) {
     const [isLoading, setLoading] = useState(false);
@@ -65,6 +66,7 @@ function WorkplaceAreaForm({ shown, handleChange, values, setValues, errors }) {
 }
 
 export default function WorkplaceAreaLayout() {
+    const filter = useFilter();
     const initialValues = {
         name: '',
         desc: '',
@@ -91,6 +93,7 @@ export default function WorkplaceAreaLayout() {
                 action: 'api/v1/delete-area'
             }}
             deleteSelectedItemAction={'api/v1/delete-areas'}
+            filter={filter}
             table={{
                 canSelect: true,
                 columns: [

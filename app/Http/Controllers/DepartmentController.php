@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Helpers\CommonHelpers;
+use App\Helpers\Filtering;
 use App\Models\Department;
 use App\Models\DepartmentPIC;
 use Illuminate\Http\Request;
@@ -147,6 +148,17 @@ class DepartmentController extends Controller
         }
 
         $query->withCount('areas');
+
+
+        if ($request->filter) {
+            $filter = json_decode($request->filter);
+            $query = Filtering::build($query, $request->filter_mode)
+                ->whereString('departments.name', isset($filter->name) ? $filter->name : null)
+                ->whereString('departments.code', isset($filter->code) ? $filter->code : null)
+                ->whereString('division_name', isset($filter->division_name) ? $filter->division_name : null)
+                ->having('areas_count', isset($filter->areas_count) ? $filter->areas_count : null)
+                ->done();
+        }
 
         return $query->paginate($request->max);
     }

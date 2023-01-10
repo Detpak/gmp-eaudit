@@ -38,6 +38,8 @@
 .table-nowrap {
     --bs-table-bg: white;
     white-space: nowrap;
+    border-collapse: separate;
+    border-spacing: 0;
 }
 
 .table-header-fixed-left {

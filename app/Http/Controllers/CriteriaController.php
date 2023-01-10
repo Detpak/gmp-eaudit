@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Helpers\CommonHelpers;
+use App\Helpers\Filtering;
 use App\Models\Criteria;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Response;
@@ -85,6 +86,14 @@ class CriteriaController extends Controller
         if ($request->sort && $request->dir) {
             $query->orderBy($request->sort, $request->dir);
         }
+
+        $filter = json_decode($request->filter);
+        $query = Filtering::build($query, $request->filter_mode)
+            ->whereString('name', isset($filter->name) ? $filter->name : null)
+            ->whereString('code', isset($filter->code) ? $filter->code : null)
+            ->where('weight', isset($filter->weight) ? $filter->weight : null)
+            ->having('groups_count', isset($filter->groups_count) ? $filter->groups_count : null)
+            ->done();
 
         return $query->paginate($request->max);
     }

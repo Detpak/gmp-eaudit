@@ -225,9 +225,9 @@ export default function DynamicTable({
     source,
     filter
 }) {
-    const thClassName = "p-0 table-column sticky-top";
-    const thFixedLeftClassName = "p-0 table-column table-header-fixed-left";
-    const thFixedRightClassName = "p-0 table-column table-header-fixed-right";
+    const thClassName = "p-0 table-column sticky-top border";
+    const thFixedLeftClassName = "p-0 table-column table-header-fixed-left border align-top";
+    const thFixedRightClassName = "p-0 table-column table-header-fixed-right border align-top";
     const tdClassName = "px-3 py-2";
     const tdFixedLeftClassName = "px-3 table-column-fixed-left py-2";
     const tdFixedRightClassName = "px-3 table-column-fixed-right py-2";
@@ -425,7 +425,9 @@ export default function DynamicTable({
                             <tr>
                                 {selectedItems &&
                                     <th className={thFixedLeftClassName}>
-                                        <div className="px-3 py-2 border"><FontAwesomeIcon icon={faCheck} /></div>
+                                        <div className="px-3 py-2">
+                                            <FontAwesomeIcon icon={faCheck} />
+                                        </div>
                                     </th>
                                 }
                                 {columns.map((column, index) => {
@@ -439,7 +441,7 @@ export default function DynamicTable({
 
                                     return (
                                         <th key={index} className={thClassName} style={{ zIndex: 1 }}>
-                                            <div className={`px-3 py-2 border ${selectedItems || index != 0 ? 'border-start-0' : ''}`}>
+                                            <div className={`px-3 py-2`}>
                                                 <div className="hstack gap-3" style={{ minWidth: isBetween && isDate ? 210 : (isBetween && isNumber ? 130 : 100 ) }}>
                                                     <div className="user-select-none flex-fill">{column.name}</div>
                                                     {sortable &&
@@ -495,7 +497,7 @@ export default function DynamicTable({
                                 })}
                                 {actionColumn &&
                                     <th className={thFixedRightClassName}>
-                                        <div className="px-3 py-2 border">Action</div>
+                                        <div className="px-3 py-2">Action</div>
                                     </th>
                                 }
                             </tr>
@@ -538,7 +540,7 @@ export default function DynamicTable({
                                     }
                                 </tr>
                             ))
-                            }
+                        }
                         </tbody>
                     </Table>
                     {

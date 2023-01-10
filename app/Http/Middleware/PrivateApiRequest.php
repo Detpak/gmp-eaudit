@@ -26,6 +26,12 @@ class PrivateApiRequest
         }
 
         $tokenSplit = explode('|', $request->bearerToken()); // [0] = user id, [1] = token
+        $user = User::find($tokenSplit[0]);
+
+        if (!$user) {
+            return Response::json(['result' => 'error'], 404);
+        }
+
         $accessTokens = ApiAccessToken::where('user_id', $tokenSplit[0])->get();
         $result = false;
 
@@ -33,23 +39,6 @@ class PrivateApiRequest
         foreach ($accessTokens as $accessToken) {
             if (Hash::check($tokenSplit[1], $accessToken->token)) {
                 $result = true;
-                $roleData = $accessToken->user->role;
-
-                switch ($role) {
-                    case 'auditee':
-                        if (!$roleData->auditee) {
-                            abort(404);
-                        }
-                        break;
-                    case 'auditor':
-                        if (!$roleData->auditor) {
-                            abort(404);
-                        }
-                        break;
-                    default:
-                        break;
-                }
-
                 break;
             }
         }
@@ -58,11 +47,30 @@ class PrivateApiRequest
             return Response::json(['result' => 'invalid_token']);
         }
 
+        if ($role) {
+            $roleData = $user->role;
+
+            // Check if user has the appropriate role
+            switch ($role) {
+                case 'auditee':
+                    if (!$roleData->auditee) {
+                        abort(404);
+                    }
+                    break;
+                case 'auditor':
+                    if (!$roleData->auditor) {
+                        abort(404);
+                    }
+                    break;
+            }
+        }
+
         $request->merge([
             'auth' => [
                 'user_id' => $tokenSplit[0],
                 'token' => $tokenSplit[1]
-            ]
+            ],
+            'user' => $user
         ]);
 
         return $next($request);

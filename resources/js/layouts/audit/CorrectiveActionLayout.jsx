@@ -131,13 +131,13 @@ export default function CorrectiveActionLayout() {
                     name: 'Criteria Name',
                 },
                 {
-                    number: true,
+                    type: 'number',
                     id: 'ca_weight',
                     name: 'Criteria Weight',
                     exportFormat: '0.00%'
                 },
                 {
-                    number: true,
+                    type: 'number',
                     id: 'deducted_weight',
                     name: 'Deducted Weight',
                     exportFormat: '0.00%'

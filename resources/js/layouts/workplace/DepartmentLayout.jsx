@@ -2,6 +2,7 @@ import _ from "lodash";
 import { useEffect, useState } from "react";
 import { Button, Form, ListGroup, Spinner } from "react-bootstrap";
 import httpRequest from "../../api";
+import { useFilter } from "../../components/FilterTable";
 import { RequiredSpan } from "../../components/LabelSpan";
 import ListView from "../../components/ListView";
 import SearchList from "../../components/SearchList";
@@ -107,7 +108,36 @@ function DepartmentForm({ shown, handleChange, values, setValues, errors }) {
     );
 }
 
+const tableColumns = [
+    {
+        id: 'name',
+        name: 'Department'
+    },
+    {
+        id: 'code',
+        name: 'Code'
+    },
+    {
+        id: 'division_name',
+        name: 'Division'
+    },
+    {
+        //selectable: false,
+        type: 'number',
+        id: 'areas_count',
+        name: '# Areas'
+    },
+    {
+        filterable: false,
+        sortable: false,
+        id: 'pics',
+        name: 'PIC(s)'
+    },
+];
+
 export default function DepartmentLayout() {
+    const filter = useFilter();
+
     const initialValues = {
         name: '',
         code: '',
@@ -134,32 +164,10 @@ export default function DepartmentLayout() {
                 action: 'api/v1/delete-dept'
             }}
             deleteSelectedItemAction={'api/v1/delete-depts'}
+            filter={filter}
             table={{
                 canSelect: true,
-                columns: [
-                    {
-                        id: 'name',
-                        name: 'Department'
-                    },
-                    {
-                        id: 'code',
-                        name: 'Code'
-                    },
-                    {
-                        id: 'division_name',
-                        name: 'Division'
-                    },
-                    {
-                        //selectable: false,
-                        id: 'areas_count',
-                        name: '# Areas'
-                    },
-                    {
-                        sortable: false,
-                        id: 'pics',
-                        name: 'PIC(s)'
-                    },
-                ],
+                columns: tableColumns,
                 source: {
                     url: 'api/v1/fetch-depts',
                     method: 'GET',
