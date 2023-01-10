@@ -67,38 +67,6 @@ class AuditRecordController extends Controller
                 ->having('score', isset($filter->score) ? $filter->score : null)
                 ->having('date', isset($filter->date) ? $filter->date : null)
                 ->done();
-
-            /* if (isset($filter->cycle_id->value)) {
-                $query->where('audit_cycles.cycle_id', 'LIKE', "%{$filter->cycle_id->value}%", $mode);
-            }
-
-            if (isset($filter->dept_name->value)) {
-                $query->where('departments.name', 'LIKE', "%{$filter->dept_name->value}%", $mode);
-            }
-
-            if (isset($filter->total_case_found->value)) {
-                $query->having('total_case_found', $filter->total_case_found->op, $filter->total_case_found->value, $mode);
-            }
-
-            if (isset($filter->observation->value)) {
-                $query->having('observation', $filter->observation->op, $filter->observation->value, $mode);
-            }
-
-            if (isset($filter->minor_nc->value)) {
-                $query->having("minor_nc", $filter->minor_nc->op, $filter->minor_nc->value, $mode);
-            }
-
-            if (isset($filter->major_nc->value)) {
-                $query->having("major_nc", $filter->major_nc->op, $filter->major_nc->value, $mode);
-            }
-
-            if (isset($filter->score_deduction->value)) {
-                $query->having("score_deduction", $filter->score_deduction->op, $filter->score_deduction->value, $mode);
-            }
-
-            if (isset($filter->score->value)) {
-                $query->having("score", $filter->score->op, $filter->score->value, $mode);
-            } */
         }
 
         if ($request->sort && $request->dir) {
@@ -177,38 +145,6 @@ class AuditRecordController extends Controller
 
                 $query->whereIn('audit_records.status', $statusId, $mode);
             }
-
-            /* if (isset($filter->auditor_name->value)) {
-                $query->where('users.name', 'LIKE', "%{$filter->auditor_name->value}%", $mode);
-            }
-
-            if (isset($filter->total_case_found->value)) {
-                $query->having('total_case_found', $filter->total_case_found->op, $filter->total_case_found->value, $mode);
-            }
-
-            if (isset($filter->observation->value)) {
-                $query->having('observation', $filter->observation->op, $filter->observation->value, $mode);
-            }
-
-            if (isset($filter->minor_nc->value)) {
-                $query->having("minor_nc", $filter->minor_nc->op, $filter->minor_nc->value, $mode);
-            }
-
-            if (isset($filter->major_nc->value)) {
-                $query->having("major_nc", $filter->major_nc->op, $filter->major_nc->value, $mode);
-            }
-
-            if (isset($filter->total_weight->value)) {
-                $query->having("total_weight", $filter->total_weight->op, $filter->total_weight->value, $mode);
-            }
-
-            if (isset($filter->score_deduction->value)) {
-                $query->having("score_deduction", $filter->score_deduction->op, $filter->score_deduction->value, $mode);
-            }
-
-            if (isset($filter->score->value)) {
-                $query->having("score", $filter->score->op, $filter->score->value, $mode);
-            } */
         }
 
         if (!$request->list) {
