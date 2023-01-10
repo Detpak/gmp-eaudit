@@ -16,7 +16,7 @@ export default function PortalPage() {
                         <div className="vstack gap-2">
                             {userData.admin_access ? <Button href={rootUrl('app')}>Go to Admin Page</Button> : <></>}
                             {userData.auditor ? <Button href={rootUrl('audit')}>Submit Audit</Button> : <></>}
-                            {userData.auditee ? <Button href={rootUrl('corrective-action')}>Create Corrective Action</Button> : <></>}
+                            {/* {userData.auditee ? <Button href={rootUrl('corrective-action')}>Create Corrective Action</Button> : <></>} */}
                             <Button onClick={() => setShowProfileModal(true)}>Edit Profile</Button>
                             <hr />
                             <Button href={rootUrl('deauth')} variant="danger">Logout</Button>
