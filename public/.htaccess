@@ -27,4 +27,8 @@
     RewriteRule \.js\.gz$ - [T=text/javascript,E=no-gzip:1,E=FORCE_GZIP]
 
     Header set Content-Encoding gzip env=FORCE_GZIP
+
+    <IfModule mod_brotli.c>
+        AddOutputFilterByType BROTLI_COMPRESS application/json text/html text/plain
+    </IfModule>
 </IfModule>
