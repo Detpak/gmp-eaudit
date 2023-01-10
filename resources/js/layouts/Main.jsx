@@ -30,5 +30,9 @@ export default function App({ mode }) {
         }
     };
 
-    return React.createElement(layoutProvider);
+    return (
+        <React.StrictMode>
+            {React.createElement(layoutProvider)}
+        </React.StrictMode>
+    );
 };

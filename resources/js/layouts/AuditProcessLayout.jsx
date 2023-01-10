@@ -13,6 +13,7 @@ import { scrollToElementById, waitForMs } from "../utils";
 import httpRequest from '../api';
 import { ImageModal } from "../components/ImageModal";
 import { RequiredSpan } from "../components/LabelSpan";
+import { useMemo } from "react";
 
 
 function AuditProcessResult({ auditResult, setAuditResult }) {
@@ -176,7 +177,10 @@ function AuditProcessForm({ setAuditResult }) {
     const [maxProgress, setMaxProgress] = useState(0);
     const [submitProgress, setSubmitProgress] = useState(0);
     const [isLoadingCases, setLoadingCases] = useState(false);
-    const date = useRef(new Date().toLocaleDateString('en-UK', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }));
+    const date = useMemo(() => {
+        return new Date()
+            .toLocaleDateString('en-UK', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }, [])
+        });
 
     const fetchData = async () => {
         const userData = await httpRequest.get('api/v1/get-current-user');

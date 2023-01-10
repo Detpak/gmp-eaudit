@@ -74,7 +74,6 @@ export function showToastMsg(msg) {
 
 export async function updateUserData() {
     const response = await httpRequest.get(`api/v1/get-current-user`);
-    console.log(response.data.result);
     globalState.setGlobalState('userData', response.data.result);
 }
 

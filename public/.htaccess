@@ -29,6 +29,8 @@
     Header set Content-Encoding gzip env=FORCE_GZIP
 </IfModule>
 
-<IfModule mod_deflate.c>
-    AddOutputFilterByType DEFLATE application/json text/html text/plain
+<IfModule mod_filter.c>
+    <IfModule mod_deflate.c>
+        AddOutputFilterByType DEFLATE application/json text/html text/plain
+    </IfModule>
 </IfModule>
