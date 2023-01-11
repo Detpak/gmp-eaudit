@@ -165,7 +165,7 @@ class UsersController extends Controller
             [
                 'name' => 'required|string|max:255',
                 'employee_id' => 'required|numeric',
-                'login_id' => 'required|string|max:255',
+                'login_id' => 'required|string|max:255|unique:users,login_id',
                 'email' => 'nullable|string|email|max:255',
                 'password' => 'required|string|max:255|min:8|confirmed',
                 'role_id' => 'required|exists:roles,id'
@@ -216,6 +216,12 @@ class UsersController extends Controller
         }
 
         $user = User::find($request->id);
+
+        if ($request->login_id != $user->login_id) {
+            if (User::where('login_id', $request->login_id)->exists()) {
+                return Response::json(['formError' => ['login_id' => ['Login ID already used.']]]);
+            }
+        }
 
         if (!$user) {
             return Response::json(['result' => 'Data not found']);

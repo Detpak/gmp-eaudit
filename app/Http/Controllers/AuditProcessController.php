@@ -115,8 +115,8 @@ class AuditProcessController extends Controller
         $criteriaGroup = CriteriaGroup::find($request->cgroup_id);
 
         // Reset findings count after a year.
-        // TODO: use dedicated date attribute.
-        if (AppStateHelpers::getState()->updated_at->year < Carbon::now()->year) {
+        $lastAuditDate = AppStateHelpers::getState()->last_audit_date;
+        if ($lastAuditDate != null && $lastAuditDate->year < $auditDate->year) {
             try {
                 AppStateHelpers::resetFindingsCounter();
             } catch (\Throwable $th) {
@@ -204,7 +204,7 @@ class AuditProcessController extends Controller
 
             $record->save();
             $cycle->save();
-            AppStateHelpers::advanceFindingsCounter($failedCriteriaParams->count());
+            AppStateHelpers::advanceFindingsCounter($failedCriteriaParams->count(), $auditDate);
         }
         catch (\Throwable $th) {
             AuditFinding::where('record_id', $request->record_id)->delete();

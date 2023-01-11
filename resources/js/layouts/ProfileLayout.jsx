@@ -35,6 +35,7 @@ export function ProfileForm({ onSuccess }) {
         const response = await httpRequest.post('api/v1/edit-user', formData);
 
         if (response.data.formError) {
+            setLoading(false);
             setErrors(response.data.formError);
             return;
         }
@@ -143,7 +144,7 @@ export default function ProfileLayout() {
 
             <PageContent>
                 <PageContentView className="py-4">
-                    <h3 className="display-spacing fw-bold">Edit Profile</h3>
+                    <h3 className="display-spacing fw-bold">Edit My Profile</h3>
                     <hr />
                     <ProfileForm />
                 </PageContentView>

@@ -458,7 +458,7 @@ function AuditProcessForm({ setAuditResult }) {
                                 </tr>
                                 <tr>
                                     <th>Date:</th>
-                                    <td>{date.current}</td>
+                                    <td>{date}</td>
                                 </tr>
                             </tbody>
                         </Table>

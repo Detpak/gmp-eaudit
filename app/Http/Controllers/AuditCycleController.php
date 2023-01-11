@@ -54,6 +54,7 @@ class AuditCycleController extends Controller
         // Reset cycle count when we're in the new year
         if ($lastCycleDate && $startDate->year > Carbon::createFromFormat('Y-m-d', $lastCycleDate)->year) {
             AppStateHelpers::resetCycleCount();
+            AppStateHelpers::resetFindingsCounter();
         }
 
         $state = AppStateHelpers::incrementCycle($startDate);

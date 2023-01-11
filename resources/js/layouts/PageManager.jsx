@@ -80,7 +80,7 @@ export const routes = [
         }
     },
     {
-        name: 'Profile',
+        name: 'My Profile',
         link: 'profile',
         icon: faUser,
         page: ProfileLayout,

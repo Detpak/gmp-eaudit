@@ -6,6 +6,7 @@ use App\Helpers\UserHelpers;
 use App\Models\ApiAccessToken;
 use App\Models\User;
 use Carbon\Carbon;
+use Detection\MobileDetect;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
@@ -17,22 +18,20 @@ class LoginController extends Controller
 {
     private function openView()
     {
+        // Superadmin will always redirected to the admin page.
         if (UserHelpers::isSuperAdmin()) {
             return Redirect::intended('app');
         }
 
+        $detect = new MobileDetect;
         $isAuditor = UserHelpers::isAuditor();
-        $isAuditee = UserHelpers::isAuditee();
-        $adminAccess =  UserHelpers::canOpenAdminPage();
+        $adminAccess = UserHelpers::canOpenAdminPage();
 
-        if (($isAuditor && $isAuditee) || $adminAccess) {
+        if ($isAuditor && $detect->isMobile()) {
             return Redirect::intended('portal');
         }
-        else if ($isAuditor) {
-            return Redirect::intended('audit');
-        }
-        else if ($isAuditee) {
-            return Redirect::intended('corrective-action');
+        else if ($isAuditor && !$adminAccess) {
+            return Redirect::intended('portal');
         }
 
         return Redirect::intended('app');

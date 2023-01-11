@@ -56,6 +56,7 @@ class Kernel extends HttpKernel
         'user' => \App\Http\Middleware\UserAuthentication::class,
         'auditee' => \App\Http\Middleware\AuditeeUser::class,
         'auditor' => \App\Http\Middleware\AuditorUser::class,
+        'desktop_only' => \App\Http\Middleware\DesktopOnly::class,
         'private_api' => \App\Http\Middleware\PrivateApiRequest::class,
         'auth' => \App\Http\Middleware\Authenticate::class,
         'auth.basic' => \Illuminate\Auth\Middleware\AuthenticateWithBasicAuth::class,

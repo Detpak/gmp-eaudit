@@ -46,10 +46,11 @@ class AppStateHelpers
         return $state->num_findings;
     }
 
-    public static function advanceFindingsCounter($count)
+    public static function advanceFindingsCounter($count, $auditDate)
     {
         AppStateHelpers::init();
         $state = AppState::first();
+        $state->last_audit_date = $auditDate;
         $state->num_findings += $count;
         $state->save();
     }

@@ -22,6 +22,9 @@ width: 100% !important;
 }
 }
 </style>
+@isset($style)
+<link rel="stylesheet" href="{{ $style }}">
+@endisset
 </head>
 <body>
 
