@@ -219,7 +219,7 @@ class UsersController extends Controller
 
         if ($request->login_id != $user->login_id) {
             if (User::where('login_id', $request->login_id)->exists()) {
-                return Response::json(['formError' => ['login_id' => ['Login ID already used.']]]);
+                return Response::json(['formError' => ['login_id' => ['Login ID is already used.']]]);
             }
         }
 

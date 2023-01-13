@@ -5,9 +5,8 @@ namespace App\Http\Middleware;
 use App\Helpers\UserHelpers;
 use Closure;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Redirect;
 
-class UserAuthentication
+class GmpPanelUser
 {
     /**
      * Handle an incoming request.
@@ -18,10 +17,8 @@ class UserAuthentication
      */
     public function handle(Request $request, Closure $next)
     {
-        if (!UserHelpers::isLoggedIn()) {
-            return Redirect::intended('/')
-                ->with('redirect', $request->url())
-                ->withErrors(['loginMsg' => "You are not logged in!"]);
+        if (!UserHelpers::canOpenAdminPage()) {
+            abort(404);
         }
 
         return $next($request);

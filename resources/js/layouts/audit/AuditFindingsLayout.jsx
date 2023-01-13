@@ -84,6 +84,83 @@ function CancelFinding({ id, setId, triggerRefresh }) {
     );
 }
 
+const tableColumns = [
+    {
+        id: 'cycle_id',
+        name: 'Cycle ID',
+    },
+    {
+        id: 'record_code',
+        name: 'Record ID',
+    },
+    {
+        id: 'code',
+        name: 'ID',
+    },
+    {
+        id: 'department_name',
+        name: 'Department',
+    },
+    {
+        id: 'area_name',
+        name: 'Area',
+    },
+    {
+        id: 'status',
+        name: 'Status'
+    },
+    {
+        id: 'desc',
+        name: 'Description',
+    },
+    {
+        id: 'category',
+        name: 'Category'
+    },
+    {
+        id: 'cg_name',
+        name: 'Criteria Group'
+    },
+    {
+        id: 'ca_name',
+        name: 'Criteria'
+    },
+    {
+        type: 'number',
+        id: 'ca_weight',
+        name: 'Criteria Weight',
+        exportFormat: '0.00%'
+    },
+    {
+        type: 'number',
+        id: 'deducted_weight',
+        name: 'Deducted Weight',
+        exportFormat: '0.00%'
+    },
+    {
+        export: false,
+        filterable: false,
+        sortable: false,
+        name: 'Images'
+    },
+    {
+        export: false,
+        filterable: false,
+        sortable: false,
+        name: 'Corrective Action'
+    },
+    {
+        export: false,
+        filterable: false,
+        sortable: false,
+        name: 'Cancellation'
+    },
+    {
+        id: 'cancel_reason',
+        name: 'Cancellation Reason'
+    }
+];
+
 export default function AuditFindingsLayout() {
     const [findingId, setFindingId] = useState(null);
     const [cancelFindingId, setCancelFindingId] = useState(null);
@@ -105,79 +182,9 @@ export default function AuditFindingsLayout() {
             <BaseAuditPage
                 refreshTable={refreshTable}
                 fetch="api/v1/fetch-findings"
-                columns={[
-                    {
-                        id: 'record_code',
-                        name: 'Record ID',
-                    },
-                    {
-                        id: 'code',
-                        name: 'ID',
-                    },
-                    {
-                        id: 'department_name',
-                        name: 'Department',
-                    },
-                    {
-                        id: 'area_name',
-                        name: 'Area',
-                    },
-                    {
-                        id: 'status',
-                        name: 'Status'
-                    },
-                    {
-                        id: 'desc',
-                        name: 'Description',
-                    },
-                    {
-                        id: 'category',
-                        name: 'Category'
-                    },
-                    {
-                        id: 'cg_name',
-                        name: 'Criteria Group'
-                    },
-                    {
-                        id: 'ca_name',
-                        name: 'Criteria'
-                    },
-                    {
-                        type: 'number',
-                        id: 'ca_weight',
-                        name: 'Criteria Weight',
-                        exportFormat: '0.00%'
-                    },
-                    {
-                        type: 'number',
-                        id: 'deducted_weight',
-                        name: 'Deducted Weight',
-                        exportFormat: '0.00%'
-                    },
-                    {
-                        export: false,
-                        filterable: false,
-                        sortable: false,
-                        name: 'Images'
-                    },
-                    {
-                        export: false,
-                        filterable: false,
-                        sortable: false,
-                        name: 'Corrective Action'
-                    },
-                    {
-                        export: false,
-                        filterable: false,
-                        sortable: false,
-                        name: 'Cancellation'
-                    },
-                    {
-                        id: 'cancel_reason',
-                        name: 'Cancellation Reason'
-                    }
-                ]}
+                columns={tableColumns}
                 produce={item => [
+                    item.cycle_id,
                     item.record_code,
                     item.code,
                     item.department_name,
@@ -190,9 +197,10 @@ export default function AuditFindingsLayout() {
                     `${item.ca_weight}%`,
                     `${item.deducted_weight}%`,
                     <ImageModal buttonSize="sm" src={`api/v1/fetch-finding-images/${item.id}`} disabled={item.images_count == 0} />,
-                    <>
+<>
                         <Button
                             onClick={_ => setFindingId(item.id)}
+                            className="w-100"
                             variant="success"
                             size="sm"
                             disabled={item.has_auditee_id == null || item.status != 0 || !userData.auditee}
@@ -214,6 +222,7 @@ export default function AuditFindingsLayout() {
                     <>
                         <Button
                             onClick={_ => setCancelFindingId(item.id)}
+                            className="w-100"
                             size="sm"
                             variant="danger"
                             disabled={item.status != 0 || !userData.auditor}
@@ -235,6 +244,7 @@ export default function AuditFindingsLayout() {
                     item.cancel_reason ? item.cancel_reason : '-',
                 ]}
                 produceExport={item => [
+                    item.cycle_id,
                     item.record_code,
                     item.code,
                     item.department_name,

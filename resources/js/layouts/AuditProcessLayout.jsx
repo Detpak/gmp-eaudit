@@ -471,6 +471,7 @@ function AuditProcessForm({ setAuditResult }) {
                                 caption={(data) => <>{data.name}</>}
                                 disableIf={(data) => data.areas_count == 0}
                                 title="Please Select Department"
+                                className="w-100"
                             >
                                 {({ data }) => (
                                     <div className="text-wrap">{data.name}</div>

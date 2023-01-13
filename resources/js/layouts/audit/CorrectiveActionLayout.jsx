@@ -12,6 +12,7 @@ import DescriptionModal from "../../components/DescriptionModal";
 import ModalForm from "../../components/ModalForm";
 import { useEffect } from "react";
 import BaseAuditPage from "./BaseAuditPage";
+import { globalState } from "../../app_state";
 
 function ApproveCorrectiveActionForm({ id, disabled, refreshTable }) {
     const [shown, setShown] = useState(false);
@@ -38,7 +39,7 @@ function ApproveCorrectiveActionForm({ id, disabled, refreshTable }) {
 
     return (
         <>
-            <Button size="sm" onClick={() => setShown(true)} disabled={disabled}>Approve</Button>
+            <Button size="sm" className="w-100" onClick={() => setShown(true)} disabled={disabled}>Approve</Button>
             <Modal show={shown} onHide={() => setShown(false)}>
                 <Modal.Header closeButton>
                     <Modal.Title className="fw-bold display-spacing">Approve Corrective Action</Modal.Title>
@@ -89,8 +90,82 @@ function ApproveCorrectiveActionForm({ id, disabled, refreshTable }) {
     )
 }
 
+const tableColumns = [
+    {
+        id: 'cycle_id',
+        name: 'Cycle ID',
+    },
+    {
+        id: 'record_code',
+        name: 'Record ID',
+    },
+    {
+        id: 'code',
+        name: 'Case ID',
+    },
+    {
+        id: 'area_name',
+        name: 'Area Name',
+    },
+    {
+        id: 'auditee',
+        name: 'Auditee',
+    },
+    {
+        id: 'status',
+        name: 'Status',
+    },
+    {
+        id: 'category',
+        name: 'Category',
+    },
+    {
+        id: 'ca_name',
+        name: 'Criteria Name',
+    },
+    {
+        type: 'number',
+        id: 'ca_weight',
+        name: 'Criteria Weight',
+        exportFormat: '0.00%'
+    },
+    {
+        type: 'number',
+        id: 'deducted_weight',
+        name: 'Deducted Weight',
+        exportFormat: '0.00%'
+    },
+    {
+        id: 'desc',
+        name: 'Description',
+    },
+    {
+        id: 'closing_remarks',
+        name: 'Closing Remarks'
+    },
+    {
+        export: false,
+        filterable: false,
+        sortable: false,
+        name: 'Finding Images'
+    },
+    {
+        export: false,
+        filterable: false,
+        sortable: false,
+        name: 'Images'
+    },
+    {
+        export: false,
+        filterable: false,
+        sortable: false,
+        name: 'Action'
+    }
+];
+
 export default function CorrectiveActionLayout() {
     const refreshTable = useRefreshTable();
+    const [userData, setUserData] = globalState.useGlobalState('userData');
 
     const resetApproval = async (id) => {
         const response = await httpRequest.get(`api/v1/dev/reset-ca-approval/${id}`);
@@ -101,69 +176,9 @@ export default function CorrectiveActionLayout() {
         <BaseAuditPage
             refreshTable={refreshTable}
             fetch="api/v1/fetch-corrective-actions"
-            columns={[
-                {
-                    id: 'record_code',
-                    name: 'Record ID',
-                },
-                {
-                    id: 'code',
-                    name: 'Case ID',
-                },
-                {
-                    id: 'area_name',
-                    name: 'Area Name',
-                },
-                {
-                    id: 'auditee',
-                    name: 'Auditee',
-                },
-                {
-                    id: 'status',
-                    name: 'Status',
-                },
-                {
-                    id: 'category',
-                    name: 'Category',
-                },
-                {
-                    id: 'ca_name',
-                    name: 'Criteria Name',
-                },
-                {
-                    type: 'number',
-                    id: 'ca_weight',
-                    name: 'Criteria Weight',
-                    exportFormat: '0.00%'
-                },
-                {
-                    type: 'number',
-                    id: 'deducted_weight',
-                    name: 'Deducted Weight',
-                    exportFormat: '0.00%'
-                },
-                {
-                    id: 'desc',
-                    name: 'Description',
-                },
-                {
-                    id: 'closing_remarks',
-                    name: 'Closing Remarks'
-                },
-                {
-                    export: false,
-                    filterable: false,
-                    sortable: false,
-                    name: 'Images'
-                },
-                {
-                    export: false,
-                    filterable: false,
-                    sortable: false,
-                    name: 'Action'
-                }
-            ]}
+            columns={tableColumns}
             produce={item => [
+                item.cycle_id,
                 item.record_code,
                 item.code,
                 item.area_name,
@@ -175,13 +190,15 @@ export default function CorrectiveActionLayout() {
                 `${item.deducted_weight}%`,
                 <DescriptionModal msg={item.desc} />,
                 <DescriptionModal msg={item.closing_remarks} />,
-                <ImageModal buttonSize="sm" src={`api/v1/fetch-corrective-action-images/${item.id}`} disabled={item.images_count == 0} />,
+                <ImageModal buttonSize="sm" src={`api/v1/fetch-finding-images/${item.case_id}`} />,
+                <ImageModal buttonSize="sm" src={`api/v1/fetch-corrective-action-images/${item.id}`} />,
                 <>
                     <ApproveCorrectiveActionForm id={item.id} disabled={item.status == 3} refreshTable={refreshTable} />
-                    <LoadingButton size="sm" onClick={async () => resetApproval(item.id)}>Reset Approval</LoadingButton>
+                    {userData.superadmin && <LoadingButton size="sm" onClick={async () => resetApproval(item.id)}>Reset Approval</LoadingButton>}
                 </>,
             ]}
             produceExport={item => [
+                item.cycle_id,
                 item.record_code,
                 item.code,
                 item.area_name,

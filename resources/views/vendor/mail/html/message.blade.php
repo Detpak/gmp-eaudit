@@ -1,4 +1,4 @@
-@component('mail::layout', ['style' => $style])
+@component('mail::layout', ['style' => isset($style) ? $style : null])
 {{-- Header --}}
 @slot('header')
 @component('mail::header', ['url' => config('app.url')])

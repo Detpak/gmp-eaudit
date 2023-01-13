@@ -160,6 +160,7 @@ class CorrectiveActionController extends Controller
 
         $query->join('audit_findings', 'audit_findings.id', '=', 'corrective_actions.finding_id')
               ->join('audit_records', 'audit_records.id', '=', 'audit_findings.record_id')
+              ->join('audit_cycles', 'audit_cycles.id', '=', 'audit_records.cycle_id')
               ->join('areas', 'areas.id', '=', 'audit_records.area_id')
               ->join('users', 'users.id', '=', 'corrective_actions.auditee_id')
               ->select('corrective_actions.id',
@@ -167,7 +168,9 @@ class CorrectiveActionController extends Controller
                        'corrective_actions.closing_remarks',
                        'areas.name as area_name',
                        'users.name as auditee',
+                       'audit_cycles.cycle_id as cycle_id',
                        'audit_records.code as record_code',
+                       'audit_findings.id as case_id',
                        'audit_findings.ca_name',
                        'audit_findings.ca_code',
                        'audit_findings.ca_weight',
@@ -178,7 +181,11 @@ class CorrectiveActionController extends Controller
 
         if ($request->search) {
             $query->where('audit_findings.code', 'LIKE', "%{$request->search}%")
-                  ->orWhere('audit_findings.ca_name', 'LIKE', "%{$request->search}%");
+                  ->orWhere('audit_records.code', 'LIKE', "%{$request->search}%")
+                  ->orWhere('audit_cycles.cycle_id', 'LIKE', "%{$request->search}%")
+                  ->orWhere('areas.name', 'LIKE', "%{$request->search}%")
+                  ->orWhere('users.name', 'LIKE', "%{$request->search}%")
+                  ->orWhere('corrective_actions.desc', 'LIKE', "%{$request->search}%");
         }
 
         if ($request->cycle_id) {
@@ -196,6 +203,7 @@ class CorrectiveActionController extends Controller
             $filter = json_decode($request->filter);
             $mode = $request->filter_mode == 'any' ? 'or' : 'and';
             $query = Filtering::build($query, $request->filter_mode)
+                ->whereString('audit_cycles.cycle_id', isset($filter->cycle_id) ? $filter->cycle_id : null)
                 ->whereString('audit_records.code', isset($filter->record_code) ? $filter->record_code : null)
                 ->whereString('audit_findings.code', isset($filter->code) ? $filter->code : null)
                 ->whereString('areas.name', isset($filter->area_name) ? $filter->area_name : null)

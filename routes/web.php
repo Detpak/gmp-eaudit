@@ -29,7 +29,7 @@ Route::middleware('user')->group(function() {
     //Route::get('/app', function() { return redirect()->intended('/app/dashboard'); });
     Route::view('/portal', 'secondary_page', ['page' => 'portal']);
     Route::redirect('/app', '/app/dashboard');
-    Route::view('/app/{path?}', 'main_view')->where('path', '.*')->middleware('desktop_only');
+    Route::view('/app/{path?}', 'main_view')->where('path', '.*')->middleware(['desktop_only', 'gmp_panel_user']);
     Route::view('/audit', 'secondary_page', ['page' => 'audit'])->middleware('auditor');
 
     Route::view('/approve-ca/{caId}', 'secondary_page', ['page' => 'approve_ca'])

@@ -8,6 +8,9 @@
                         @csrf
                         <h3 class="card-title mb-3 fw-bold text-center">MyAudit+</h3>
                         <h5 class="card-title mb-3 fw-bold text-center">GMP Audit Tools</h5>
+                        @error('loginMsg')
+                            <div class="mb-2 text-danger text-center">{{ $message }}</div>
+                        @enderror
                         <div class="mb-3">
                             <label for="loginID" class="form-label">Username</label>
                             <input type="text" class="form-control @error('loginID') is-invalid @enderror" value="{{ old('loginID') }}" id="loginID" name="loginID">

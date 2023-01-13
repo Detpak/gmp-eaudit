@@ -6,7 +6,17 @@ import { Dropdown, Form, Spinner } from "react-bootstrap";
 import httpRequest from "../api";
 import { useIsMounted } from "../utils";
 
-export default function DropdownList({ source, selectedItem, setSelectedItem, caption, title, children, disableIf }) {
+export default function DropdownList({
+    source,
+    selectedItem,
+    setSelectedItem,
+    selectFirstData,
+    className,
+    caption,
+    title,
+    children,
+    disableIf
+}) {
     const [show, setShow] = useState(false);
     const [isLoading, setLoading] = useState(false);
     const [canFetch, setCanFetch] = useState(true);
@@ -100,7 +110,7 @@ export default function DropdownList({ source, selectedItem, setSelectedItem, ca
                 </Dropdown.Toggle>
             </div>
 
-            <Dropdown.Menu className="w-100 shadow" flip={false}>
+            <Dropdown.Menu className={`shadow ${className}`} flip={false}>
                 <Dropdown.Header>
                     <Form.Control type="text" placeholder="Search" value={search} onChange={(ev) => setSearch(ev.target.value)} />
                 </Dropdown.Header>

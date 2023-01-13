@@ -8,6 +8,7 @@ import { Pie, Bar, Line } from "react-chartjs-2"
 import { useIsMounted } from "../utils";
 import chroma from "chroma-js";
 import { useMemo } from "react";
+import DropdownList from "../components/DropdownList";
 
 function SummaryButton({ href, caption, value, icon }) {
     return (
@@ -65,6 +66,7 @@ export default function DashboardLayout() {
     const [top10criteria, setTop10Criteria] = useState(null);
     const [caseStatistics, setCaseStatistics] = useState(null);
     const [caseFound, setCaseFound] = useState(null);
+    const [cycle, setCycle] = useState(null);
     const mounted = useIsMounted();
     const colorPalette = useMemo(() => {
         const bezierPoints = _.chain()
@@ -86,26 +88,38 @@ export default function DashboardLayout() {
 
         setSummary({});
 
-        const summary = await httpRequest.get('api/v1/get-summary');
-        setSummary(summary.data);
-
-        const areaStatusData = await httpRequest.post('api/v1/get-chart', { type: 'area_status' });
-        setAreaStatus(areaStatusData.data);
-
-        const top10CriteriaData = await httpRequest.post('api/v1/get-chart', { type: 'top10_criteria' });
-        setTop10Criteria(top10CriteriaData.data);
-
-        const caseStatisticsData = await httpRequest.post('api/v1/get-chart', { type: 'case_statistics' });
-        setCaseStatistics(caseStatisticsData.data);
-
-        const totalCaseFoundData = await httpRequest.post('api/v1/get-chart', { type: 'case_found_per_cycle' });
-        setCaseFound(totalCaseFoundData.data);
+        Promise.all([
+            httpRequest.get('api/v1/get-summary'),
+            httpRequest.post('api/v1/get-chart', { type: 'area_status' }),
+            httpRequest.post('api/v1/get-chart', { type: 'top10_criteria' }),
+            httpRequest.post('api/v1/get-chart', { type: 'case_statistics' }),
+            httpRequest.post('api/v1/get-chart', { type: 'case_found_per_cycle' }),
+        ])
+        .then((values) => {
+            if (!mounted.current) return;
+            setSummary(values[0].data);
+            setAreaStatus(values[1].data);
+            setTop10Criteria(values[2].data);
+            setCaseStatistics(values[3].data);
+            setCaseFound(values[4].data);
+        });
     }, [refreshTrigger]);
 
     return (
         <>
             <PageNavbar>
                 <Button onClick={refresh}><FontAwesomeIcon icon={faRotateRight} /></Button>
+                <DropdownList
+                    source="api/v1/fetch-cycles"
+                    selectedItem={cycle}
+                    setSelectedItem={setCycle}
+                    caption={(data) => <>{data.cycle_id}</>}
+                    selectFirstData={true}
+                >
+                    {({ data }) => (
+                        <span>{data.cycle_id}</span>
+                    )}
+                </DropdownList>
             </PageNavbar>
 
             <PageContent>

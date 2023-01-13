@@ -40,6 +40,38 @@ class AuditProcessController extends Controller
             });
     }
 
+    public function apiValidateAudit(Request $request)
+    {
+        $wrap = [
+            'cycle_id' => $request->cycle_id,
+            'auditor_id' => $request->auditor_id,
+            'record_id' => $request->record_id,
+            'cgroup_id' => $request->cgroup_id,
+            'findings' => json_decode($request->findings, true)
+        ];
+
+        $validator = Validator::make(
+            $wrap,
+            [
+                'cycle_id'                      => 'required|exists:audit_cycles,id',
+                'auditor_id'                    => 'required|exists:users,id',
+                'record_id'                     => 'required|exists:audit_records,id',
+                'cgroup_id'                     => 'required|exists:criteria_groups,id',
+                'findings.*.category'           => ['required_if:findings.*.need_action,true', Rule::in([0, 1, 2])],
+                'findings.*.desc'               => 'required_if:findings.*.need_action,true|max:65536'
+            ],
+            [
+                'findings.*.desc.required_if'   => 'Description must be filled'
+            ],
+            [
+                'record_id' => 'area'
+            ]);
+
+        if ($validator->fails()) {
+            return ['formError' => $validator->errors()];
+        }
+    }
+
     public function apiSubmitAudit(Request $request)
     {
         $wrap = [
@@ -256,12 +288,14 @@ class AuditProcessController extends Controller
         $query = AuditFinding::query();
 
         $query->join('audit_records', 'audit_records.id', '=', 'audit_findings.record_id')
+              ->join('audit_cycles', 'audit_cycles.id', '=', 'audit_records.cycle_id')
               ->join('areas', 'areas.id', '=', 'audit_records.area_id')
               ->join('departments', 'departments.id', '=', 'areas.department_id')
               ->select('audit_findings.id',
                        'audit_findings.record_id',
                        'audit_findings.code',
                        'audit_records.code as record_code',
+                       'audit_cycles.cycle_id',
                        'departments.name as department_name',
                        'areas.name as area_name',
                        'audit_findings.desc',
@@ -285,6 +319,7 @@ class AuditProcessController extends Controller
 
         if ($request->search) {
             $query->where('audit_records.code', 'LIKE', "%{$request->search}%")
+                ->orWhere('audit_cycles.cycle_id', 'LIKE', "%{$request->search}%")
                 ->orWhere('departments.name', 'LIKE', "%{$request->search}%")
                 ->orWhere('areas.name', 'LIKE', "%{$request->search}%")
                 ->orWhere('audit_findings.code', 'LIKE', "{$request->search}")
@@ -308,6 +343,7 @@ class AuditProcessController extends Controller
             $filter = json_decode($request->filter);
             $mode = $request->filter_mode == 'any' ? 'or' : 'and';
             $query = Filtering::build($query, $request->filter_mode)
+                ->whereString('audit_cycles.cycle_id', isset($filter->cycle_id) ? $filter->cycle_id : null)
                 ->whereString('audit_records.code', isset($filter->record_code) ? $filter->record_code : null)
                 ->whereString('audit_findings.code', isset($filter->code) ? $filter->code : null)
                 ->whereString('departments.name', isset($filter->department_name) ? $filter->department_name : null)

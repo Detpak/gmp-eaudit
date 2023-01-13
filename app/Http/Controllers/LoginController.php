@@ -27,10 +27,7 @@ class LoginController extends Controller
         $isAuditor = UserHelpers::isAuditor();
         $adminAccess = UserHelpers::canOpenAdminPage();
 
-        if ($isAuditor && $detect->isMobile()) {
-            return Redirect::intended('portal');
-        }
-        else if ($isAuditor && !$adminAccess) {
+        if ($isAuditor && ($detect->isMobile() || !$adminAccess)) {
             return Redirect::intended('portal');
         }
 
@@ -92,8 +89,7 @@ class LoginController extends Controller
 
         $user = User::where('login_id', $request->loginID)->first();
 
-        if (!Hash::check($request->loginPassword, $user->password))
-        {
+        if (!Hash::check($request->loginPassword, $user->password)) {
             return redirect('/')
                 ->withErrors(['loginPassword' => 'Wrong Password'])
                 ->withInput()
