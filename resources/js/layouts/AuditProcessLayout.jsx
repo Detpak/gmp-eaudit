@@ -504,6 +504,7 @@ function AuditProcessForm({ setAuditResult }) {
                                     setSelectedItem={setRecord}
                                     caption={(data) => <>{data.area_name}</>}
                                     title="Please Select Area"
+                                    className="w-100"
                                 >
                                     {({ data }) => <div className="text-wrap">{data.area_name}</div>}
                                 </DropdownList>

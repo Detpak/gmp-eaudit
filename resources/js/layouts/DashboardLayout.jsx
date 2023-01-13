@@ -9,6 +9,8 @@ import { useIsMounted } from "../utils";
 import chroma from "chroma-js";
 import { useMemo } from "react";
 import DropdownList from "../components/DropdownList";
+import { useRef } from "react";
+import { set } from "lodash";
 
 function SummaryButton({ href, caption, value, icon }) {
     return (
@@ -28,16 +30,16 @@ function SummaryButton({ href, caption, value, icon }) {
     )
 }
 
-function ChartColumn({ caption, children, summary }) {
+function ChartColumn({ caption, children, cycle, isLoading }) {
     return (
         <Card className="col m-2 p-3" style={{ minWidth: 550 }}>
-            <h4 className="fw-bold display-spacing">
-                {summary != null ?
-                    <>{caption} - {('current_cycle' in summary) ? summary.current_cycle.cycle_id : <Spinner animation="border" />}</>
-                    :
-                    caption
-                }
-            </h4>
+            <div className="hstack">
+                <h4 className="fw-bold display-spacing">
+                    <>{caption}{cycle != null ? ` - ${cycle.cycle_id}` : ""}</>
+                </h4>
+                {(isLoading || cycle == null) && <Spinner animation="border" size="sm" className="ms-auto" />}
+            </div>
+
             {children}
         </Card>
     );
@@ -64,9 +66,11 @@ export default function DashboardLayout() {
     const [refreshTrigger, setRefreshTrigger] = useState(false);
     const [areaStatus, setAreaStatus] = useState(null);
     const [top10criteria, setTop10Criteria] = useState(null);
+    const [top10Approved, setTop10Approved] = useState(null);
     const [caseStatistics, setCaseStatistics] = useState(null);
-    const [caseFound, setCaseFound] = useState(null);
     const [cycle, setCycle] = useState(null);
+    const [isLoading, setLoading] = useState(false);
+    const abortController = useRef(null);
     const mounted = useIsMounted();
     const colorPalette = useMemo(() => {
         const bezierPoints = _.chain()
@@ -86,35 +90,69 @@ export default function DashboardLayout() {
     useEffect(async () => {
         if (!mounted.current) return;
 
+        const abort = new AbortController();
+
         setSummary({});
 
+        const response = await httpRequest.get('api/v1/get-summary', { signal: abort.signal });
+
+        if (response.data && mounted.current) {
+            setSummary(response.data);
+        }
+
+        return () => abort.abort();
+    }, [refreshTrigger]);
+
+    useEffect(async () => {
+        if (!mounted.current) return;
+        if (cycle == null) return;
+
+        if (abortController.current != null) {
+            abortController.current.abort();
+        }
+
+        abortController.current = new AbortController();
+        setLoading(true);
+
         Promise.all([
-            httpRequest.get('api/v1/get-summary'),
-            httpRequest.post('api/v1/get-chart', { type: 'area_status' }),
-            httpRequest.post('api/v1/get-chart', { type: 'top10_criteria' }),
-            httpRequest.post('api/v1/get-chart', { type: 'case_statistics' }),
-            httpRequest.post('api/v1/get-chart', { type: 'case_found_per_cycle' }),
+            httpRequest.post('api/v1/get-chart', { type: 'area_status', cycle_id: cycle.id, signal: abortController.current.signal }),
+            httpRequest.post('api/v1/get-chart', { type: 'top10_criteria', cycle_id: cycle.id, signal: abortController.current.signal }),
+            httpRequest.post('api/v1/get-chart', { type: 'top10_approved', cycle_id: cycle.id, signal: abortController.current.signal }),
+            httpRequest.post('api/v1/get-chart', { type: 'case_statistics', cycle_id: cycle.id, signal: abortController.current.signal }),
         ])
         .then((values) => {
             if (!mounted.current) return;
-            setSummary(values[0].data);
-            setAreaStatus(values[1].data);
-            setTop10Criteria(values[2].data);
+            console.log(values);
+            setAreaStatus(values[0].data);
+            setTop10Criteria(values[1].data);
+            setTop10Approved(values[2].data);
             setCaseStatistics(values[3].data);
-            setCaseFound(values[4].data);
+            setLoading(false);
+        })
+        .catch((reason) => {
+            console.log(reason);
         });
-    }, [refreshTrigger]);
+
+        return () => {
+            if (abortController.current != null) {
+                abortController.current.abort();
+                abortController.current = null;
+            }
+        };
+    }, [refreshTrigger, cycle]);
 
     return (
         <>
             <PageNavbar>
-                <Button onClick={refresh}><FontAwesomeIcon icon={faRotateRight} /></Button>
+                <Button onClick={refresh} className="me-2"><FontAwesomeIcon icon={faRotateRight} /></Button>
                 <DropdownList
                     source="api/v1/fetch-cycles"
                     selectedItem={cycle}
                     setSelectedItem={setCycle}
-                    caption={(data) => <>{data.cycle_id}</>}
+                    caption={(data) => <>Cycle: {data.cycle_id}</>}
                     selectFirstData={true}
+                    disabled={cycle == null}
+                    title="Please wait..."
                 >
                     {({ data }) => (
                         <span>{data.cycle_id}</span>
@@ -159,25 +197,7 @@ export default function DashboardLayout() {
                         </Col>
                     </Row>
                     <Row>
-                        <ChartColumn summary={null} caption="Total Case Found per Cycle">
-                            {caseFound &&
-                                <Line
-                                    style={{ minHeight: 250, maxHeight: 250 }}
-                                    data={{
-                                        labels: caseFound.map((cycle) => cycle.cycle_id),
-                                        datasets: [
-                                            {
-                                                data: caseFound.map((cycle) => cycle.total_findings),
-                                                borderColor: 'rgb(75, 192, 192)',
-                                                tension: 0.25
-                                            }
-                                        ]
-                                    }}
-                                    options={barOptions}
-                                />
-                            }
-                        </ChartColumn>
-                        <ChartColumn summary={summary} caption="Area Status">
+                        <ChartColumn cycle={cycle} isLoading={isLoading} caption="Area Status">
                             {areaStatus != null &&
                                 <Pie
                                     style={{ minHeight: 250, maxHeight: 250 }}
@@ -216,9 +236,7 @@ export default function DashboardLayout() {
                                 />
                             }
                         </ChartColumn>
-                    </Row>
-                    <Row>
-                        <ChartColumn summary={summary} caption="Top 10 Criteria">
+                        <ChartColumn cycle={cycle} isLoading={isLoading} caption="Top 10 Case Criteria">
                             {top10criteria &&
                                 <Bar
                                     style={{ minHeight: 250, maxHeight: 250 }}
@@ -235,7 +253,26 @@ export default function DashboardLayout() {
                                 />
                             }
                         </ChartColumn>
-                        <ChartColumn summary={summary} caption="Case Statistic">
+                    </Row>
+                    <Row>
+                        <ChartColumn cycle={cycle} isLoading={isLoading} caption="Top 10 Approved Case Criteria">
+                            {top10Approved &&
+                                <Bar
+                                    style={{ minHeight: 250, maxHeight: 250 }}
+                                    data={{
+                                        labels: top10Approved.map((data) => data.name),
+                                        datasets: [
+                                            {
+                                                data: top10Approved.map((data) => data.count),
+                                                backgroundColor: colorPalette.colors(top10Approved.length)
+                                            }
+                                        ]
+                                    }}
+                                    options={barOptions}
+                                />
+                            }
+                        </ChartColumn>
+                        <ChartColumn cycle={cycle} isLoading={isLoading} caption="Case Statistic">
                             {caseStatistics &&
                                 <Bar
                                     style={{ minHeight: 250, maxHeight: 250 }}

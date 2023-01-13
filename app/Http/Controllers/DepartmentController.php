@@ -149,7 +149,6 @@ class DepartmentController extends Controller
 
         $query->withCount('areas');
 
-
         if ($request->filter) {
             $filter = json_decode($request->filter);
             $query = Filtering::build($query, $request->filter_mode)

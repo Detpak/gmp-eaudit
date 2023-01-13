@@ -132,6 +132,10 @@ class AuditCycleController extends Controller
     {
         $query = AuditCycle::query();
 
+        if ($request->list) {
+            $query->select('id', 'cycle_id');
+        }
+
         if ($request->search) {
             $query->where('cycle_id', 'LIKE', "%{$request->search}%");
 
@@ -143,10 +147,8 @@ class AuditCycleController extends Controller
             }
         }
 
-        if ($request->list == '1') {
-            $query->whereNull('close_date');
-        }
-        else {
+        if ($request->list != '1') {
+            //$query->whereNull('close_date');
             $query->with('criteriaGroup');
         }
 

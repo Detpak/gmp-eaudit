@@ -15,6 +15,7 @@ export default function DropdownList({
     caption,
     title,
     children,
+    disabled,
     disableIf
 }) {
     const [show, setShow] = useState(false);
@@ -40,7 +41,8 @@ export default function DropdownList({
         const params = {
             search: searchKeyword,
             page: page,
-            max: 8
+            max: 8,
+            list: 1
         };
 
         httpRequest.get(source, { params: params, signal: abortController.current.signal })
@@ -83,6 +85,29 @@ export default function DropdownList({
         setSelectedItem(listData[eventKey]);
     };
 
+    useEffect(async () => {
+        if (!selectFirstData) return;
+        abortController.current = new AbortController();
+
+        const params = {
+            search: '',
+            page: 1,
+            max: 1,
+            list: 1
+        };
+
+        const response = await httpRequest.get(source, { params: params, signal: abortController.current.signal });
+
+        setSelectedItem(response.data.data[0]);
+
+        return () => {
+            if (abortController.current != null) {
+                abortController.current.abort();
+                abortController.current = null;
+            }
+        }
+    }, [selectFirstData]);
+
     useEffect(() => {
         if (!show) return;
         abortController.current = new AbortController();
@@ -105,7 +130,7 @@ export default function DropdownList({
     return (
         <Dropdown show={show} onSelect={handleSelect} onToggle={(nextShow) => handleShow(nextShow)}>
             <div className="d-grid gap-2">
-                <Dropdown.Toggle className="text-truncate">
+                <Dropdown.Toggle className="text-truncate" disabled={disabled}>
                     {selectedItem ? caption(selectedItem) : title}
                 </Dropdown.Toggle>
             </div>
