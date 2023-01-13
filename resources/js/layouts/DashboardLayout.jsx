@@ -272,7 +272,7 @@ export default function DashboardLayout() {
                                 />
                             }
                         </ChartColumn>
-                        <ChartColumn cycle={cycle} isLoading={isLoading} caption="Case Statistic">
+                        <ChartColumn cycle={cycle} isLoading={isLoading} caption="Number of Cases by Category">
                             {caseStatistics &&
                                 <Bar
                                     style={{ minHeight: 250, maxHeight: 250 }}
