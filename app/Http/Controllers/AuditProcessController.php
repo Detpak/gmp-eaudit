@@ -307,7 +307,7 @@ class AuditProcessController extends Controller
                        'audit_findings.cg_code',
                        'audit_findings.status',
                        'audit_findings.cancel_reason',
-                       'audit_findings.created_at',
+                       DB::raw("DATE_FORMAT(audit_findings.created_at, '%Y-%m-%d %T') as submit_date"),
                        DB::raw('audit_findings.ca_weight * (audit_findings.weight_deduct / 100) as deducted_weight'));
 
         $query->addSelect([
@@ -336,7 +336,7 @@ class AuditProcessController extends Controller
             $query->orderBy($request->sort, $request->dir);
         }
         else {
-            $query->orderBy('audit_records.id', 'asc');
+            $query->orderBy('audit_findings.id', 'desc');
         }
 
         if ($request->filter) {
@@ -353,6 +353,7 @@ class AuditProcessController extends Controller
                 ->whereString('audit_findings.ca_name', isset($filter->ca_name) ? $filter->ca_name : null)
                 ->where('audit_findings.ca_weight', isset($filter->ca_weight) ? $filter->ca_weight : null)
                 ->having('deducted_weight', isset($filter->deducted_weight) ? $filter->deducted_weight : null)
+                ->havingDateTime('submit_date', isset($filter->submit_date) ? $filter->submit_date : null)
                 ->whereString('audit_findings.cancel_reason', isset($filter->cancel_reason) ? $filter->cancel_reason : null)
                 ->done();
 

@@ -22,6 +22,22 @@ const FILTER_OP_GT = 4;
 const FILTER_OP_GE = 5;
 const FILTER_OP_BETWEEN = 6;
 
+const FILTER_OP_EQ_DATE = 7;
+const FILTER_OP_NE_DATE = 8;
+const FILTER_OP_LT_DATE = 9;
+const FILTER_OP_LE_DATE = 10;
+const FILTER_OP_GT_DATE = 11;
+const FILTER_OP_GE_DATE = 12;
+const FILTER_OP_BETWEEN_DATE = 13;
+
+const FILTER_OP_EQ_TIME = 14;
+const FILTER_OP_NE_TIME = 15;
+const FILTER_OP_LT_TIME = 16;
+const FILTER_OP_LE_TIME = 17;
+const FILTER_OP_GT_TIME = 18;
+const FILTER_OP_GE_TIME = 19;
+const FILTER_OP_BETWEEN_TIME = 20;
+
 const MAX_PAGES = 3;
 
 const NUMBER_CONDITION = [
@@ -31,8 +47,44 @@ const NUMBER_CONDITION = [
     '\u2264',
     '>',
     '\u2265',
+    '\u21C6',
+
+    '=',
+    '\u2260',
+    '<',
+    '\u2264',
+    '>',
+    '\u2265',
+    '\u21C6',
+
+    '=',
+    '\u2260',
+    '<',
+    '\u2264',
+    '>',
+    '\u2265',
     '\u21C6'
 ];
+
+function isDateOperation(op) {
+    return op >= FILTER_OP_EQ_DATE && op <= FILTER_OP_BETWEEN_DATE;
+}
+
+function isTimeOperation(op) {
+    return op >= FILTER_OP_EQ_TIME && op <= FILTER_OP_BETWEEN_TIME;
+}
+
+function getFromToNoun(op) {
+    if (isDateOperation(op)) {
+        return 'Date';
+    }
+
+    if (isTimeOperation(op)) {
+        return 'Time';
+    }
+
+    return '';
+};
 
 export function useRefreshTable() {
     const [refresh, setRefresh] = useState(false);
@@ -51,7 +103,6 @@ export function ExportTable({ className, fetch, searchKeyword, filter, columns, 
 
     const exportTable = async () => {
         exportStatus.setProcessing(true);
-        exportStatus.setMessage('Applying parameters...');
 
         const params = { };
 
@@ -123,12 +174,20 @@ export function ExportTable({ className, fetch, searchKeyword, filter, columns, 
                                 switch (columnsRow[index].dataType) {
                                     case 'number':
                                         data.type = Number;
+                                        data.internal_type = 'number';
                                         break;
                                     case 'date':
                                         data.type = Date;
+                                        data.internal_type = 'date';
+                                        break;
+                                    case 'date_time':
+                                        data.type = Date;
+                                        data.internal_type = 'date_time';
+                                        data.format = 'dd/mm/yyyy hh:mm AM/PM';
                                         break;
                                     default:
                                         data.type = String;
+                                        data.internal_type = 'string';
                                         break;
                                 }
                             }
@@ -143,12 +202,22 @@ export function ExportTable({ className, fetch, searchKeyword, filter, columns, 
                             return data;
                         });
 
-                    // Adjust column width
+                    console.log(formattedRow);
+
+                    // Adjust column width by number of characters
                     formattedRow.forEach((column, index) => {
                         const currentWidth = columnProps[index].width;
-                        const str = column.type == Date ?
-                            `${column.value.getMonth() + 1}/${column.value.getDate() + 1}/${column.value.getFullYear()}` :
-                            `${column.value}`;
+                        let str = '';
+
+                        if (column.internal_type == 'date') {
+                            str = 'mm/dd/YYYY';
+                        }
+                        else if (column.internal_type == 'date_time') {
+                            str = column.format;
+                        }
+                        else {
+                            str = `${column.value}`;
+                        }
 
                         columnProps[index].width = Math.min(Math.max(str.length + 2, currentWidth), 100);
                     });
@@ -197,7 +266,7 @@ export function ExportTable({ className, fetch, searchKeyword, filter, columns, 
                 </Modal.Body>
                 <Modal.Footer>
                     <div className="me-2">{exportStatus.message}</div>
-                    <LoadingButton onClick={exportTable} icon={faDownload}>Download</LoadingButton>
+                    <LoadingButton onClick={exportTable} icon={faDownload}>Save</LoadingButton>
                 </Modal.Footer>
             </Modal>
         </>
@@ -215,6 +284,14 @@ const popperOffset = {
     ]
 };
 
+const thClassName = "p-0 table-column sticky-top border";
+const thFixedLeftClassName = "p-0 table-column table-header-fixed-left border align-top";
+const thFixedRightClassName = "p-0 table-column table-header-fixed-right border align-top";
+const tdClassName = "px-3 py-2";
+const tdFixedLeftClassName = "px-3 table-column-fixed-left py-2";
+const tdFixedRightClassName = "px-3 table-column-fixed-right py-2";
+const entriesList = _.range(1, 11).map((value) => value * 10); // 5, 10, 15, 20, ...
+
 export default function DynamicTable({
     refreshTrigger,
     columns,
@@ -225,13 +302,6 @@ export default function DynamicTable({
     source,
     filter
 }) {
-    const thClassName = "p-0 table-column sticky-top border";
-    const thFixedLeftClassName = "p-0 table-column table-header-fixed-left border align-top";
-    const thFixedRightClassName = "p-0 table-column table-header-fixed-right border align-top";
-    const tdClassName = "px-3 py-2";
-    const tdFixedLeftClassName = "px-3 table-column-fixed-left py-2";
-    const tdFixedRightClassName = "px-3 table-column-fixed-right py-2";
-    const entriesList = _.range(1, 11).map((value) => value * 10); // 5, 10, 15, 20, ...
     const [search, setSearch] = useState('');
     const [listData, setListData] = useState([]);
     const [isLoading, setLoading] = useState(false);
@@ -374,7 +444,10 @@ export default function DynamicTable({
                     .mapValues((value, key, column) => {
                         const defaultVal = { value: '' };
 
-                        if (column[key].type == 'number' || column[key].type == 'date') {
+                        if (column[key].type == 'number' ||
+                            column[key].type == 'date' ||
+                            column[key].type == 'date_time')
+                        {
                             defaultVal.value1 = '';
                             defaultVal.op = FILTER_OP_EQ;
                         }
@@ -437,12 +510,17 @@ export default function DynamicTable({
                                     const isString = !hasType || hasType && column.type == 'string';
                                     const isNumber = hasType && column.type == 'number';
                                     const isDate = hasType && column.type == 'date';
-                                    const isBetween = filter && filterState.shouldFilter && !isString && filterParams[column.id].op == FILTER_OP_BETWEEN;
+                                    const isDateTime = hasType && column.type == 'date_time';
+                                    const isDateOrDateTime = isDate || isDateTime;
+                                    const isBetween = filter && filterState.shouldFilter && !isString &&
+                                        (filterParams[column.id].op == FILTER_OP_BETWEEN ||
+                                            filterParams[column.id].op == FILTER_OP_BETWEEN_DATE ||
+                                            filterParams[column.id].op == FILTER_OP_BETWEEN_TIME);
 
                                     return (
                                         <th key={index} className={thClassName} style={{ zIndex: 1 }}>
                                             <div className={`px-3 py-2`}>
-                                                <div className="hstack gap-3" style={{ minWidth: isBetween && isDate ? 210 : (isBetween && isNumber ? 130 : 100 ) }}>
+                                                <div className="hstack gap-3" style={{ minWidth: isBetween && isDateOrDateTime ? 210 : (isBetween && isNumber ? 130 : 100 ) }}>
                                                     <div className="user-select-none flex-fill">{column.name}</div>
                                                     {sortable &&
                                                         <FontAwesomeIcon
@@ -454,13 +532,13 @@ export default function DynamicTable({
                                                 {filter && filterState.shouldFilter &&
                                                     <div className="hstack gap-1 mt-2">
                                                         {/* {React.createElement(columnElement, { column: column })} */}
-                                                        {(isNumber || isDate) &&
+                                                        {(isNumber || isDateOrDateTime) &&
                                                             <Dropdown onSelect={key => handleFilterOp(key, column)}>
                                                                 <Dropdown.Toggle size="sm" className="no-caret">
                                                                     {NUMBER_CONDITION[filterParams[column.id].op]}
                                                                 </Dropdown.Toggle>
 
-                                                                <Dropdown.Menu className="sm-header" popperConfig={popperOffset}>
+                                                                <Dropdown.Menu className="sm-header overflow-auto" popperConfig={popperOffset} style={{ maxHeight: 250 }}>
                                                                     <Dropdown.Item eventKey={FILTER_OP_EQ}>Equal (=)</Dropdown.Item>
                                                                     <Dropdown.Item eventKey={FILTER_OP_NE}>Not equal ({"\u2260"})</Dropdown.Item>
                                                                     <Dropdown.Item eventKey={FILTER_OP_LT}>Less-than ({'<'})</Dropdown.Item>
@@ -468,6 +546,26 @@ export default function DynamicTable({
                                                                     <Dropdown.Item eventKey={FILTER_OP_GT}>Greater-than ({">"})</Dropdown.Item>
                                                                     <Dropdown.Item eventKey={FILTER_OP_GE}>Greater-than or equal ({"\u2265"})</Dropdown.Item>
                                                                     <Dropdown.Item eventKey={FILTER_OP_BETWEEN}>Between ({'\u21C6'})</Dropdown.Item>
+                                                                    {isDateTime &&
+                                                                        <>
+                                                                            <Dropdown.Divider />
+                                                                            <Dropdown.Item eventKey={FILTER_OP_EQ_DATE}>Equal to date (=)</Dropdown.Item>
+                                                                            <Dropdown.Item eventKey={FILTER_OP_NE_DATE}>Not equal to date ({"\u2260"})</Dropdown.Item>
+                                                                            <Dropdown.Item eventKey={FILTER_OP_LT_DATE}>Less-than date ({'<'})</Dropdown.Item>
+                                                                            <Dropdown.Item eventKey={FILTER_OP_LE_DATE}>Less-than or equal to date ({"\u2264"})</Dropdown.Item>
+                                                                            <Dropdown.Item eventKey={FILTER_OP_GT_DATE}>Greater-than date ({">"})</Dropdown.Item>
+                                                                            <Dropdown.Item eventKey={FILTER_OP_GE_DATE}>Greater-than or equal to date ({"\u2265"})</Dropdown.Item>
+                                                                            <Dropdown.Item eventKey={FILTER_OP_BETWEEN_DATE}>Between of date ({'\u21C6'})</Dropdown.Item>
+                                                                            <Dropdown.Divider />
+                                                                            <Dropdown.Item eventKey={FILTER_OP_EQ_TIME}>Equal to time (=)</Dropdown.Item>
+                                                                            <Dropdown.Item eventKey={FILTER_OP_NE_TIME}>Not equal to time ({"\u2260"})</Dropdown.Item>
+                                                                            <Dropdown.Item eventKey={FILTER_OP_LT_TIME}>Less-than time ({'<'})</Dropdown.Item>
+                                                                            <Dropdown.Item eventKey={FILTER_OP_LE_TIME}>Less-than or equal to time ({"\u2264"})</Dropdown.Item>
+                                                                            <Dropdown.Item eventKey={FILTER_OP_GT_TIME}>Greater-than time ({">"})</Dropdown.Item>
+                                                                            <Dropdown.Item eventKey={FILTER_OP_GE_TIME}>Greater-than or equal to time ({"\u2265"})</Dropdown.Item>
+                                                                            <Dropdown.Item eventKey={FILTER_OP_BETWEEN_TIME}>Between of time ({'\u21C6'})</Dropdown.Item>
+                                                                        </>
+                                                                    }
                                                                 </Dropdown.Menu>
                                                             </Dropdown>
                                                         }
@@ -477,7 +575,7 @@ export default function DynamicTable({
                                                             onChange={filterable ? ev => handleFilterValue0(ev, column) : null}
                                                             onKeyUp={ev => ev.key == 'Enter' && processFilter()}
                                                             disabled={!filterable}
-                                                            placeholder={isBetween ? 'From' : ''}
+                                                            placeholder={filterable ? `${isBetween ? 'From ' : ''}${getFromToNoun(filterParams[column.id].op)}` : ''}
                                                         />
                                                         {isBetween &&
                                                             <Form.Control
@@ -486,7 +584,7 @@ export default function DynamicTable({
                                                                 onChange={filterable ? ev => handleFilterValue1(ev, column) : null}
                                                                 onKeyUp={ev => ev.key == 'Enter' && processFilter()}
                                                                 disabled={!filterable}
-                                                                placeholder={isBetween ? 'To' : ''}
+                                                                placeholder={filterable ? `${isBetween ? 'To ' : ''}${getFromToNoun(filterParams[column.id].op)}` : ''}
                                                             />
                                                         }
                                                     </div>

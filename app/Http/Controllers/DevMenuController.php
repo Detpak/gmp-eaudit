@@ -11,6 +11,7 @@ use App\Models\CorrectiveAction;
 use App\Models\CorrectiveActionImages;
 use App\Models\FailedPhoto;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
 
 class DevMenuController extends Controller
@@ -45,13 +46,12 @@ class DevMenuController extends Controller
         $correctiveActions->delete();
     }
 
-    public function apiResetCurrentCycle()
+    private function resetCycle($cycle)
     {
-        $currentCycle = AuditCycle::whereNull('close_date')->first();
-        $currentCycle->total_findings = 0;
-        $currentCycle->save();
+        $cycle->total_findings = 0;
+        $cycle->save();
 
-        $records = AuditRecord::where('cycle_id', $currentCycle->id);
+        $records = AuditRecord::where('cycle_id', $cycle->id);
         $records->update(['auditor_id' => null, 'status' => 0]);
 
         foreach ($records->get() as $record) {
@@ -76,6 +76,12 @@ class DevMenuController extends Controller
 
             $findings->delete();
         }
+    }
+
+    public function apiResetCurrentCycle()
+    {
+        $currentCycle = AuditCycle::whereNull('close_date')->first();
+        $this->resetCycle($currentCycle);
 
         return ['result' => 'ok'];
     }
@@ -101,10 +107,23 @@ class DevMenuController extends Controller
         }
 
         $ca->closing_remarks = null;
+        $ca->close_date = null;
         $ca->save();
 
         $ca->finding->status = 1;
         $ca->finding->save();
+
+        return ['result' => 'ok'];
+    }
+
+    public function apiResetAuditState()
+    {
+        DB::table('corrective_action_images')->delete();
+        DB::table('corrective_actions')->delete();
+        DB::table('failed_photos')->delete();
+        DB::table('audit_finding')->delete();
+        DB::table('audit_records')->delete();
+        DB::table('audit_cycles')->delete();
 
         return ['result' => 'ok'];
     }

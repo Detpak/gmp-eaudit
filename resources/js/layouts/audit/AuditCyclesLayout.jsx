@@ -175,7 +175,7 @@ export default function AuditCyclesLayout() {
                         url: 'api/v1/fetch-cycles',
                         method: 'GET',
                         produce: item => [
-                            item.cycle_id,
+                            <a href="#">{item.cycle_id}</a>,
                             item.start_date,
                             item.finish_date ? item.finish_date : '-',
                             item.close_date ? item.close_date : '-',

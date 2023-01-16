@@ -47,18 +47,18 @@ Route::prefix('/v1')->group(function() {
         Route::post('/close-corrective-action', [CorrectiveActionController::class, 'apiClose']);
     });
 
+    Route::middleware('private_api:superadmin')->group(function() {
+        Route::get('dev/reset-current-cycle', [DevMenuController::class, 'apiResetCurrentCycle']);
+        Route::get('dev/reset-findings-counter', [DevMenuController::class, 'apiResetFindingsCounter']);
+        Route::get('dev/reset-ca/{id}', [DevMenuController::class, 'apiResetCorrectiveAction']);
+        Route::get('dev/reset-ca-approval/{id}', [DevMenuController::class, 'apiResetApproval']);
+        Route::get('dev/uncancel-ca/{id}', [DevMenuController::class, 'apiUncancel']);
+        Route::get('dev/reset-audit-state', [DevMenuController::class, 'apiResetAuditState']);
+        Route::get('dev/get-app-state', [DevMenuController::class, 'apiGetAppState']);
+    });
+
     Route::middleware('private_api')->group(function() {
         Route::post('/get-chart', [DashboardController::class, 'apiGetChart']);
-
-        // Debug APIs
-        if (env('APP_DEBUG')) {
-            Route::get('dev/reset-current-cycle', [DevMenuController::class, 'apiResetCurrentCycle']);
-            Route::get('dev/reset-findings-counter', [DevMenuController::class, 'apiResetFindingsCounter']);
-            Route::get('dev/reset-ca/{id}', [DevMenuController::class, 'apiResetCorrectiveAction']);
-            Route::get('dev/reset-ca-approval/{id}', [DevMenuController::class, 'apiResetApproval']);
-            Route::get('dev/uncancel-ca/{id}', [DevMenuController::class, 'apiUncancel']);
-            Route::get('dev/get-app-state', [DevMenuController::class, 'apiGetAppState']);
-        }
 
         Route::get('/get-summary', [DashboardController::class, 'apiGetSummary']);
 
@@ -73,7 +73,7 @@ Route::prefix('/v1')->group(function() {
         //Route::post('/add-corrective-action', [CorrectiveActionController::class, 'apiAdd']);
         Route::get('/fetch-corrective-actions', [CorrectiveActionController::class, 'apiFetch']);
         Route::get('/fetch-corrective-action-images/{id}', [CorrectiveActionController::class, 'apiFetchImages']);
-        //Route::post('/close-corrective-action', [CorrectiveActionController::class, 'apiClose']);
+        // Route::post('/close-corrective-action', [CorrectiveActionController::class, 'apiClose']);
         Route::get('/get-corrective-action/{id}', [CorrectiveActionController::class, 'apiGet']);
 
         // Audit records APIs

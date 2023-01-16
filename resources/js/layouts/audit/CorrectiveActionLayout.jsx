@@ -19,6 +19,7 @@ function ApproveCorrectiveActionForm({ id, disabled, refreshTable }) {
     const [isSubmitting, setSubmitting] = useState(false);
     const [remarks, setRemarks] = useState('');
     const [formError, setFormError] = useState(null);
+    const [userData, setUserData] = globalState.useGlobalState('userData');
 
     const closeCA = async () => {
         if (!confirm('Are you sure?')) return;
@@ -32,6 +33,13 @@ function ApproveCorrectiveActionForm({ id, disabled, refreshTable }) {
         return (await httpRequest.post('api/v1/close-corrective-action', formData)).data;
     };
 
+    const resetApproval = async () => {
+        const response = await httpRequest.get(`api/v1/dev/reset-ca-approval/${id}`);
+        refreshTable.triggerRefresh();
+        console.log(response.data);
+    };
+
+
     useEffect(() => {
         setRemarks('');
         setFormError(null);
@@ -39,7 +47,17 @@ function ApproveCorrectiveActionForm({ id, disabled, refreshTable }) {
 
     return (
         <>
-            <Button size="sm" className="w-100" onClick={() => setShown(true)} disabled={disabled}>Approve</Button>
+            <Button
+                size="sm"
+                onClick={() => setShown(true)}
+                disabled={disabled}
+                className={userData.superadmin ? '' : 'w-100'}
+            >
+                Approve
+            </Button>
+
+            {userData.superadmin && <LoadingButton size="sm" className="ms-1" onClick={async () => resetApproval()}>Reset Approval</LoadingButton>}
+
             <Modal show={shown} onHide={() => setShown(false)}>
                 <Modal.Header closeButton>
                     <Modal.Title className="fw-bold display-spacing">Approve Corrective Action</Modal.Title>
@@ -144,6 +162,16 @@ const tableColumns = [
         name: 'Closing Remarks'
     },
     {
+        id: 'submit_date',
+        type: 'date_time',
+        name: 'Submit Date',
+    },
+    {
+        id: 'close_date',
+        type: 'date_time',
+        name: 'Close Date',
+    },
+    {
         export: false,
         filterable: false,
         sortable: false,
@@ -165,12 +193,6 @@ const tableColumns = [
 
 export default function CorrectiveActionLayout() {
     const refreshTable = useRefreshTable();
-    const [userData, setUserData] = globalState.useGlobalState('userData');
-
-    const resetApproval = async (id) => {
-        const response = await httpRequest.get(`api/v1/dev/reset-ca-approval/${id}`);
-        console.log(response.data);
-    };
 
     return (
         <BaseAuditPage
@@ -190,12 +212,11 @@ export default function CorrectiveActionLayout() {
                 `${item.deducted_weight}%`,
                 <DescriptionModal msg={item.desc} />,
                 <DescriptionModal msg={item.closing_remarks} />,
+                item.submit_date,
+                item.close_date ? item.close_date : '-',
                 <ImageModal buttonSize="sm" src={`api/v1/fetch-finding-images/${item.case_id}`} />,
                 <ImageModal buttonSize="sm" src={`api/v1/fetch-corrective-action-images/${item.id}`} />,
-                <>
-                    <ApproveCorrectiveActionForm id={item.id} disabled={item.status == 3} refreshTable={refreshTable} />
-                    {userData.superadmin && <LoadingButton size="sm" onClick={async () => resetApproval(item.id)}>Reset Approval</LoadingButton>}
-                </>,
+                <ApproveCorrectiveActionForm id={item.id} disabled={item.status == 3} refreshTable={refreshTable} />,
             ]}
             produceExport={item => [
                 item.cycle_id,
@@ -210,6 +231,8 @@ export default function CorrectiveActionLayout() {
                 item.deducted_weight / 100,
                 item.desc,
                 item.closing_remarks,
+                new Date(item.submit_date),
+                new Date(item.close_date)
             ]}
         />
     )

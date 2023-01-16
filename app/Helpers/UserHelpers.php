@@ -57,6 +57,10 @@ class UserHelpers
 
     public static function canOpenAdminPage()
     {
+        if (UserHelpers::getUserData()->superadmin) {
+            return true;
+        }
+
         $role = UserHelpers::getRole();
 
         foreach ($role->access_info as $route => $value) {

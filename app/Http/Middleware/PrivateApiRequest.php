@@ -53,13 +53,18 @@ class PrivateApiRequest
             // Check if user has the appropriate role
             switch ($role) {
                 case 'auditee':
-                    if (!$roleData->auditee) {
-                        abort(404);
+                    if (!$roleData || !$roleData->auditee) {
+                        return Response::json(['result' => 'error', 'msg' => 'Not permitted']);
                     }
                     break;
                 case 'auditor':
-                    if (!$roleData->auditor) {
-                        abort(404);
+                    if (!$roleData || !$roleData->auditor) {
+                        return Response::json(['result' => 'error', 'msg' => 'Not permitted']);
+                    }
+                    break;
+                case 'superadmin':
+                    if (!$user->superadmin) {
+                        return Response::json(['result' => 'error', 'msg' => 'Not permitted']);
                     }
                     break;
             }

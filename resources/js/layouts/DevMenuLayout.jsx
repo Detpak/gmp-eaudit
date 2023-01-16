@@ -34,6 +34,12 @@ export default function DevMenuLayout() {
         console.log(response.data);
     };
 
+    const resetAuditState = async () => {
+        const response = await httpRequest.get('api/v1/dev/reset-audit-state');
+        setRefreshTrigger(!refreshTrigger);
+        console.log(response.data);
+    };
+
     const [test, setTest] = useState(false);
 
     const click = ev => {
@@ -49,6 +55,7 @@ export default function DevMenuLayout() {
                         <LoadingButton isLoading={isLoading} onClick={handleClick}>Test Loading Button</LoadingButton>
                         <LoadingButton onClick={resetCurrentCycle}>Reset Current Cycle</LoadingButton>
                         <LoadingButton onClick={resetFindingsCounter}>Reset Findings Counter</LoadingButton>
+                        <LoadingButton onClick={resetAuditState}>Reset Audit State</LoadingButton>
                         <ToggleButton
                             id="test"
                             type="checkbox"

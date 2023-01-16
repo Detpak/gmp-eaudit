@@ -166,6 +166,8 @@ class CorrectiveActionController extends Controller
               ->select('corrective_actions.id',
                        'corrective_actions.desc',
                        'corrective_actions.closing_remarks',
+                       DB::raw("DATE_FORMAT(corrective_actions.created_at, '%Y-%m-%d %T') as submit_date"),
+                       'corrective_actions.close_date',
                        'areas.name as area_name',
                        'users.name as auditee',
                        'audit_cycles.cycle_id as cycle_id',
@@ -196,7 +198,7 @@ class CorrectiveActionController extends Controller
             $query->orderBy($request->sort, $request->dir);
         }
         else {
-            $query->orderBy('corrective_actions.id', 'asc');
+            $query->orderBy('corrective_actions.id', 'desc');
         }
 
         if ($request->filter) {
@@ -213,6 +215,7 @@ class CorrectiveActionController extends Controller
                 ->whereString('audit_findings.ca_name', isset($filter->ca_name) ? $filter->ca_name : null)
                 ->where('audit_findings.ca_weight', isset($filter->ca_weight) ? $filter->ca_weight : null)
                 ->having('deducted_weight', isset($filter->deducted_weight) ? $filter->deducted_weight : null)
+                ->havingDateTime('submit_date', isset($filter->submit_date) ? $filter->submit_date : null)
                 ->whereString('closing_remarks', isset($filter->closing_remarks) ? $filter->closing_remarks : null)
                 ->done();
 
@@ -295,6 +298,7 @@ class CorrectiveActionController extends Controller
 
         try {
             $ca->closing_remarks = $request->remarks;
+            $ca->close_date = Carbon::now();
             $ca->save();
 
             $ca->finding->status = 3;

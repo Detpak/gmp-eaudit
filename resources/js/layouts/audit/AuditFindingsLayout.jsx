@@ -138,6 +138,11 @@ const tableColumns = [
         exportFormat: '0.00%'
     },
     {
+        type: 'date_time',
+        id: 'submit_date',
+        name: 'Submit Date',
+    },
+    {
         export: false,
         filterable: false,
         sortable: false,
@@ -196,11 +201,12 @@ export default function AuditFindingsLayout() {
                     `${item.ca_name} (${item.ca_code})`,
                     `${item.ca_weight}%`,
                     `${item.deducted_weight}%`,
+                    item.submit_date,
                     <ImageModal buttonSize="sm" src={`api/v1/fetch-finding-images/${item.id}`} disabled={item.images_count == 0} />,
-<>
+                    <>
                         <Button
                             onClick={_ => setFindingId(item.id)}
-                            className="w-100"
+                            className={userData.superadmin ? '' : "w-100"}
                             variant="success"
                             size="sm"
                             disabled={item.has_auditee_id == null || item.status != 0 || !userData.auditee}
@@ -222,7 +228,7 @@ export default function AuditFindingsLayout() {
                     <>
                         <Button
                             onClick={_ => setCancelFindingId(item.id)}
-                            className="w-100"
+                            className={userData.superadmin ? '' : "w-100"}
                             size="sm"
                             variant="danger"
                             disabled={item.status != 0 || !userData.auditor}
@@ -256,6 +262,7 @@ export default function AuditFindingsLayout() {
                     `${item.ca_name} (${item.ca_code})`,
                     item.ca_weight / 100,
                     item.deducted_weight / 100,
+                    new Date(item.submit_date),
                     item.cancel_reason,
                 ]}
             />
