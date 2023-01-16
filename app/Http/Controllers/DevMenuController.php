@@ -119,11 +119,29 @@ class DevMenuController extends Controller
     public function apiResetAuditState()
     {
         DB::table('corrective_action_images')->delete();
+        DB::statement("ALTER TABLE corrective_action_images AUTO_INCREMENT = 1");
+
         DB::table('corrective_actions')->delete();
+        DB::statement("ALTER TABLE corrective_actions AUTO_INCREMENT = 1");
+
         DB::table('failed_photos')->delete();
-        DB::table('audit_finding')->delete();
+        DB::statement("ALTER TABLE failed_photos AUTO_INCREMENT = 1");
+
+        DB::table('audit_findings')->delete();
+        DB::statement("ALTER TABLE audit_findings AUTO_INCREMENT = 1");
+
         DB::table('audit_records')->delete();
+        DB::statement("ALTER TABLE audit_records AUTO_INCREMENT = 1");
+
         DB::table('audit_cycles')->delete();
+        DB::statement("ALTER TABLE audit_cycles AUTO_INCREMENT = 1");
+
+        $app_state = AppState::first();
+        $app_state->current_cycle = 0;
+        $app_state->num_findings = 0;
+        $app_state->last_cycle_date = null;
+        $app_state->last_audit_date = null;
+        $app_state->save();
 
         return ['result' => 'ok'];
     }

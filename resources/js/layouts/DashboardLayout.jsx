@@ -37,7 +37,7 @@ function ChartColumn({ caption, children, cycle, isLoading }) {
                 <h4 className="fw-bold display-spacing">
                     <>{caption}{cycle != null ? ` - ${cycle.cycle_id}` : ""}</>
                 </h4>
-                {(isLoading || cycle == null) && <Spinner animation="border" size="sm" className="ms-auto" />}
+                {isLoading && <Spinner animation="border" size="sm" className="ms-auto" />}
             </div>
 
             {children}
@@ -122,7 +122,6 @@ export default function DashboardLayout() {
         ])
         .then((values) => {
             if (!mounted.current) return;
-            console.log(values);
             setAreaStatus(values[0].data);
             setTop10Criteria(values[1].data);
             setTop10Approved(values[2].data);
@@ -152,7 +151,7 @@ export default function DashboardLayout() {
                     caption={(data) => <>Cycle: {data.cycle_id}</>}
                     selectFirstData={true}
                     disabled={cycle == null}
-                    title="Please wait..."
+                    title="No Cycle Started"
                 >
                     {({ data }) => (
                         <span>{data.cycle_id}</span>
