@@ -181,7 +181,7 @@ const tableColumns = [
         export: false,
         filterable: false,
         sortable: false,
-        name: 'Images'
+        name: 'Corrective Images'
     },
     {
         export: false,
