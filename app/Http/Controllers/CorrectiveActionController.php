@@ -312,7 +312,9 @@ class CorrectiveActionController extends Controller
 
         $auditee = $ca->auditee;
         if ($auditee->email) {
-            Mail::to($auditee->email)->send(new CorrectiveActionApproved($ca));
+            Mail::to($auditee->email)
+                ->cc($request->user)
+                ->send(new CorrectiveActionApproved($ca));
         }
 
         return ['result' => 'ok'];

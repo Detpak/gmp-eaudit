@@ -146,7 +146,7 @@ const tableColumns = [
         export: false,
         filterable: false,
         sortable: false,
-        name: 'Images'
+        name: 'Finding Images'
     },
     {
         export: false,
