@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Helpers\AppStateHelpers;
+use App\Helpers\UserHelpers;
 use App\Models\AppState;
 use App\Models\AuditCycle;
 use App\Models\AuditFinding;
@@ -10,9 +11,12 @@ use App\Models\AuditRecord;
 use App\Models\CorrectiveAction;
 use App\Models\CorrectiveActionImages;
 use App\Models\FailedPhoto;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Validator;
 
 class DevMenuController extends Controller
 {
@@ -142,6 +146,21 @@ class DevMenuController extends Controller
         $app_state->last_cycle_date = null;
         $app_state->last_audit_date = null;
         $app_state->save();
+
+        return ['result' => 'ok'];
+    }
+
+    public function apiAuthTest(Request $request)
+    {
+        $validator = Validator::make($request->all(), ['password' => 'required|min:8']);
+
+        if ($validator->fails()) {
+            return ['formError' => $validator->errors()];
+        }
+
+        if (!Hash::check($request->password, $request->user->password)) {
+            return ['formError' => ['password' => ['Wrong password.']]];
+        }
 
         return ['result' => 'ok'];
     }

@@ -55,6 +55,7 @@ Route::prefix('/v1')->group(function() {
         Route::get('dev/uncancel-ca/{id}', [DevMenuController::class, 'apiUncancel']);
         Route::get('dev/reset-audit-state', [DevMenuController::class, 'apiResetAuditState']);
         Route::get('dev/get-app-state', [DevMenuController::class, 'apiGetAppState']);
+        Route::post('dev/auth-test', [DevMenuController::class, 'apiAuthTest']);
     });
 
     Route::middleware('private_api')->group(function() {
