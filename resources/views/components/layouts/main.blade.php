@@ -46,7 +46,11 @@
 <body>
     <main id="main-container">{{ $slot }}</main>
 
-    @if(App::environment(['local', 'staging']))
+    <script src="{{ mix('js/manifest.js') }}"></script>
+    <script src="{{ mix('js/vendor.js') }}"></script>
+    <script src="{{ mix('js/app.js') }}"></script>
+
+    {{-- @if(App::environment(['local', 'staging']))
     <script src="{{ asset('js/manifest.js') }}?id={{ Str::random(16) }}"></script>
     <script src="{{ asset('js/vendor.js') }}?id={{ Str::random(16) }}"></script>
     <script src="{{ asset('js/app.js') }}?id={{ Str::random(16) }}"></script>
@@ -54,6 +58,6 @@
     <script src="{{ asset('js/manifest.js') }}"></script>
     <script src="{{ asset('js/vendor.js') }}"></script>
     <script src="{{ asset('js/app.js') }}"></script>
-    @endif
+    @endif --}}
 </body>
 </html>

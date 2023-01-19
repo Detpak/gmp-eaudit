@@ -6,6 +6,7 @@ mix.react()
     .js('resources/js/app.js', 'public/js')
     .sourceMaps()
     .compress({ productionOnly: true })
+    .version()
     .options({
         uglify: true
     });
