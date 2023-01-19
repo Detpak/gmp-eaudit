@@ -432,7 +432,7 @@ export default function DynamicTable({
     useEffect(() => {
         mounted.current = true;
         return () => { mounted.current = false; };
-    }, [])
+    }, []);
 
     if (filter) {
         useEffect(() => {
@@ -467,6 +467,11 @@ export default function DynamicTable({
     }
 
     useEffect(() => {
+        if (!mounted.current) {
+            mounted.current = true;
+            return;
+        }
+
         if (search != searchKeyword) {
             setSearch(searchKeyword);
 
@@ -475,10 +480,15 @@ export default function DynamicTable({
                 fetchData(filterParams);
             }, 500);
 
-            return () => clearTimeout(timeout);
+            return () => {
+                mounted.current = false;
+                clearTimeout(timeout)
+            };
         }
 
         fetchData(filterParams);
+
+        return () => { mounted.current = false; };
     }, [refreshTrigger, searchKeyword, sort, entries, currentPage]);
 
     return (

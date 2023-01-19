@@ -27,7 +27,7 @@ function ResetAuditStateDialog({ show, setShow }) {
     };
 
     return (
-        <Modal show={show}>
+        <Modal show={show} onHide={() => setShow(false)}>
             <Modal.Header closeButton={!isLoading}>
                 <Modal.Title>Reset Audit State</Modal.Title>
             </Modal.Header>
@@ -41,6 +41,7 @@ function ResetAuditStateDialog({ show, setShow }) {
                             value={password}
                             onChange={(ev) => setPassword(ev.target.value)}
                             isInvalid={formError && formError.password}
+                            type="password"
                         />
                         <Form.Control.Feedback type="invalid">{formError && formError.password ? formError.password : ''}</Form.Control.Feedback>
 
