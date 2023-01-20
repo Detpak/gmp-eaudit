@@ -140,11 +140,19 @@ class CorrectiveActionController extends Controller
             ];
         }
 
-        $auditor = $finding->record->auditor;
+        $record = $finding->record;
+        $auditor = $record->auditor;
+        $auditees = $record->area->department->pics;
+        $mailto = $auditees->map(function ($users) {
+            return $users->email;
+        });
+
         if ($auditor->email) {
-            Mail::to($auditor->email)->send(
-                new CorrectiveActionTaken($ca->id, $finding, $ca->auditee, $ca->desc, $images, $caDate->toDateTimeString()));
+            $mailto->push($auditor->email);
         }
+
+        Mail::to($mailto->unique())
+            ->send(new CorrectiveActionTaken($ca->id, $finding, $ca->auditee, $ca->desc, $images, $caDate->toDateTimeString()));
 
         return [
             'result' => 'ok',
@@ -310,12 +318,26 @@ class CorrectiveActionController extends Controller
             ];
         }
 
-        $auditee = $ca->auditee;
-        if ($auditee->email) {
-            Mail::to($auditee->email)
-                ->cc($request->user)
-                ->send(new CorrectiveActionApproved($ca));
+        $record = $ca->finding->record;
+        $auditor = $record->auditor;
+        $auditees = $record->area->department->pics;
+        $mailto = $auditees->map(function ($users) {
+            return $users->email;
+        });
+
+        if ($auditor->email) {
+            $mailto->push($auditor->email);
         }
+
+        Mail::to($mailto->unique())
+            ->send(new CorrectiveActionApproved($ca));
+
+        // $auditee = $ca->auditee;
+        // if ($auditee->email) {
+        //     Mail::to($auditee->email)
+        //         ->cc($request->user)
+        //         ->send(new CorrectiveActionApproved($ca));
+        // }
 
         return ['result' => 'ok'];
     }
