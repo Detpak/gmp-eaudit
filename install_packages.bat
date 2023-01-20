@@ -1,0 +1,2 @@
+composer i
+npm i
