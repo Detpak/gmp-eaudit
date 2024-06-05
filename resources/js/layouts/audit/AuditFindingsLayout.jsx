@@ -15,7 +15,7 @@ import { useEffect } from "react";
 import BaseAuditPage from "./BaseAuditPage";
 import { globalState } from "../../app_state";
 
-function getCaseStatus(status)
+export function getCaseStatus(status)
 {
     return [
         "New",
@@ -260,8 +260,8 @@ export default function AuditFindingsLayout() {
                     getCategoryString(item.category),
                     `${item.cg_name} (${item.cg_code})`,
                     `${item.ca_name} (${item.ca_code})`,
-                    item.ca_weight / 100,
-                    item.deducted_weight / 100,
+                    (item.ca_weight / 100).toFixed(2),
+                    (item.deducted_weight / 100).toFixed(2),
                     new Date(item.submit_date),
                     item.cancel_reason,
                 ]}
