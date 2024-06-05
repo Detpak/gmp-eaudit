@@ -318,10 +318,15 @@ export default function DynamicTable({
         setError(false);
         setLoading(true);
 
-        const params = {
+        let params = {
             page: currentPage,
             max: entries
         };
+
+        if (source.params) {
+            params = { ...params, ...source.params };
+            console.log(params);
+        }
 
         if (filter) {
             params.filter = _.pickBy(filtering, filter => filter.value.length > 0);
@@ -348,7 +353,7 @@ export default function DynamicTable({
         try {
             const response = await httpRequest.get(source.url, { params: params });
 
-            if (response.data.data && mounted.current) {
+            if (response.data.data) {
                 if (response.data.last_page < currentPage) {
                     setCurrentPage(response.data.last_page);
                 }
@@ -394,6 +399,7 @@ export default function DynamicTable({
     const handleSort = (column) => {
         if (sort && sort.column == column) {
             const dir = (sort.dir + 1) % 3;
+            console.log(dir);
 
             if (dir === 0) {
                 setSort(null);
@@ -429,10 +435,10 @@ export default function DynamicTable({
         fetchData(filterParams);
     };
 
-    useEffect(() => {
-        mounted.current = true;
-        return () => { mounted.current = false; };
-    }, []);
+    // useEffect(() => {
+    //     mounted.current = true;
+    //     return () => { mounted.current = false; };
+    // }, []);
 
     if (filter) {
         useEffect(() => {
@@ -466,11 +472,11 @@ export default function DynamicTable({
         }, [filterState]);
     }
 
-    useEffect(() => {
-        if (!mounted.current) {
-            mounted.current = true;
-            return;
-        }
+    useEffect(async () => {
+        // if (!mounted.current) {
+        //     mounted.current = true;
+        //     return;
+        // }
 
         if (search != searchKeyword) {
             setSearch(searchKeyword);
@@ -488,7 +494,7 @@ export default function DynamicTable({
 
         fetchData(filterParams);
 
-        return () => { mounted.current = false; };
+        //return () => { mounted.current = false; };
     }, [refreshTrigger, searchKeyword, sort, entries, currentPage]);
 
     return (
@@ -660,7 +666,7 @@ export default function DynamicTable({
                     {error && <div className="text-center p-4">Failed to retrieve data.</div>}
                 </div>
             </div>
-            <div className="d-flex align-items-center mb-3">
+            <div className="d-flex align-items-center">
                 <div className="flex-fill hstack gap-1">
                     <span>Show</span>
                     <Form.Group>
