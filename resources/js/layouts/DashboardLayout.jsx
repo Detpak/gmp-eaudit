@@ -5,12 +5,15 @@ import { Button, Card, Col, Container, Row, Spinner } from "react-bootstrap";
 import httpRequest from "../api";
 import { PageContent, PageContentView, PageNavbar } from "../components/PageNav";
 import { Pie, Bar, Line } from "react-chartjs-2"
-import { useIsMounted } from "../utils";
+import { getCategoryString, useIsMounted } from "../utils";
 import chroma from "chroma-js";
 import { useMemo } from "react";
 import DropdownList from "../components/DropdownList";
 import { useRef } from "react";
 import { set } from "lodash";
+import DynamicTable from "../components/DynamicTable";
+import DescriptionModal from "../components/DescriptionModal";
+import { getCaseStatus } from "./audit/AuditFindingsLayout";
 
 function SummaryButton({ href, caption, value, icon }) {
     return (
@@ -21,7 +24,7 @@ function SummaryButton({ href, caption, value, icon }) {
                     {value != null ?
                         <h2 className="fw-bold my-0">{value}</h2>
                         :
-                        <Spinner animation="border"/>
+                        <Spinner animation="border" />
                     }
                 </div>
                 <FontAwesomeIcon icon={icon} className="chart-icon" />
@@ -61,13 +64,43 @@ const barOptions = {
     }
 };
 
+const tableColumns = [
+    {
+        id: 'code',
+        name: 'ID',
+    },
+    {
+        id: 'department_name',
+        name: 'Department',
+    },
+    {
+        id: 'area_name',
+        name: 'Area',
+    },
+    {
+        id: 'status',
+        name: 'Status'
+    },
+    {
+        id: 'desc',
+        name: 'Description',
+    },
+    {
+        type: 'date_time',
+        id: 'submit_date',
+        name: 'Submit Date',
+    },
+];
+
 export default function DashboardLayout() {
     const [summary, setSummary] = useState({});
     const [refreshTrigger, setRefreshTrigger] = useState(false);
+    const [tableRefresh, setTableRefresh] = useState(false);
     const [areaStatus, setAreaStatus] = useState(null);
     const [top10criteria, setTop10Criteria] = useState(null);
     const [top10Approved, setTop10Approved] = useState(null);
     const [caseStatistics, setCaseStatistics] = useState(null);
+    const [findings, setFindings] = useState(null);
     const [cycle, setCycle] = useState(null);
     const [isLoading, setLoading] = useState(false);
     const abortController = useRef(null);
@@ -75,7 +108,7 @@ export default function DashboardLayout() {
     const colorPalette = useMemo(() => {
         const bezierPoints = _.chain()
             .range(12)
-            .map((value) => chroma.hsv(value / 12 * 360,   0.60, 1.0).desaturate(1))
+            .map((value) => chroma.hsv(value / 12 * 360, 0.60, 1.0).desaturate(1))
             .value();
 
         return chroma
@@ -89,17 +122,12 @@ export default function DashboardLayout() {
 
     useEffect(async () => {
         if (!mounted.current) return;
-
         const abort = new AbortController();
-
         setSummary({});
-
         const response = await httpRequest.get('api/v1/get-summary', { signal: abort.signal });
-
         if (response.data && mounted.current) {
             setSummary(response.data);
         }
-
         return () => abort.abort();
     }, [refreshTrigger]);
 
@@ -113,6 +141,7 @@ export default function DashboardLayout() {
 
         abortController.current = new AbortController();
         setLoading(true);
+        setTableRefresh(!tableRefresh);
 
         Promise.all([
             httpRequest.post('api/v1/get-chart', { type: 'area_status', cycle_id: cycle.id, signal: abortController.current.signal }),
@@ -120,17 +149,17 @@ export default function DashboardLayout() {
             httpRequest.post('api/v1/get-chart', { type: 'top10_approved', cycle_id: cycle.id, signal: abortController.current.signal }),
             httpRequest.post('api/v1/get-chart', { type: 'case_statistics', cycle_id: cycle.id, signal: abortController.current.signal }),
         ])
-        .then((values) => {
-            if (!mounted.current) return;
-            setAreaStatus(values[0].data);
-            setTop10Criteria(values[1].data);
-            setTop10Approved(values[2].data);
-            setCaseStatistics(values[3].data);
-            setLoading(false);
-        })
-        .catch((reason) => {
-            console.log(reason);
-        });
+            .then((values) => {
+                if (!mounted.current) return;
+                setAreaStatus(values[0].data);
+                setTop10Criteria(values[1].data);
+                setTop10Approved(values[2].data);
+                setCaseStatistics(values[3].data);
+                setLoading(false);
+            })
+            .catch((reason) => {
+                console.log(reason);
+            });
 
         return () => {
             if (abortController.current != null) {
@@ -271,36 +300,28 @@ export default function DashboardLayout() {
                                 />
                             }
                         </ChartColumn>
-                        <ChartColumn cycle={cycle} isLoading={isLoading} caption="Number of Cases by Category">
-                            {caseStatistics &&
-                                <Bar
-                                    style={{ minHeight: 250, maxHeight: 250 }}
-                                    data={{
-                                        labels: ['Observation', 'Minor NC', 'Major NC'],
-                                        datasets: [
-                                            {
-                                                data: [
-                                                    caseStatistics.observation,
-                                                    caseStatistics.minor_nc,
-                                                    caseStatistics.major_nc,
-                                                ],
-                                                backgroundColor: [
-                                                    'rgba(75, 192, 192, 0.2)',
-                                                    'rgba(255, 206, 86, 0.2)',
-                                                    'rgba(255, 99, 132, 0.2)',
-                                                ],
-                                                borderColor: [
-                                                    'rgba(75, 192, 192, 1)',
-                                                    'rgba(255, 206, 86, 1)',
-                                                    'rgba(255, 99, 132, 1)',
-                                                ],
-                                                borderWidth: 1,
-                                            }
-                                        ]
-                                    }}
-                                    options={barOptions}
-                                />
-                            }
+                        <ChartColumn>
+                            <DynamicTable
+                                refreshTrigger={tableRefresh}
+                                searchKeyword={''}
+                                columns={tableColumns}
+                                source={{
+                                    url: "api/v1/fetch-findings",
+                                    method: 'GET',
+                                    params: {
+                                        dashboard: true,
+                                        cycle: cycle,
+                                    },
+                                    produce: item => [
+                                        item.code,
+                                        item.department_name,
+                                        item.area_name,
+                                        getCaseStatus(item.status),
+                                        <DescriptionModal msg={item.desc} />,
+                                        item.submit_date,
+                                    ]
+                                }}
+                            />
                         </ChartColumn>
                     </Row>
                 </PageContentView>

@@ -65,7 +65,8 @@ class AuditProcessController extends Controller
             ],
             [
                 'record_id' => 'area'
-            ]);
+            ]
+        );
 
         if ($validator->fails()) {
             return ['formError' => $validator->errors()];
@@ -97,7 +98,8 @@ class AuditProcessController extends Controller
             ],
             [
                 'record_id' => 'area'
-            ]);
+            ]
+        );
 
         if ($validator->fails()) {
             return ['formError' => $validator->errors()];
@@ -133,11 +135,17 @@ class AuditProcessController extends Controller
 
         // Filter passed criterias
         $failedCriteria = collect($wrap['findings'])
-            ->filter(function ($value) { return $value['need_action']; })
-            ->map(function ($value, $key) { return [...$value, 'case_id' => $key]; } );
+            ->filter(function ($value) {
+                return $value['need_action'];
+            })
+            ->map(function ($value, $key) {
+                return [...$value, 'case_id' => $key];
+            });
 
         // Get failed criteria parameters
-        $failedCriteriaIds = $failedCriteria->map(function ($value) { return $value['id']; });
+        $failedCriteriaIds = $failedCriteria->map(function ($value) {
+            return $value['id'];
+        });
         $failedCriteriaParams = Criteria::whereIn('id', $failedCriteriaIds)->get();
 
         if ($failedCriteriaParams->count() == 0 && $failedCriteriaParams->count() < $failedCriteriaIds->count()) {
@@ -165,7 +173,7 @@ class AuditProcessController extends Controller
         // Create audit findings data
         $auditFindings = $failedCriteria
             ->zip($failedCriteriaParams)
-            ->map(function ($value, $key) use($criteriaGroup, $request, $lastNumberOfFindings, $auditDate) {
+            ->map(function ($value, $key) use ($criteriaGroup, $request, $lastNumberOfFindings, $auditDate) {
                 $code = str_pad($lastNumberOfFindings + $key + 1, 4, "0", STR_PAD_LEFT);
                 $category = $value[0]['category'];
                 return [
@@ -226,7 +234,7 @@ class AuditProcessController extends Controller
                             'updated_at' => $auditDate->toDateTimeString(),
                         ];
                     })
-                    ->toArray()
+                        ->toArray()
                 );
             }
 
@@ -237,8 +245,7 @@ class AuditProcessController extends Controller
             $record->save();
             $cycle->save();
             AppStateHelpers::advanceFindingsCounter($failedCriteriaParams->count(), $auditDate);
-        }
-        catch (\Throwable $th) {
+        } catch (\Throwable $th) {
             AuditFinding::where('record_id', $request->record_id)->delete();
             return [
                 'result' => 'error',
@@ -272,7 +279,9 @@ class AuditProcessController extends Controller
                 'images' => $imageFiles
                     ->groupBy('case_id')
                     ->map(function ($case) {
-                        return $case->map(function ($image) { return asset('case_images/' . $image['filename']); });
+                        return $case->map(function ($image) {
+                            return asset('case_images/' . $image['filename']);
+                        });
                     })
             ]
         ];
@@ -287,28 +296,53 @@ class AuditProcessController extends Controller
     {
         $query = AuditFinding::query();
 
+        if ($request->dashboard) {
+            $query->join('audit_records', 'audit_records.id', '=', 'audit_findings.record_id')
+                ->join('audit_cycles', 'audit_cycles.id', '=', 'audit_records.cycle_id')
+                ->join('areas', 'areas.id', '=', 'audit_records.area_id')
+                ->join('departments', 'departments.id', '=', 'areas.department_id')
+                ->select(
+                    'audit_findings.id',
+                    'audit_findings.code',
+                    'audit_records.code as record_code',
+                    'departments.name as department_name',
+                    'areas.name as area_name',
+                    'audit_findings.desc',
+                    'audit_findings.status',
+                    DB::raw("DATE_FORMAT(audit_findings.created_at, '%Y-%m-%d %T') as submit_date")
+                )
+                ->orderBy('audit_findings.created_at', 'desc');
+            if ($request->cycle) {
+                $cycle = json_decode($request->cycle);
+                $query->where('audit_records.cycle_id', $cycle->id);
+            }
+            return $query->paginate($request->max);
+        }
+
         $query->join('audit_records', 'audit_records.id', '=', 'audit_findings.record_id')
-              ->join('audit_cycles', 'audit_cycles.id', '=', 'audit_records.cycle_id')
-              ->join('areas', 'areas.id', '=', 'audit_records.area_id')
-              ->join('departments', 'departments.id', '=', 'areas.department_id')
-              ->select('audit_findings.id',
-                       'audit_findings.record_id',
-                       'audit_findings.code',
-                       'audit_records.code as record_code',
-                       'audit_cycles.cycle_id',
-                       'departments.name as department_name',
-                       'areas.name as area_name',
-                       'audit_findings.desc',
-                       'audit_findings.category',
-                       'audit_findings.ca_name',
-                       'audit_findings.ca_code',
-                       'audit_findings.ca_weight',
-                       'audit_findings.cg_name',
-                       'audit_findings.cg_code',
-                       'audit_findings.status',
-                       'audit_findings.cancel_reason',
-                       DB::raw("DATE_FORMAT(audit_findings.created_at, '%Y-%m-%d %T') as submit_date"),
-                       DB::raw('audit_findings.ca_weight * (audit_findings.weight_deduct / 100) as deducted_weight'));
+            ->join('audit_cycles', 'audit_cycles.id', '=', 'audit_records.cycle_id')
+            ->join('areas', 'areas.id', '=', 'audit_records.area_id')
+            ->join('departments', 'departments.id', '=', 'areas.department_id')
+            ->select(
+                'audit_findings.id',
+                'audit_findings.record_id',
+                'audit_findings.code',
+                'audit_records.code as record_code',
+                'audit_cycles.cycle_id',
+                'departments.name as department_name',
+                'areas.name as area_name',
+                'audit_findings.desc',
+                'audit_findings.category',
+                'audit_findings.ca_name',
+                'audit_findings.ca_code',
+                'audit_findings.ca_weight',
+                'audit_findings.cg_name',
+                'audit_findings.cg_code',
+                'audit_findings.status',
+                'audit_findings.cancel_reason',
+                DB::raw("DATE_FORMAT(audit_findings.created_at, '%Y-%m-%d %T') as submit_date"),
+                DB::raw('audit_findings.ca_weight * (audit_findings.weight_deduct / 100) as deducted_weight')
+            );
 
         $query->addSelect([
             'has_auditee_id' => DepartmentPIC::select('user_id')
@@ -334,8 +368,7 @@ class AuditProcessController extends Controller
 
         if ($request->sort && $request->dir) {
             $query->orderBy($request->sort, $request->dir);
-        }
-        else {
+        } else {
             $query->orderBy('audit_findings.id', 'desc');
         }
 
@@ -363,7 +396,9 @@ class AuditProcessController extends Controller
                     "resolved" => 1,
                     "cancelled" => 2,
                     "closed" => 3,
-                ])->filter(function ($value, $key) use ($filter) { return Str::contains($key, Str::lower($filter->status->value)); });
+                ])->filter(function ($value, $key) use ($filter) {
+                    return Str::contains($key, Str::lower($filter->status->value));
+                });
 
                 $query->whereIn('audit_findings.status', $statusId, $mode);
             }
@@ -373,7 +408,9 @@ class AuditProcessController extends Controller
                     "observation" => 0,
                     "minor nc" => 1,
                     "major nc" => 2,
-                ])->filter(function ($value, $key) use ($filter) { return Str::contains($key, Str::lower($filter->category->value)); });
+                ])->filter(function ($value, $key) use ($filter) {
+                    return Str::contains($key, Str::lower($filter->category->value));
+                });
 
                 $query->whereIn('audit_findings.category', $categoryId, $mode);
             }
@@ -389,7 +426,9 @@ class AuditProcessController extends Controller
         return FailedPhoto::where('finding_id', $findingId)
             ->select('filename')
             ->get()
-            ->map(function ($image) { return asset('case_images/' . $image['filename']); });
+            ->map(function ($image) {
+                return asset('case_images/' . $image['filename']);
+            });
     }
 
     public function apiGet($id)
@@ -419,7 +458,8 @@ class AuditProcessController extends Controller
             [
                 'id' => 'required|exists:audit_findings,id',
                 'reason' => 'nullable|max:65536'
-            ]);
+            ]
+        );
 
         if ($validator->fails()) {
             return ['formError' => $validator->errors()];
