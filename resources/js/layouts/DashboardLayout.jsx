@@ -122,17 +122,6 @@ export default function DashboardLayout() {
 
     useEffect(async () => {
         if (!mounted.current) return;
-        const abort = new AbortController();
-        setSummary({});
-        const response = await httpRequest.get('api/v1/get-summary', { signal: abort.signal });
-        if (response.data && mounted.current) {
-            setSummary(response.data);
-        }
-        return () => abort.abort();
-    }, [refreshTrigger]);
-
-    useEffect(async () => {
-        if (!mounted.current) return;
         if (cycle == null) return;
 
         if (abortController.current != null) {
@@ -142,8 +131,10 @@ export default function DashboardLayout() {
         abortController.current = new AbortController();
         setLoading(true);
         setTableRefresh(!tableRefresh);
+        setSummary({});
 
         Promise.all([
+            httpRequest.get('api/v1/get-summary', { params: { cycle_id: cycle.id }, signal: abortController.current.signal }),
             httpRequest.post('api/v1/get-chart', { type: 'area_status', cycle_id: cycle.id, signal: abortController.current.signal }),
             httpRequest.post('api/v1/get-chart', { type: 'top10_criteria', cycle_id: cycle.id, signal: abortController.current.signal }),
             httpRequest.post('api/v1/get-chart', { type: 'top10_approved', cycle_id: cycle.id, signal: abortController.current.signal }),
@@ -151,10 +142,11 @@ export default function DashboardLayout() {
         ])
             .then((values) => {
                 if (!mounted.current) return;
-                setAreaStatus(values[0].data);
-                setTop10Criteria(values[1].data);
-                setTop10Approved(values[2].data);
-                setCaseStatistics(values[3].data);
+                setSummary(values[0].data);
+                setAreaStatus(values[1].data);
+                setTop10Criteria(values[2].data);
+                setTop10Approved(values[3].data);
+                setCaseStatistics(values[4].data);
                 setLoading(false);
             })
             .catch((reason) => {

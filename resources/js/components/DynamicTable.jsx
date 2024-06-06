@@ -624,6 +624,7 @@ export default function DynamicTable({
                                             <input
                                                 type="checkbox"
                                                 className="form-check-input"
+                                                name="select-box"
                                                 defaultChecked={item.id in selectedItems ? selectedItems[item.id] : false}
                                                 onChange={(ev) => handleSelect(item.id, ev.target.checked)}
                                             />
