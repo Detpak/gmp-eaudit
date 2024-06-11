@@ -12,7 +12,7 @@ import httpRequest from "../api";
 import { useMemo } from "react";
 import { Base64 } from "js-base64";
 import writeXlsxFile from "write-excel-file";
-import { useStatus, waitForMs } from "../utils";
+import { useIsMounted, useStatus, waitForMs } from "../utils";
 
 const FILTER_OP_EQ = 0;
 const FILTER_OP_NE = 1;
@@ -104,7 +104,7 @@ export function ExportTable({ className, fetch, searchKeyword, filter, columns, 
     const exportTable = async () => {
         exportStatus.setProcessing(true);
 
-        const params = { };
+        const params = {};
 
         if (mode == 'current') {
             params.max = numEntries;
@@ -312,7 +312,7 @@ export default function DynamicTable({
     const [sort, setSort] = filter ? filter.sort : useState(null);
     const [entries, setEntries] = filter ? filter.entries : useState(20);
     const [currentPage, setCurrentPage] = filter ? filter.page : useState(1);
-    const mounted = useRef(false);
+    const mounted = useIsMounted();
 
     const fetchData = async (filtering) => {
         setError(false);
@@ -350,24 +350,25 @@ export default function DynamicTable({
             }
         }
 
-        try {
-            const response = await httpRequest.get(source.url, { params: params });
-
-            if (response.data.data) {
-                if (response.data.last_page < currentPage) {
-                    setCurrentPage(response.data.last_page);
+        httpRequest.get(source.url, { params: params })
+            .then((response) => {
+                if (mounted.current) {
+                    if (response.data.data) {
+                        if (response.data.last_page < currentPage) {
+                            setCurrentPage(response.data.last_page);
+                        }
+                        setNumPages(response.data.last_page);
+                        setListData(response.data.data);
+                    }
+                    setLoading(false);
                 }
+            })
+            .catch((reason) => {
+                console.log(ex);
+                setError(true);
+                setLoading(false);
+            });
 
-                setNumPages(response.data.last_page);
-                setListData(response.data.data);
-            }
-        }
-        catch (ex) {
-            console.log(ex);
-            setError(true);
-        }
-
-        setLoading(false);
     };
 
     const handleDeleteClick = async (itemId) => {
@@ -406,7 +407,7 @@ export default function DynamicTable({
                 return;
             }
 
-            setSort({ column: column, dir: dir  });
+            setSort({ column: column, dir: dir });
         }
         else {
             setSort({ column: column, dir: 1 });
@@ -452,8 +453,7 @@ export default function DynamicTable({
 
                         if (column[key].type == 'number' ||
                             column[key].type == 'date' ||
-                            column[key].type == 'date_time')
-                        {
+                            column[key].type == 'date_time') {
                             defaultVal.value1 = '';
                             defaultVal.op = FILTER_OP_EQ;
                         }
@@ -473,11 +473,6 @@ export default function DynamicTable({
     }
 
     useEffect(async () => {
-        // if (!mounted.current) {
-        //     mounted.current = true;
-        //     return;
-        // }
-
         if (search != searchKeyword) {
             setSearch(searchKeyword);
 
@@ -487,14 +482,12 @@ export default function DynamicTable({
             }, 500);
 
             return () => {
-                mounted.current = false;
                 clearTimeout(timeout)
             };
         }
 
         fetchData(filterParams);
-
-        //return () => { mounted.current = false; };
+        return () => { };
     }, [refreshTrigger, searchKeyword, sort, entries, currentPage]);
 
     return (
@@ -503,7 +496,7 @@ export default function DynamicTable({
                 {isLoading && !error &&
                     <div className="d-flex flex-column position-absolute w-100 h-100 bg-white bg-opacity-50 text-center justify-content-center" style={{ zIndex: 2 }}>
                         <div>
-                            <Spinner animation="border"/>
+                            <Spinner animation="border" />
                         </div>
                         <h5>Please Wait</h5>
                     </div>
@@ -536,7 +529,7 @@ export default function DynamicTable({
                                     return (
                                         <th key={index} className={thClassName} style={{ zIndex: 1 }}>
                                             <div className={`px-3 py-2`}>
-                                                <div className="hstack gap-3" style={{ minWidth: isBetween && isDateOrDateTime ? 210 : (isBetween && isNumber ? 130 : 100 ) }}>
+                                                <div className="hstack gap-3" style={{ minWidth: isBetween && isDateOrDateTime ? 210 : (isBetween && isNumber ? 130 : 100) }}>
                                                     <div className="user-select-none flex-fill">{column.name}</div>
                                                     {sortable &&
                                                         <FontAwesomeIcon
@@ -641,7 +634,7 @@ export default function DynamicTable({
                                                 onClick={() => actionColumn.onEditClick(item.id)}
                                                 disabled={actionColumn.allowEditIf && actionColumn.allowEditIf(item)}
                                             >
-                                                <FontAwesomeIcon icon={faPenToSquare}/>
+                                                <FontAwesomeIcon icon={faPenToSquare} />
                                             </Button>
                                             <LoadingButton
                                                 variant="danger"
@@ -655,14 +648,14 @@ export default function DynamicTable({
                                     }
                                 </tr>
                             ))
-                        }
+                            }
                         </tbody>
                     </Table>
                     {
                         !isLoading && listData.length == 0 &&
-                            <div className="text-center p-4">
-                                No records available.
-                            </div>
+                        <div className="text-center p-4">
+                            No records available.
+                        </div>
                     }
                     {error && <div className="text-center p-4">Failed to retrieve data.</div>}
                 </div>
