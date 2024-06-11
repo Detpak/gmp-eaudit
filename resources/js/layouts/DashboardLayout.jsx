@@ -60,6 +60,9 @@ const barOptions = {
     plugins: {
         legend: {
             display: false
+        },
+        datalabels: {
+            display: false
         }
     }
 };
@@ -96,7 +99,7 @@ export default function DashboardLayout() {
     const [summary, setSummary] = useState({});
     const [refreshTrigger, setRefreshTrigger] = useState(false);
     const [tableRefresh, setTableRefresh] = useState(false);
-    const [areaStatus, setAreaStatus] = useState(null);
+    const [caseStatus, setCaseStatus] = useState(null);
     const [top10criteria, setTop10Criteria] = useState(null);
     const [top10Approved, setTop10Approved] = useState(null);
     const [caseStatistics, setCaseStatistics] = useState(null);
@@ -143,7 +146,7 @@ export default function DashboardLayout() {
             .then((values) => {
                 if (!mounted.current) return;
                 setSummary(values[0].data);
-                setAreaStatus(values[1].data);
+                setCaseStatus(values[1].data);
                 setTop10Criteria(values[2].data);
                 setTop10Approved(values[3].data);
                 setCaseStatistics(values[4].data);
@@ -217,18 +220,18 @@ export default function DashboardLayout() {
                         </Col>
                     </Row>
                     <Row>
-                        <ChartColumn cycle={cycle} isLoading={isLoading} caption="Area Status">
-                            {areaStatus != null &&
-                                <Pie
+                        <ChartColumn cycle={cycle} isLoading={isLoading} caption="Case Status">
+                            {caseStatus != null &&
+                                <Bar
                                     style={{ minHeight: 250, maxHeight: 250 }}
                                     data={{
                                         labels: ['Not Started', 'In-Progress', 'Done'],
                                         datasets: [
                                             {
                                                 data: [
-                                                    areaStatus.not_started,
-                                                    areaStatus.in_progress,
-                                                    areaStatus.done,
+                                                    Math.round(100.0 * caseStatus.not_started),
+                                                    Math.round(100.0 * caseStatus.in_progress),
+                                                    Math.round(100.0 * caseStatus.done),
                                                 ],
                                                 backgroundColor: [
                                                     'rgba(255, 99, 132, 0.2)',
@@ -245,11 +248,26 @@ export default function DashboardLayout() {
                                         ],
                                     }}
                                     options={{
+                                        indexAxis: 'y',
                                         responsive: true,
                                         maintainAspectRatio: true,
                                         plugins: {
                                             legend: {
-                                                position: 'right'
+                                                display: false,
+                                            },
+                                            datalabels: {
+                                                anchor: 'center',
+                                                align: 'end',
+                                                clamp: true,
+                                                clip: true,
+                                                formatter: value => `${value}%`
+                                            },
+                                            tooltip: {
+                                                callbacks: {
+                                                    label: context => {
+                                                        return context.parsed.x + "%";
+                                                    }
+                                                }
                                             }
                                         }
                                     }}

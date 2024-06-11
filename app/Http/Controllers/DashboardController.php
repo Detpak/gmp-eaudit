@@ -56,10 +56,15 @@ class DashboardController extends Controller
                     ->get();
 
             case 'area_status':
+                $total = AuditRecord::where('cycle_id', $request->cycle_id)->count();
+                $totalSubmission = AuditFinding::join('audit_records', 'audit_records.id', '=', 'audit_findings.record_id')
+                    ->where('audit_records.cycle_id', $request->cycle_id)
+                    ->count();
                 return [
-                    'not_started' => AuditRecord::where('cycle_id', $request->cycle_id)->where('status', 0)->count(),
-                    'in_progress' => AuditRecord::where('cycle_id', $request->cycle_id)->where('status', 1)->count(),
-                    'done' => AuditRecord::where('cycle_id', $request->cycle_id)->where('status', 2)->count(),
+                    'not_started' => AuditRecord::where('cycle_id', $request->cycle_id)->where('status', 0)->count() / $total,
+                    'in_progress' => AuditRecord::where('cycle_id', $request->cycle_id)->where('status', 1)->count() / $total,
+                    'done' => AuditRecord::where('cycle_id', $request->cycle_id)->where('status', 2)->count() / $total,
+                    'total_submission' => $totalSubmission,
                 ];
 
             case 'top10_criteria':

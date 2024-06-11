@@ -6,8 +6,11 @@ import $ from 'jquery';
 import httpRequest from './api';
 import 'chart.js/auto';
 import App from './layouts/Main';
+import {Chart} from 'chart.js';
+import ChartDataLabels from 'chartjs-plugin-datalabels';
 
 $(function() {
+    Chart.register(ChartDataLabels);
     axios.defaults.headers.common["X-Requested-With"] ="XMLHttpRequest";
     axios.defaults.headers.common["X-CSRF-TOKEN"] = document.querySelector("meta[name='csrf-token']").content;
 
