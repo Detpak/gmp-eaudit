@@ -99,7 +99,7 @@ export default function DashboardLayout() {
     const [summary, setSummary] = useState({});
     const [refreshTrigger, setRefreshTrigger] = useState(false);
     const [tableRefresh, setTableRefresh] = useState(false);
-    const [caseStatus, setCaseStatus] = useState(null);
+    const [areaStatus, setAreaStatus] = useState(null);
     const [top10criteria, setTop10Criteria] = useState(null);
     const [top10Approved, setTop10Approved] = useState(null);
     const [caseStatistics, setCaseStatistics] = useState(null);
@@ -146,7 +146,7 @@ export default function DashboardLayout() {
             .then((values) => {
                 if (!mounted.current) return;
                 setSummary(values[0].data);
-                setCaseStatus(values[1].data);
+                setAreaStatus(values[1].data);
                 setTop10Criteria(values[2].data);
                 setTop10Approved(values[3].data);
                 setCaseStatistics(values[4].data);
@@ -220,8 +220,8 @@ export default function DashboardLayout() {
                         </Col>
                     </Row>
                     <Row>
-                        <ChartColumn cycle={cycle} isLoading={isLoading} caption="Case Status">
-                            {caseStatus != null &&
+                        <ChartColumn cycle={cycle} isLoading={isLoading} caption="Area Status">
+                            {areaStatus != null &&
                                 <Bar
                                     style={{ minHeight: 250, maxHeight: 250 }}
                                     data={{
@@ -229,9 +229,9 @@ export default function DashboardLayout() {
                                         datasets: [
                                             {
                                                 data: [
-                                                    Math.round(100.0 * caseStatus.not_started),
-                                                    Math.round(100.0 * caseStatus.in_progress),
-                                                    Math.round(100.0 * caseStatus.done),
+                                                    Math.round(100.0 * areaStatus.not_started),
+                                                    Math.round(100.0 * areaStatus.in_progress),
+                                                    Math.round(100.0 * areaStatus.done),
                                                 ],
                                                 backgroundColor: [
                                                     'rgba(255, 99, 132, 0.2)',
