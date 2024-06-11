@@ -300,9 +300,11 @@ class CorrectiveActionController extends Controller
         if ($ca->finding->status == 3) {
             return [
                 'result' => 'error',
-                'msg' => 'Unable to close the corrective action. Corrective Action has been closed by auditor.'
+                'msg' => 'Unable to close the corrective action. Corrective Action has been closed by other auditor.'
             ];
         }
+
+        $record = $ca->finding->record;
 
         try {
             $ca->closing_remarks = $request->remarks;
@@ -311,6 +313,9 @@ class CorrectiveActionController extends Controller
 
             $ca->finding->status = 3;
             $ca->finding->save();
+
+            $record->status = 2;
+            $record->save();
         } catch (\Throwable $th) {
             return [
                 'result' => 'error',
@@ -318,7 +323,6 @@ class CorrectiveActionController extends Controller
             ];
         }
 
-        $record = $ca->finding->record;
         $auditor = $record->auditor;
         $auditees = $record->area->department->pics;
         $mailto = $auditees->map(function ($users) {
