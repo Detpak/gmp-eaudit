@@ -23,17 +23,20 @@ class DashboardController extends Controller
 
     public function apiGetSummary(Request $request)
     {
-        $cycle = AuditCycle::find($request->cycle_id);
-        $finding = AuditFinding::join('audit_records', 'audit_records.id', '=', 'audit_findings.record_id')
-            ->where('audit_records.cycle_id', $cycle->id);
+        $cycle = $request->cycle_id ? AuditCycle::find($request->cycle_id) : null;
+        $finding = AuditFinding::join('audit_records', 'audit_records.id', '=', 'audit_findings.record_id');
+        $ca = CorrectiveAction::join('audit_findings', 'audit_findings.id', '=', 'corrective_actions.finding_id')
+            ->join('audit_records', 'audit_records.id', '=', 'audit_findings.record_id');
+
+        if ($cycle) {
+            $finding->where('audit_records.cycle_id', $cycle->id);
+            $ca->where('audit_records.cycle_id', $cycle->id);
+        }
 
         return [
             'cycles' => AuditCycle::count(),
             'case_submitted' => $finding->count(),
-            'corrective_actions' => CorrectiveAction::join('audit_findings', 'audit_findings.id', '=', 'corrective_actions.finding_id')
-                ->join('audit_records', 'audit_records.id', '=', 'audit_findings.record_id')
-                ->where('audit_records.cycle_id', $cycle->id)
-                ->count(),
+            'corrective_actions' => $ca->count(),
             'approved_ca' => $finding->where('audit_findings.status', '3')->count(),
             'current_cycle' => $cycle
         ];
@@ -41,6 +44,10 @@ class DashboardController extends Controller
 
     public function apiGetChart(Request $request)
     {
+        $cycleId = isset($request->cycle_id) ? $request->cycle_id : null;
+        $cycleIdClause = function ($query, $cycleId) {
+            $query->where('cycle_id', $cycleId);
+        };
         switch ($request->type) {
             case 'top10_approved':
                 return CorrectiveAction::join('audit_findings', 'audit_findings.id', '=', 'corrective_actions.finding_id')
@@ -49,29 +56,31 @@ class DashboardController extends Controller
                         DB::raw('any_value(audit_findings.ca_name) as name'),
                         DB::raw('count(audit_findings.ca_code) as count')
                     )
-                    ->where('audit_records.cycle_id', $request->cycle_id)
+                    ->when($cycleId, $cycleIdClause)
                     ->groupBy('audit_findings.ca_code')
                     ->orderBy('count', 'desc')
                     ->limit(10)
                     ->get();
 
             case 'area_status':
-                $total = AuditRecord::where('cycle_id', $request->cycle_id)->count();
+                $total = AuditRecord::query()->when($cycleId, $cycleIdClause)->count();
                 $totalSubmission = AuditFinding::join('audit_records', 'audit_records.id', '=', 'audit_findings.record_id')
-                    ->where('audit_records.cycle_id', $request->cycle_id)
+                    ->when($cycleId, $cycleIdClause)
                     ->count();
                 return [
-                    'not_started' => AuditRecord::where('cycle_id', $request->cycle_id)->where('status', 0)->count() / $total,
-                    'in_progress' => AuditRecord::where('cycle_id', $request->cycle_id)->where('status', 1)->count() / $total,
-                    'done' => AuditRecord::where('cycle_id', $request->cycle_id)->where('status', 2)->count() / $total,
+                    'not_started' => AuditRecord::when($cycleId, $cycleIdClause)->where('status', 0)->count() / $total,
+                    'in_progress' => AuditRecord::when($cycleId, $cycleIdClause)->where('status', 1)->count() / $total,
+                    'done' => AuditRecord::when($cycleId, $cycleIdClause)->where('status', 2)->count() / $total,
                     'total_submission' => $totalSubmission,
                 ];
 
             case 'top10_criteria':
-                //return $cycle;
                 return AuditFinding::join('audit_records', 'audit_findings.record_id', '=', 'audit_records.id')
-                    ->select(DB::raw('any_value(audit_findings.ca_name) as name'), DB::raw('count(audit_findings.ca_code) as count'))
-                    ->where('audit_records.cycle_id', $request->cycle_id)
+                    ->select(
+                        DB::raw('any_value(audit_findings.ca_name) as name'),
+                        DB::raw('count(audit_findings.ca_code) as count')
+                    )
+                    ->when($cycleId, $cycleIdClause)
                     ->groupBy('audit_findings.ca_code')
                     ->orderBy('count', 'desc')
                     ->limit(10)
@@ -84,7 +93,7 @@ class DashboardController extends Controller
                         DB::raw('SUM(CASE WHEN audit_findings.category = 1 THEN 1 ELSE 0 END) as minor_nc'),
                         DB::raw('SUM(CASE WHEN audit_findings.category = 2 THEN 1 ELSE 0 END) as major_nc')
                     )
-                    ->where('audit_records.cycle_id', $request->cycle_id)
+                    ->when($cycleId, $cycleIdClause)
                     ->first();
 
             case 'case_found_per_cycle':

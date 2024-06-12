@@ -128,7 +128,7 @@ export default function DropdownList({
     }, [show, search]);
 
     return (
-        <Dropdown show={show} onSelect={handleSelect} onToggle={(nextShow) => handleShow(nextShow)}>
+        <Dropdown className={className} show={show} onSelect={handleSelect} onToggle={(nextShow) => handleShow(nextShow)}>
             <div className="d-grid gap-2">
                 <Dropdown.Toggle className="text-truncate" disabled={disabled}>
                     {selectedItem ? caption(selectedItem) : title}

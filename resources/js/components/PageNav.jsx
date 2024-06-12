@@ -10,7 +10,7 @@ export function PageNavbar({ className, children }) {
 
     return (
         <Navbar bg="light" className={`p-3 ${className}`}>
-            <Nav variant="pills" className="nav me-auto" navbar={false}>
+            <Nav variant="pills" className="nav me-auto align-items-center" navbar={false}>
                 {children}
             </Nav>
             <NavDropdown

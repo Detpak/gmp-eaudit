@@ -1,7 +1,7 @@
 import { faCheckToSlot, faListCheck, faRecycle, faRotateRight, faThumbsUp } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useState, useEffect } from "react";
-import { Button, Card, Col, Container, Row, Spinner } from "react-bootstrap";
+import { Button, Card, Col, Container, Form, Row, Spinner } from "react-bootstrap";
 import httpRequest from "../api";
 import { PageContent, PageContentView, PageNavbar } from "../components/PageNav";
 import { Pie, Bar, Line } from "react-chartjs-2"
@@ -105,6 +105,7 @@ export default function DashboardLayout() {
     const [caseStatistics, setCaseStatistics] = useState(null);
     const [findings, setFindings] = useState(null);
     const [cycle, setCycle] = useState(null);
+    const [allCycle, setAllCycle] = useState(false);
     const [isLoading, setLoading] = useState(false);
     const abortController = useRef(null);
     const mounted = useIsMounted();
@@ -136,12 +137,14 @@ export default function DashboardLayout() {
         setTableRefresh(!tableRefresh);
         setSummary({});
 
+        const cycle_id = allCycle ? null : cycle.id;
+
         Promise.all([
-            httpRequest.get('api/v1/get-summary', { params: { cycle_id: cycle.id }, signal: abortController.current.signal }),
-            httpRequest.post('api/v1/get-chart', { type: 'area_status', cycle_id: cycle.id, signal: abortController.current.signal }),
-            httpRequest.post('api/v1/get-chart', { type: 'top10_criteria', cycle_id: cycle.id, signal: abortController.current.signal }),
-            httpRequest.post('api/v1/get-chart', { type: 'top10_approved', cycle_id: cycle.id, signal: abortController.current.signal }),
-            httpRequest.post('api/v1/get-chart', { type: 'case_statistics', cycle_id: cycle.id, signal: abortController.current.signal }),
+            httpRequest.get('api/v1/get-summary', { params: { cycle_id: cycle_id }, signal: abortController.current.signal }),
+            httpRequest.post('api/v1/get-chart', { type: 'area_status', cycle_id: cycle_id, signal: abortController.current.signal }),
+            httpRequest.post('api/v1/get-chart', { type: 'top10_criteria', cycle_id: cycle_id, signal: abortController.current.signal }),
+            httpRequest.post('api/v1/get-chart', { type: 'top10_approved', cycle_id: cycle_id, signal: abortController.current.signal }),
+            httpRequest.post('api/v1/get-chart', { type: 'case_statistics', cycle_id: cycle_id, signal: abortController.current.signal }),
         ])
             .then((values) => {
                 if (!mounted.current) return;
@@ -162,25 +165,34 @@ export default function DashboardLayout() {
                 abortController.current = null;
             }
         };
-    }, [refreshTrigger, cycle]);
+    }, [refreshTrigger, cycle, allCycle]);
 
     return (
         <>
             <PageNavbar>
                 <Button onClick={refresh} className="me-2"><FontAwesomeIcon icon={faRotateRight} /></Button>
                 <DropdownList
+                    className="me-2"
                     source="api/v1/fetch-cycles"
                     selectedItem={cycle}
                     setSelectedItem={setCycle}
                     caption={(data) => <>Cycle: {data.cycle_id}</>}
                     selectFirstData={true}
-                    disabled={cycle == null}
+                    disabled={cycle == null || allCycle}
                     title="No Cycle Started"
                 >
                     {({ data }) => (
                         <span>{data.cycle_id}</span>
                     )}
                 </DropdownList>
+                <Form.Group>
+                    <Form.Check
+                        type="checkbox"
+                        label="All Cycles"
+                        defaultChecked={allCycle}
+                        onChange={(ev) => setAllCycle(!allCycle)}
+                    />
+                </Form.Group>
             </PageNavbar>
 
             <PageContent>
